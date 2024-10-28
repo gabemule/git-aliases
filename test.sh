@@ -3,56 +3,79 @@
 # Colors for output
 GREEN='\033[0;32m'
 BLUE='\033[0;34m'
+YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
-echo -e "${BLUE}=== Git Workflow Test Script ===${NC}"
-echo "This script will guide you through testing all commands."
-echo "Follow the instructions and verify the results."
+# Function to pause and wait for user
+pause() {
+    echo -e "\n${YELLOW}Press Enter to continue...${NC}"
+    read
+}
 
-echo -e "\n${BLUE}1. Testing start-branch.sh${NC}"
-echo "Run the following command:"
-echo "$ ./start-branch.sh -t TEST-123"
-echo "When prompted:"
-echo "1. Select: feature"
-echo "2. Enter name: test-feature"
-echo "Expected result: New branch 'feature/test-feature' created"
-echo "Verify with: git branch"
+# Clear screen and show header
+clear
+echo -e "${BLUE}=== Git Workflow Test ===${NC}"
+echo -e "This script will run all commands in sequence.\n"
 
-echo -e "\n${BLUE}2. Testing conventional-commit.sh${NC}"
-echo "First, create a test file:"
-echo "$ echo 'test content' > test.txt"
-echo "$ git add test.txt"
-echo "Then commit:"
-echo "$ ./conventional-commit.sh"
-echo "When prompted:"
-echo "1. Select: feat"
-echo "2. Enter scope (optional): test"
-echo "3. Description: add test file"
-echo "4. Body: this is a test commit"
-echo "5. Breaking change: N"
-echo "6. Push changes: Y"
-echo "Expected result: Commit created with [TEST-123] reference"
-echo "Verify with: git log -1"
+# Step 1: Create branch
+echo -e "${BLUE}Step 1: Creating feature branch${NC}"
+echo "You will be prompted to:"
+echo "1. Select 'feature' using arrow keys"
+echo "2. Enter 'test-feature' as the name"
+pause
+./start-branch.sh -t TEST-123
 
-echo -e "\n${BLUE}3. Testing open-pr.sh${NC}"
-echo "Run the following command:"
-echo "$ ./open-pr.sh"
-echo "When prompted:"
-echo "1. Select target: development"
-echo "2. Enter title: Test PR"
-echo "3. Enter description: Testing PR creation"
-echo "Expected result: PR created with [TEST-123] in title"
-echo "Verify in GitHub UI"
+# Verify branch creation
+echo -e "\n${YELLOW}Verifying branch creation:${NC}"
+git branch
+pause
 
-echo -e "\n${BLUE}4. Cleanup${NC}"
-echo "After testing, clean up with:"
-echo "$ git checkout production"
-echo "$ git branch -D feature/test-feature"
+# Step 2: Create and commit file
+echo -e "\n${BLUE}Step 2: Creating test file and committing${NC}"
+echo "You will be prompted to:"
+echo "1. Select 'feat' type"
+echo "2. Enter 'test' as scope"
+echo "3. Enter 'add test file' as description"
+echo "4. Enter 'this is a test commit' as body"
+echo "5. Select 'N' for breaking change"
+echo "6. Select 'Y' to push changes"
+pause
+echo "test content" > test.txt
+git add test.txt
+./conventional-commit.sh
 
-echo -e "\n${GREEN}Would you like to start the tests? (Y/n)${NC}"
-read -p "> " start
+# Verify commit
+echo -e "\n${YELLOW}Verifying commit:${NC}"
+git log -1
+pause
 
-if [[ $start =~ ^[Yy]?$ ]]; then
-    echo -e "\n${BLUE}Starting with start-branch.sh...${NC}"
-    echo "Run: ./start-branch.sh -t TEST-123"
+# Step 3: Create PR
+echo -e "\n${BLUE}Step 3: Creating Pull Request${NC}"
+echo "You will be prompted to:"
+echo "1. Select 'development' as target"
+echo "2. Enter 'Test PR' as title"
+echo "3. Enter 'Testing PR creation' as description"
+pause
+./open-pr.sh
+
+# Verify PR
+echo -e "\n${YELLOW}Verifying PR:${NC}"
+gh pr list
+pause
+
+# Step 4: Run verification
+echo -e "\n${BLUE}Step 4: Running verification${NC}"
+pause
+./verify.sh
+
+# Cleanup
+echo -e "\n${BLUE}Step 5: Cleanup${NC}"
+echo -e "Would you like to clean up (delete test branch)? (Y/n)"
+read -n 1 cleanup
+echo
+if [[ $cleanup =~ ^[Yy]?$ ]]; then
+    git checkout production
+    git branch -D feature/test-feature
 fi
+
+echo -e "\n${GREEN}Test sequence complete!${NC}"
