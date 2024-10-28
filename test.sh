@@ -4,6 +4,7 @@
 GREEN='\033[0;32m'
 BLUE='\033[0;34m'
 YELLOW='\033[1;33m'
+RED='\033[0;31m'
 NC='\033[0m' # No Color
 
 # Function to pause and wait for user
@@ -11,6 +12,20 @@ pause() {
     echo -e "\n${YELLOW}Press Enter to continue...${NC}"
     read
 }
+
+# Function to handle errors
+handle_error() {
+    echo -e "\n${RED}Error: $1${NC}"
+    echo "Would you like to continue? (Y/n)"
+    read -n 1 continue_test
+    if [[ ! $continue_test =~ ^[Yy]?$ ]]; then
+        exit 1
+    fi
+    echo
+}
+
+# Ensure verify.sh is executable
+chmod +x verify.sh 2>/dev/null
 
 # Clear screen and show header
 clear
@@ -23,7 +38,7 @@ echo "You will be prompted to:"
 echo "1. Select 'feature' using arrow keys"
 echo "2. Enter 'test-feature' as the name"
 pause
-./start-branch.sh -t TEST-123
+./start-branch.sh -t TEST-123 || handle_error "Failed to create branch"
 
 # Verify branch creation
 echo -e "\n${YELLOW}Verifying branch creation:${NC}"
@@ -42,7 +57,14 @@ echo "6. Select 'Y' to push changes"
 pause
 echo "test content" > test.txt
 git add test.txt
-./conventional-commit.sh
+./conventional-commit.sh || handle_error "Failed to create commit"
+
+# Handle push failure
+if [ $? -ne 0 ]; then
+    echo -e "${YELLOW}Push failed. Pulling latest changes...${NC}"
+    git pull origin feature/test-feature || handle_error "Failed to pull changes"
+    git push origin feature/test-feature || handle_error "Failed to push changes"
+fi
 
 # Verify commit
 echo -e "\n${YELLOW}Verifying commit:${NC}"
@@ -56,7 +78,7 @@ echo "1. Select 'development' as target"
 echo "2. Enter 'Test PR' as title"
 echo "3. Enter 'Testing PR creation' as description"
 pause
-./open-pr.sh
+./open-pr.sh || handle_error "Failed to create PR"
 
 # Verify PR
 echo -e "\n${YELLOW}Verifying PR:${NC}"
@@ -66,7 +88,7 @@ pause
 # Step 4: Run verification
 echo -e "\n${BLUE}Step 4: Running verification${NC}"
 pause
-./verify.sh
+./verify.sh || handle_error "Verification failed"
 
 # Cleanup
 echo -e "\n${BLUE}Step 5: Cleanup${NC}"
