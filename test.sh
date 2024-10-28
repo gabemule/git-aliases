@@ -53,6 +53,24 @@ cleanup_branch() {
     git push origin --delete $branch 2>/dev/null
 }
 
+# Function to handle uncommitted changes
+handle_uncommitted() {
+    if [[ -n $(git status -s) ]]; then
+        echo -e "${YELLOW}Stashing uncommitted changes...${NC}"
+        git stash save "Temporary stash for testing $(date '+%Y-%m-%d %H:%M:%S')"
+        return 0
+    fi
+    return 1
+}
+
+# Function to restore uncommitted changes
+restore_uncommitted() {
+    if [ $1 -eq 0 ]; then
+        echo -e "${YELLOW}Restoring uncommitted changes...${NC}"
+        git stash pop
+    fi
+}
+
 # Ensure verify.sh is executable
 chmod +x verify.sh 2>/dev/null
 
@@ -60,6 +78,11 @@ chmod +x verify.sh 2>/dev/null
 clear
 echo -e "${BLUE}=== Git Workflow Test ===${NC}"
 echo -e "This script will run all commands in sequence.\n"
+
+# Handle any uncommitted changes
+had_changes=1
+handle_uncommitted
+had_changes=$?
 
 # Ensure development branch exists
 echo -e "${BLUE}Checking required branches...${NC}"
@@ -114,7 +137,11 @@ echo "1. Select 'development' as target"
 echo "2. Enter 'Test PR' as title"
 echo "3. Enter 'Testing PR creation' as description"
 pause
+
+# Stash any changes before PR creation
+handle_uncommitted
 ./open-pr.sh || handle_error "Failed to create PR"
+restore_uncommitted $?
 
 # Verify PR
 echo -e "\n${YELLOW}Verifying PR:${NC}"
@@ -134,5 +161,8 @@ echo
 if [[ $cleanup =~ ^[Yy]?$ ]]; then
     cleanup_branch "feature/test-feature"
 fi
+
+# Restore any stashed changes
+restore_uncommitted $had_changes
 
 echo -e "\n${GREEN}Test sequence complete!${NC}"
