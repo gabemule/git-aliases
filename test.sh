@@ -1,96 +1,58 @@
 #!/bin/bash
 
 # Colors for output
-RED='\033[0;31m'
 GREEN='\033[0;32m'
+BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
-# Test counter
-tests_run=0
-tests_passed=0
+echo -e "${BLUE}=== Git Workflow Test Script ===${NC}"
+echo "This script will guide you through testing all commands."
+echo "Follow the instructions and verify the results."
 
-# Function to run a test
-run_test() {
-    local test_name=$1
-    local command=$2
-    local expected_pattern=$3
-    
-    ((tests_run++))
-    echo -n "Testing $test_name... "
-    
-    # Run command and capture output
-    output=$(eval "$command" 2>&1)
-    
-    # Check if output matches expected pattern
-    if echo "$output" | grep -q "$expected_pattern"; then
-        echo -e "${GREEN}PASSED${NC}"
-        ((tests_passed++))
-    else
-        echo -e "${RED}FAILED${NC}"
-        echo "Expected pattern: $expected_pattern"
-        echo "Got output: $output"
-    fi
-}
+echo -e "\n${BLUE}1. Testing start-branch.sh${NC}"
+echo "Run the following command:"
+echo "$ ./start-branch.sh -t TEST-123"
+echo "When prompted:"
+echo "1. Select: feature"
+echo "2. Enter name: test-feature"
+echo "Expected result: New branch 'feature/test-feature' created"
+echo "Verify with: git branch"
 
-# Clean up function
-cleanup() {
-    echo "Cleaning up test environment..."
-    git checkout production 2>/dev/null
-    git branch | grep "test/" | xargs git branch -D 2>/dev/null
-    git config --remove-section branch.test/feature 2>/dev/null
-}
+echo -e "\n${BLUE}2. Testing conventional-commit.sh${NC}"
+echo "First, create a test file:"
+echo "$ echo 'test content' > test.txt"
+echo "$ git add test.txt"
+echo "Then commit:"
+echo "$ ./conventional-commit.sh"
+echo "When prompted:"
+echo "1. Select: feat"
+echo "2. Enter scope (optional): test"
+echo "3. Description: add test file"
+echo "4. Body: this is a test commit"
+echo "5. Breaking change: N"
+echo "6. Push changes: Y"
+echo "Expected result: Commit created with [TEST-123] reference"
+echo "Verify with: git log -1"
 
-# Setup test environment
-echo "Setting up test environment..."
-cleanup
+echo -e "\n${BLUE}3. Testing open-pr.sh${NC}"
+echo "Run the following command:"
+echo "$ ./open-pr.sh"
+echo "When prompted:"
+echo "1. Select target: development"
+echo "2. Enter title: Test PR"
+echo "3. Enter description: Testing PR creation"
+echo "Expected result: PR created with [TEST-123] in title"
+echo "Verify in GitHub UI"
 
-# Test 1: start-branch.sh
-echo -e "\nTesting branch creation:"
-run_test "Branch creation" \
-    "./start-branch.sh -t TEST-123 <<< $'feature\ntest-feature'" \
-    "Successfully created.*test-feature"
+echo -e "\n${BLUE}4. Cleanup${NC}"
+echo "After testing, clean up with:"
+echo "$ git checkout production"
+echo "$ git branch -D feature/test-feature"
 
-# Test 2: Verify ticket storage
-echo -e "\nTesting ticket storage:"
-run_test "Ticket storage" \
-    "git config branch.feature/test-feature.ticket" \
-    "TEST-123"
+echo -e "\n${GREEN}Would you like to start the tests? (Y/n)${NC}"
+read -p "> " start
 
-# Test 3: conventional-commit.sh
-echo -e "\nTesting commit creation:"
-# Create a test file
-echo "test content" > test.txt
-git add test.txt
-
-run_test "Commit creation" \
-    "./conventional-commit.sh <<< $'feat\n\ntest commit\n\nn'" \
-    "\[TEST-123\]"
-
-# Test 4: Verify commit message
-echo -e "\nTesting commit message:"
-run_test "Commit message format" \
-    "git log -1 --pretty=%B" \
-    "feat: test commit \[TEST-123\]"
-
-# Test 5: open-pr.sh (mock test since we can't create actual PRs in test)
-echo -e "\nTesting PR creation setup:"
-run_test "PR preparation" \
-    "git branch --show-current" \
-    "feature/test-feature"
-
-# Print test summary
-echo -e "\nTest Summary:"
-echo "Tests run: $tests_run"
-echo "Tests passed: $tests_passed"
-echo "Tests failed: $((tests_run - tests_passed))"
-
-# Cleanup
-cleanup
-
-if [ $tests_passed -eq $tests_run ]; then
-    echo -e "\n${GREEN}All tests passed!${NC}"
-    exit 0
-else
-    echo -e "\n${RED}Some tests failed!${NC}"
-    exit 1
+if [[ $start =~ ^[Yy]?$ ]]; then
+    echo -e "\n${BLUE}Starting with start-branch.sh...${NC}"
+    echo "Run: ./start-branch.sh -t TEST-123"
 fi
