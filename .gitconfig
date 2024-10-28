@@ -1,0 +1,5 @@
+[alias]
+    cc = !bash "$(dirname "$(git config --get include.path)")/conventional-commit.sh"
+    start-branch = !bash "$(dirname "$(git config --get include.path)")/start-branch.sh"
+    open-pr = !bash "$(dirname "$(git config --get include.path)")/open-pr.sh"
+    # Add more aliases here as needed
