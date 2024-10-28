@@ -24,6 +24,35 @@ handle_error() {
     echo
 }
 
+# Function to handle push with pull
+handle_push() {
+    local branch=$1
+    if ! git push origin $branch; then
+        echo -e "${YELLOW}Push failed. Attempting to sync with remote...${NC}"
+        git pull origin $branch --rebase || handle_error "Failed to pull changes"
+        git push origin $branch || handle_error "Failed to push changes"
+    fi
+}
+
+# Function to ensure branch exists
+ensure_branch() {
+    local branch=$1
+    if ! git rev-parse --verify $branch >/dev/null 2>&1; then
+        echo -e "${YELLOW}Creating $branch branch...${NC}"
+        git checkout -b $branch || handle_error "Failed to create $branch branch"
+        git push origin $branch || handle_error "Failed to push $branch branch"
+    fi
+}
+
+# Function to cleanup branches
+cleanup_branch() {
+    local branch=$1
+    echo -e "${YELLOW}Cleaning up $branch...${NC}"
+    git checkout production
+    git branch -D $branch 2>/dev/null
+    git push origin --delete $branch 2>/dev/null
+}
+
 # Ensure verify.sh is executable
 chmod +x verify.sh 2>/dev/null
 
@@ -32,12 +61,22 @@ clear
 echo -e "${BLUE}=== Git Workflow Test ===${NC}"
 echo -e "This script will run all commands in sequence.\n"
 
+# Ensure development branch exists
+echo -e "${BLUE}Checking required branches...${NC}"
+git checkout production || handle_error "Failed to checkout production"
+ensure_branch "development"
+git checkout production || handle_error "Failed to checkout production"
+
 # Step 1: Create branch
-echo -e "${BLUE}Step 1: Creating feature branch${NC}"
+echo -e "\n${BLUE}Step 1: Creating feature branch${NC}"
 echo "You will be prompted to:"
 echo "1. Select 'feature' using arrow keys"
 echo "2. Enter 'test-feature' as the name"
 pause
+
+# Delete existing branch if it exists
+cleanup_branch "feature/test-feature"
+
 ./start-branch.sh -t TEST-123 || handle_error "Failed to create branch"
 
 # Verify branch creation
@@ -55,16 +94,13 @@ echo "4. Enter 'this is a test commit' as body"
 echo "5. Select 'N' for breaking change"
 echo "6. Select 'Y' to push changes"
 pause
+
 echo "test content" > test.txt
 git add test.txt
 ./conventional-commit.sh || handle_error "Failed to create commit"
 
-# Handle push failure
-if [ $? -ne 0 ]; then
-    echo -e "${YELLOW}Push failed. Pulling latest changes...${NC}"
-    git pull origin feature/test-feature || handle_error "Failed to pull changes"
-    git push origin feature/test-feature || handle_error "Failed to push changes"
-fi
+# Handle push
+handle_push "feature/test-feature"
 
 # Verify commit
 echo -e "\n${YELLOW}Verifying commit:${NC}"
@@ -92,12 +128,11 @@ pause
 
 # Cleanup
 echo -e "\n${BLUE}Step 5: Cleanup${NC}"
-echo -e "Would you like to clean up (delete test branch)? (Y/n)"
+echo -e "Would you like to clean up (delete test branch locally and remotely)? (Y/n)"
 read -n 1 cleanup
 echo
 if [[ $cleanup =~ ^[Yy]?$ ]]; then
-    git checkout production
-    git branch -D feature/test-feature
+    cleanup_branch "feature/test-feature"
 fi
 
 echo -e "\n${GREEN}Test sequence complete!${NC}"
