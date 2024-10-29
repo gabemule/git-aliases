@@ -1,8 +1,5 @@
-[akad]
-    path = $(pwd)/.gitconfig
-
 [alias]
-    cc = !bash "$(dirname "$(git config --get akad.path)")/conventional-commit.sh"
-    start-branch = !bash "$(dirname "$(git config --get akad.path)")/start-branch.sh"
-    open-pr = !bash "$(dirname "$(git config --get akad.path)")/open-pr.sh"
+    cc = !bash "$(dirname "$(git config --get akad.path)")/bin/conventional-commit.sh"
+    start-branch = !bash "$(dirname "$(git config --get akad.path)")/bin/start-branch.sh"
+    open-pr = !bash "$(dirname "$(git config --get akad.path)")/bin/open-pr.sh"
     # Add more aliases here as needed

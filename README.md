@@ -6,16 +6,12 @@ A collection of Git workflow automation scripts designed to streamline developme
 
 1. Clone this repository:
    ```bash
-   git clone https://github.com/your-username/git-aliases.git
+   git clone https://github.com/your-username/git-aliases.git && cd git-aliases
+   # Then run this one-liner:
+   echo -e "[akad]\n    path = $(pwd)/.gitconfig" >> ~/.gitconfig && git config --get akad.path >/dev/null && echo "✓ Git aliases configured successfully" || echo "✗ Configuration failed"
    ```
 
-2. Set up Git aliases (one-liner):
-   ```bash
-   echo -e "[akad]\n    path = $(pwd)/.gitconfig" >> ~/.gitconfig
-   ```
-   This will automatically add the configuration to your global Git config.
-
-3. Ensure you have:
+2. Ensure you have:
    - SSH key configured for GitHub ([Setup Guide](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent))
    - GitHub CLI installed ([Installation Guide](https://cli.github.com/))
    - Authenticated with GitHub CLI:
