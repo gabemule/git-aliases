@@ -11,7 +11,12 @@ A collection of Git workflow automation scripts designed to streamline developme
    echo -e "[akad]\n    path = $(pwd)/.gitconfig" >> ~/.gitconfig && git config --get akad.path >/dev/null && echo "✓ Git aliases configured successfully" || echo "✗ Configuration failed"
    ```
 
-2. Ensure you have:
+2. Verify installation:
+   ```bash
+   ./tests/verify-installation.sh
+   ```
+
+3. Ensure you have:
    - SSH key configured for GitHub ([Setup Guide](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent))
    - GitHub CLI installed ([Installation Guide](https://cli.github.com/))
    - Authenticated with GitHub CLI:
@@ -19,9 +24,27 @@ A collection of Git workflow automation scripts designed to streamline developme
      gh auth login
      ```
 
+## Project Structure
+
+```
+git-aliases/
+├── bin/              # Main executable scripts
+│   ├── conventional-commit.sh
+│   ├── start-branch.sh
+│   └── open-pr.sh
+├── tests/            # Testing scripts
+│   ├── test.sh              # Test runner
+│   ├── verify-installation.sh  # Tests setup/config
+│   └── verify-workflow.sh     # Tests functionality
+├── docs/             # Documentation
+│   └── improvements.md
+├── .gitconfig        # Git configuration
+└── README.md         # Main documentation
+```
+
 ## Available Commands
 
-### `start-branch.sh`
+### `git start-branch` (alias for bin/start-branch.sh)
 
 Creates new branches with standardized naming and stores ticket references.
 
@@ -33,14 +56,14 @@ Creates new branches with standardized naming and stores ticket references.
 
 **Usage:**
 ```bash
-./start-branch.sh -t PROJ-123
+git start-branch -t PROJ-123
 # Select branch type (feature, bugfix, etc.)
 # Enter task name
 # Creates: feature/user-authentication
 # Stores: PROJ-123 in branch config
 ```
 
-### `conventional-commit.sh`
+### `git cc` (alias for bin/conventional-commit.sh)
 
 Creates standardized commits following the [Conventional Commits](https://www.conventionalcommits.org/) specification, automatically including ticket references.
 
@@ -57,16 +80,16 @@ Creates standardized commits following the [Conventional Commits](https://www.co
 git add .
 
 # Create commit
-./conventional-commit.sh
+git cc
 # Select type (feat, fix, etc.)
 # Enter description
 # Automatically includes [PROJ-123]
 
 # Or set specific ticket
-./conventional-commit.sh -t PROJ-456
+git cc -t PROJ-456
 ```
 
-### `open-pr.sh`
+### `git open-pr` (alias for bin/open-pr.sh)
 
 Streamlines PR creation with automatic ticket reference inclusion.
 
@@ -78,7 +101,7 @@ Streamlines PR creation with automatic ticket reference inclusion.
 
 **Usage:**
 ```bash
-./open-pr.sh
+git open-pr
 # Select target (development/production)
 # Enter title (ticket automatically included)
 # Enter description
@@ -91,22 +114,22 @@ Tickets can be handled in several ways:
 1. **Branch Creation**
    ```bash
    # With ticket
-   ./start-branch.sh -t PROJ-123
+   git start-branch -t PROJ-123
    
    # Without ticket (will prompt)
-   ./start-branch.sh
+   git start-branch
    ```
 
 2. **Commit Creation**
    ```bash
    # Use branch ticket
-   ./conventional-commit.sh
+   git cc
    
    # Override ticket
-   ./conventional-commit.sh -t PROJ-456
+   git cc -t PROJ-456
    
    # Future: Explicitly mark as no ticket
-   # ./conventional-commit.sh -n
+   # git cc -n
    ```
 
 3. **PR Creation**
@@ -143,7 +166,7 @@ Tickets can be handled in several ways:
 
 1. Start new feature branch:
    ```bash
-   ./start-branch.sh -t PROJ-123
+   git start-branch -t PROJ-123
    # Select: feature
    # Name: user-authentication
    ```
@@ -151,7 +174,7 @@ Tickets can be handled in several ways:
 2. Make changes and commit:
    ```bash
    git add .
-   ./conventional-commit.sh
+   git cc
    # Select: feat
    # Scope: auth
    # Description: implement login
@@ -160,7 +183,7 @@ Tickets can be handled in several ways:
 
 3. Create PR:
    ```bash
-   ./open-pr.sh
+   git open-pr
    # Select: development
    # Title auto-includes: [PROJ-123]
    ```
@@ -204,14 +227,14 @@ Tickets can be handled in several ways:
 3. **Commit Issues**
    ```bash
    # Set current ticket
-   ./conventional-commit.sh -t PROJ-123
+   git cc -t PROJ-123
    ```
 
 ## Contributing
 
 1. Fork the repository
 2. Create your feature branch
-3. Commit changes using `conventional-commit.sh`
+3. Commit changes using `git cc`
 4. Open a Pull Request
 
 ## License
