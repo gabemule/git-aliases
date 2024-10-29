@@ -13,6 +13,12 @@ while getopts "t:" opt; do
             echo "Set current ticket to $new_ticket"
             exit 0
             ;;
+        # TODO: Add --no-ticket flag to explicitly mark commits without tickets
+        # n)
+        #     git config --local user.currentTicket "NO-TICKET"
+        #     echo "Commit will be marked as [NO TICKET]"
+        #     exit 0
+        #     ;;
         \?)
             echo "Invalid option: -$OPTARG"
             exit 1
@@ -146,7 +152,16 @@ if [ -z "$ticket" ]; then
     ticket=$(git config --local user.currentTicket)
 fi
 
-# Construct commit message
+# Only add ticket if one was provided or exists in config
+# TODO: Add support for explicit [NO TICKET] marking
+# if [ "$ticket" = "NO-TICKET" ]; then
+#     ticket_suffix=" [NO TICKET]"
+# elif [ -n "$ticket" ]; then
+#     ticket_suffix=" [$ticket]"
+# else
+#     ticket_suffix=""
+# fi
+
 commit_message="${type}${scope_part}${breaking_change_marker}: ${description}"
 if [ -n "$body" ]; then
     commit_message+="\n\n${body}"

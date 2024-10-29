@@ -11,9 +11,9 @@ A collection of Git workflow automation scripts designed to streamline developme
 
 2. Set up Git aliases (one-liner):
    ```bash
-   echo -e "[gab]\n    path = $(pwd)/.gitconfig" >> ~/.gitconfig
+   echo -e "[akad]\n    path = $(pwd)/.gitconfig" >> ~/.gitconfig
    ```
-   This will automatically add the include directive to your global Git config.
+   This will automatically add the configuration to your global Git config.
 
 3. Ensure you have:
    - SSH key configured for GitHub ([Setup Guide](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent))
@@ -87,6 +87,36 @@ Streamlines PR creation with automatic ticket reference inclusion.
 # Enter title (ticket automatically included)
 # Enter description
 ```
+
+## Ticket References
+
+Tickets can be handled in several ways:
+
+1. **Branch Creation**
+   ```bash
+   # With ticket
+   ./start-branch.sh -t PROJ-123
+   
+   # Without ticket (will prompt)
+   ./start-branch.sh
+   ```
+
+2. **Commit Creation**
+   ```bash
+   # Use branch ticket
+   ./conventional-commit.sh
+   
+   # Override ticket
+   ./conventional-commit.sh -t PROJ-456
+   
+   # Future: Explicitly mark as no ticket
+   # ./conventional-commit.sh -n
+   ```
+
+3. **PR Creation**
+   - Automatically uses branch ticket
+   - Includes in title and description
+   - Links to ticket tracking system
 
 ## Branch Types
 
