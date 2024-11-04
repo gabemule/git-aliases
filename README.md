@@ -8,7 +8,7 @@ A collection of Git workflow automation scripts designed to streamline developme
    ```bash
    git clone https://github.com/your-username/git-aliases.git && cd git-aliases
    # Then run this one-liner:
-   echo -e "[akad]\n    path = $(pwd)/.gitconfig" >> ~/.gitconfig && git config --get akad.path >/dev/null && echo "✓ Git aliases configured successfully" || echo "✗ Configuration failed"
+   echo -e "[include]\n    path = $(pwd)/.gitconfig" >> ~/.gitconfig && git config --get include.path >/dev/null && echo "✓ Git aliases configured successfully" || echo "✗ Configuration failed"
    ```
 
 2. Verify installation:

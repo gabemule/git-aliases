@@ -31,21 +31,21 @@ check_config "git installation" \
     "command -v git >/dev/null 2>&1" \
     "Git is not installed. Please install Git first."
 
-# Check akad configuration
-check_config "akad configuration" \
-    "git config --get akad.path >/dev/null 2>&1" \
-    "akad configuration not found. Please run setup command from README."
+# Check include configuration
+check_config "include configuration" \
+    "git config --get include.path >/dev/null 2>&1" \
+    "include configuration not found. Please run setup command from README."
 
 # Check script permissions
 check_config "script permissions" \
-    "[ -x conventional-commit.sh ] && [ -x start-branch.sh ] && [ -x open-pr.sh ]" \
+    "[ -x bin/conventional-commit.sh ] && [ -x bin/start-branch.sh ] && [ -x bin/open-pr.sh ]" \
     "Scripts are not executable. Run: chmod +x *.sh"
 
 # Check if scripts are accessible
-if path=$(git config --get akad.path); then
+if path=$(git config --get include.path); then
     dir=$(dirname "$path")
     check_config "scripts location" \
-        "[ -f \"$dir/conventional-commit.sh\" ]" \
+        "[ -f \"$dir/bin/conventional-commit.sh\" ]" \
         "Scripts not found at configured path: $dir"
 fi
 
