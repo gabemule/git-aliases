@@ -27,15 +27,15 @@
            echo "✓ Git version $git_version"
        fi
        
-       # Check akad configuration
-       if ! git config --get akad.path >/dev/null; then
-           echo "❌ akad configuration missing"
+       # Check include configuration
+       if ! git config --get include.path >/dev/null; then
+           echo "❌ include configuration missing"
            echo "Fix: Add to ~/.gitconfig:"
-           echo "[akad]"
+           echo "[include]"
            echo "    path = $(pwd)/.gitconfig"
            ((errors++))
        else
-           echo "✓ akad configuration found"
+           echo "✓ include configuration found"
        fi
        
        # Check repository status
@@ -91,8 +91,8 @@
        fi
        
        # Fix configuration
-       if ! git config --get akad.path >/dev/null; then
-           echo -e "[akad]\n    path = $(pwd)/.gitconfig" >> ~/.gitconfig
+       if ! git config --get include.path >/dev/null; then
+           echo -e "[include]\n    path = $(pwd)/.gitconfig" >> ~/.gitconfig
        fi
        
        # Verify repairs
@@ -272,7 +272,7 @@
    git clone https://github.com/your-org/git-aliases.git ~/.git-aliases
    
    # Add to global git config
-   echo -e "[akad]\n    path = $HOME/.git-aliases/.gitconfig" >> ~/.gitconfig
+   echo -e "[include]\n    path = $HOME/.git-aliases/.gitconfig" >> ~/.gitconfig
    
    # Verify installation
    git cc --version
@@ -318,7 +318,7 @@
    
    # Install new workflow
    git clone https://github.com/your-org/git-aliases.git ~/.git-aliases
-   echo -e "[akad]\n    path = $HOME/.git-aliases/.gitconfig" >> ~/.gitconfig
+   echo -e "[include]\n    path = $HOME/.git-aliases/.gitconfig" >> ~/.gitconfig
 ```
 
 2. **Learning Resources**
