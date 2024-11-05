@@ -52,7 +52,8 @@ Creates new branches with standardized naming and stores ticket references.
 - Clean, descriptive branch names
 - Ticket reference storage in Git config
 - Automatic stashing of changes
-- Production branch sync
+- Main branch sync (defaults to 'production')
+- Configurable main branch per repository
 
 **Usage:**
 ```bash
@@ -222,6 +223,15 @@ Tickets can be handled in several ways:
    ```bash
    # View current ticket
    git config branch.$(git rev-parse --abbrev-ref HEAD).ticket
+   
+   # Set custom main branch for repository (defaults to 'production')
+   git config workflow.mainBranch main
+   
+   # View current main branch configuration
+   git config workflow.mainBranch
+   
+   # Reset to default main branch (production)
+   git config --unset workflow.mainBranch
    ```
 
 3. **Commit Issues**

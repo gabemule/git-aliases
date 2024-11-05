@@ -117,9 +117,12 @@ if [[ -n $(git status -s) ]]; then
     sleep 2
 fi
 
-# Switch to production branch and pull latest changes
-git checkout production
-git pull origin production
+# Get main branch from config or use default (production)
+main_branch=$(git config workflow.mainBranch || echo "production")
+
+# Switch to main branch and pull latest changes
+git checkout $main_branch
+git pull origin $main_branch
 
 # Clear screen and select branch type
 clear
@@ -159,7 +162,7 @@ if git checkout -b "$branch_name"; then
     echo
     echo "When you're done:"
     echo "1. Create a pull request to merge into 'development'"
-    echo "2. After testing, create another pull request to merge into 'production'"
+    echo "2. After testing, create another pull request to merge into '$main_branch'"
     echo
 else
     echo
