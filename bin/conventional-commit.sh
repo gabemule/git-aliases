@@ -131,7 +131,7 @@ breaking_change_marker=""
 breaking_change_footer=""
 if [[ $breaking_change =~ ^[Yy]$ ]]; then
     breaking_change_marker="!"
-    breaking_change_footer="\n\nBREAKING CHANGE: "
+    breaking_change_footer="BREAKING CHANGE: "
     breaking_change_description=$(prompt_with_default "Describe the breaking change" "")
     breaking_change_footer+="$breaking_change_description"
 fi
@@ -147,17 +147,19 @@ else
     fi
 fi
 
-commit_message="${type}${scope_part}${breaking_change_marker}: ${description}"
-if [ -n "$body" ]; then
-    commit_message+="\n\n${body}"
-fi
-commit_message+="$breaking_change_footer"
+# Build commit message
+commit_title="${type}${scope_part}${breaking_change_marker}: ${description}"
 if [ -n "$ticket" ]; then
-    if [ -n "$breaking_change_footer" ]; then
-        commit_message+="\n\n[$ticket]"
-    else
-        commit_message+=" [$ticket]"
-    fi
+    commit_title+=" [$ticket]"
+fi
+
+# Build full commit message
+commit_message="$commit_title"
+if [ -n "$body" ]; then
+    commit_message+="\n\n$body"
+fi
+if [ -n "$breaking_change_footer" ]; then
+    commit_message+="\n\n$breaking_change_footer"
 fi
 
 # Display final message
@@ -173,7 +175,14 @@ echo
 # Confirm and commit
 read -p "Do you want to commit with this message? (Y/n) " confirm
 if [[ $confirm =~ ^[Yy]?$ ]]; then
-    git commit -m "$commit_message"
+    if ! echo -e "$commit_message" | git commit -F -; then
+        echo
+        echo "Error: Commit failed! This might be due to husky hooks or other git errors."
+        echo "Please check the error message above and try again."
+        echo
+        exit 1
+    fi
+
     echo
     echo "Commit successful!"
     echo
@@ -190,6 +199,7 @@ if [[ $confirm =~ ^[Yy]?$ ]]; then
             echo
             echo "Failed to push changes. Please push manually."
             echo
+            exit 1
         fi
     else
         echo
