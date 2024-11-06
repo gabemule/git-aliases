@@ -148,7 +148,7 @@ pause
 # Step 4: Run verification
 echo -e "\n${BLUE}Step 4: Running verification${NC}"
 pause
-./verify-workflow.sh || handle_error "Verification failed"
+./binverify-workflow.sh || handle_error "Verification failed"
 
 # Cleanup
 echo -e "\n${BLUE}Step 5: Cleanup${NC}"
