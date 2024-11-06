@@ -5,24 +5,27 @@ A collection of Git workflow automation scripts designed to streamline developme
 ## Quick Start
 
 1. Clone this repository:
-   ```bash
+```bash
    git clone https://github.com/your-username/git-aliases.git && cd git-aliases
-   # Then run this one-liner:
+```
+
+2. Run the script to install the Aliases:
+```bash
    echo -e "[include]\n    path = $(pwd)/.gitconfig" >> ~/.gitconfig && git config --get include.path >/dev/null && echo "✓ Git aliases configured successfully" || echo "✗ Configuration failed"
-   ```
+```
 
-2. Verify installation:
-   ```bash
+3. Verify installation:
+```bash
    ./tests/verify-installation.sh
-   ```
+```
 
-3. Ensure you have:
+4. Ensure you have:
    - SSH key configured for GitHub ([Setup Guide](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent))
    - GitHub CLI installed ([Installation Guide](https://cli.github.com/))
    - Authenticated with GitHub CLI:
-     ```bash
-     gh auth login
-     ```
+```bash
+   gh auth login
+```
 
 ## Project Structure
 
@@ -113,25 +116,25 @@ git open-pr
 Tickets can be handled in several ways:
 
 1. **Branch Creation**
-   ```bash
+```bash
    # With ticket
    git start-branch -t PROJ-123
    
    # Without ticket (will prompt)
    git start-branch
-   ```
+```
 
 2. **Commit Creation**
-   ```bash
+```bash
    # Use branch ticket
    git cc
    
-   # Override ticket
+   # Use one-time ticket (only for this commit)
    git cc -t PROJ-456
    
    # Future: Explicitly mark as no ticket
    # git cc -n
-   ```
+```
 
 3. **PR Creation**
    - Automatically uses branch ticket
@@ -166,28 +169,28 @@ Tickets can be handled in several ways:
 ## Workflow Example
 
 1. Start new feature branch:
-   ```bash
+```bash
    git start-branch -t PROJ-123
    # Select: feature
    # Name: user-authentication
-   ```
+```
 
 2. Make changes and commit:
-   ```bash
+```bash
    git add .
    git cc
    # Select: feat
    # Scope: auth
    # Description: implement login
    # Results in: feat(auth): implement login [PROJ-123]
-   ```
+```
 
 3. Create PR:
-   ```bash
+```bash
    git open-pr
    # Select: development
    # Title auto-includes: [PROJ-123]
-   ```
+```
 
 ## Best Practices
 
@@ -214,31 +217,27 @@ Tickets can be handled in several ways:
 ## Troubleshooting
 
 1. **Missing Ticket Reference**
-   ```bash
+```bash
    # Set ticket for current branch
    git config branch.$(git rev-parse --abbrev-ref HEAD).ticket PROJ-123
-   ```
+```
 
 2. **Branch Issues**
-   ```bash
-   # View current ticket
+```bash
+   # View current branch's ticket
    git config branch.$(git rev-parse --abbrev-ref HEAD).ticket
    
    # Set custom main branch for repository (defaults to 'production')
    git config workflow.mainBranch main
-   
-   # View current main branch configuration
-   git config workflow.mainBranch
-   
-   # Reset to default main branch (production)
-   git config --unset workflow.mainBranch
-   ```
+```
 
 3. **Commit Issues**
-   ```bash
-   # Set current ticket
+```bash
+   # Use a one-time ticket for single commit
    git cc -t PROJ-123
-   ```
+   
+   # Note: -t flag tickets are not persisted and only apply to the current commit
+```
 
 ## Contributing
 

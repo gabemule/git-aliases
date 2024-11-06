@@ -4,21 +4,12 @@
 while getopts "t:" opt; do
     case $opt in
         t)
-            new_ticket="$OPTARG"
-            if [[ ! $new_ticket =~ ^[A-Z]+-[0-9]+$ ]]; then
+            one_time_ticket="$OPTARG"
+            if [[ ! $one_time_ticket =~ ^[A-Z]+-[0-9]+$ ]]; then
                 echo "Invalid ticket format. Must match PROJECT-XXX (e.g., PROJ-123)"
                 exit 1
             fi
-            git config --local user.currentTicket "$new_ticket"
-            echo "Set current ticket to $new_ticket"
-            exit 0
             ;;
-        # TODO: Add --no-ticket flag to explicitly mark commits without tickets
-        # n)
-        #     git config --local user.currentTicket "NO-TICKET"
-        #     echo "Commit will be marked as [NO TICKET]"
-        #     exit 0
-        #     ;;
         \?)
             echo "Invalid option: -$OPTARG"
             exit 1
@@ -145,22 +136,16 @@ if [[ $breaking_change =~ ^[Yy]$ ]]; then
     breaking_change_footer+="$breaking_change_description"
 fi
 
-# Get ticket from branch config or current ticket
+# Get ticket from branch config or one-time ticket
 current_branch=$(git rev-parse --abbrev-ref HEAD)
-ticket=$(git config branch."$current_branch".ticket)
-if [ -z "$ticket" ]; then
-    ticket=$(git config --local user.currentTicket)
+if [ -n "$one_time_ticket" ]; then
+    ticket="$one_time_ticket"
+else
+    ticket=$(git config branch."$current_branch".ticket)
+    if [ -z "$ticket" ]; then
+        ticket=""  # Explicitly set to empty if proceeding without ticket
+    fi
 fi
-
-# Only add ticket if one was provided or exists in config
-# TODO: Add support for explicit [NO TICKET] marking
-# if [ "$ticket" = "NO-TICKET" ]; then
-#     ticket_suffix=" [NO TICKET]"
-# elif [ -n "$ticket" ]; then
-#     ticket_suffix=" [$ticket]"
-# else
-#     ticket_suffix=""
-# fi
 
 commit_message="${type}${scope_part}${breaking_change_marker}: ${description}"
 if [ -n "$body" ]; then
