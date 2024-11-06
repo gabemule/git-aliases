@@ -6,7 +6,11 @@ A collection of Git workflow automation scripts designed to streamline developme
 
 1. Clone this repository:
 ```bash
-   git clone https://github.com/Akad-Seguros/front-git-aliases.git && cd front-git-aliases
+   git clone https://github.com/Akad-Seguros/front-git-aliases.git
+   # or
+   git clone git@github.com:Akad-Seguros/front-git-aliases.git
+   # Then, Change Destination to the cloned repo
+   cd front-git-aliases
 ```
 
 2. Run the script to install the Aliases:
