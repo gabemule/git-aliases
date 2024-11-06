@@ -71,9 +71,6 @@ restore_uncommitted() {
     fi
 }
 
-# Ensure verify.sh is executable
-chmod +x verify.sh 2>/dev/null
-
 # Clear screen and show header
 clear
 echo -e "${BLUE}=== Git Workflow Test ===${NC}"
@@ -100,7 +97,7 @@ pause
 # Delete existing branch if it exists
 cleanup_branch "feature/test-feature"
 
-./start-branch.sh -t TEST-123 || handle_error "Failed to create branch"
+./bin/start-branch.sh -t TEST-123 || handle_error "Failed to create branch"
 
 # Verify branch creation
 echo -e "\n${YELLOW}Verifying branch creation:${NC}"
@@ -120,7 +117,7 @@ pause
 
 echo "test content" > test.txt
 git add test.txt
-./conventional-commit.sh || handle_error "Failed to create commit"
+./bin/conventional-commit.sh || handle_error "Failed to create commit"
 
 # Handle push
 handle_push "feature/test-feature"
@@ -140,7 +137,7 @@ pause
 
 # Stash any changes before PR creation
 handle_uncommitted
-./open-pr.sh || handle_error "Failed to create PR"
+./bin/open-pr.sh || handle_error "Failed to create PR"
 restore_uncommitted $?
 
 # Verify PR
@@ -151,7 +148,7 @@ pause
 # Step 4: Run verification
 echo -e "\n${BLUE}Step 4: Running verification${NC}"
 pause
-./verify.sh || handle_error "Verification failed"
+./verify-workflow.sh || handle_error "Verification failed"
 
 # Cleanup
 echo -e "\n${BLUE}Step 5: Cleanup${NC}"
