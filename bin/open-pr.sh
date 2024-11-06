@@ -6,6 +6,18 @@ if ! git rev-parse --is-inside-work-tree > /dev/null 2>&1; then
     exit 1
 fi
 
+# Check if gh CLI is installed
+if ! command -v gh &> /dev/null; then
+    echo "Error: GitHub CLI (gh) is not installed."
+    echo "Please install it following the instructions at: https://cli.github.com/"
+    echo
+    echo "Quick install commands:"
+    echo "  Homebrew (macOS): brew install gh"
+    echo "  Windows: winget install --id GitHub.cli"
+    echo "  Linux: See https://github.com/cli/cli/blob/trunk/docs/install_linux.md"
+    exit 1
+fi
+
 # Get current branch and ticket
 current_branch=$(git rev-parse --abbrev-ref HEAD)
 ticket=$(git config branch."$current_branch".ticket)
@@ -54,10 +66,11 @@ fi
 # Create the PR
 pr_url=$(gh pr create --base "$target" --head "$current_branch" --title "$title" --body "$description" --web)
 
-if [ -n "$pr_url" ]; then
-    echo "PR created successfully!"
-    echo "PR URL: $pr_url"
-else
-    echo "Failed to create PR."
-    exit 1
-fi
+# With the --web flag we wont get the $pr_url
+# if [ -n "$pr_url" ]; then
+#     echo "PR created successfully!"
+#     echo "PR URL: $pr_url"
+# else
+#     echo "Failed to create PR."
+#     exit 1
+# fi

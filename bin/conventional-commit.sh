@@ -174,31 +174,21 @@ echo
 # Confirm and commit
 read -p "Do you want to commit with this message? (Y/n) " confirm
 if [[ $confirm =~ ^[Yy]?$ ]]; then
-    if [ -n "$body" ] || [ -n "$breaking_change_footer" ]; then
-        # If we have a body or breaking change, use multiple -m arguments
-        commit_args=(-m "$commit_title")
-        if [ -n "$body" ]; then
-            commit_args+=(-m "$body")
-        fi
-        if [ -n "$breaking_change_footer" ]; then
-            commit_args+=(-m "$breaking_change_footer")
-        fi
-        if ! git commit "${commit_args[@]}"; then
-            echo
-            echo "Error: Commit failed! This might be due to husky hooks or other git errors."
-            echo "Please check the error message above and try again."
-            echo
-            exit 1
-        fi
-    else
-        # If we only have the title, use a single -m
-        if ! git commit -m "$commit_title"; then
-            echo
-            echo "Error: Commit failed! This might be due to husky hooks or other git errors."
-            echo "Please check the error message above and try again."
-            echo
-            exit 1
-        fi
+    # Build commit command with multiple -m arguments
+    commit_args=(-m "$commit_title")
+    if [ -n "$body" ]; then
+        commit_args+=(-m "$body")
+    fi
+    if [ -n "$breaking_change_footer" ]; then
+        commit_args+=(-m "$breaking_change_footer")
+    fi
+
+    if ! git commit "${commit_args[@]}"; then
+        echo
+        echo "Error: Commit failed! This might be due to husky hooks or other git errors."
+        echo "Please check the error message above and try again."
+        echo
+        exit 1
     fi
 
     echo
