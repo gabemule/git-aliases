@@ -66,10 +66,11 @@ fi
 # Create the PR
 pr_url=$(gh pr create --base "$target" --head "$current_branch" --title "$title" --body "$description" --web)
 
-if [ -n "$pr_url" ]; then
-    echo "PR created successfully!"
-    echo "PR URL: $pr_url"
-else
-    echo "Failed to create PR."
-    exit 1
-fi
+# With the --web flag we wont get the $pr_url
+# if [ -n "$pr_url" ]; then
+#     echo "PR created successfully!"
+#     echo "PR URL: $pr_url"
+# else
+#     echo "Failed to create PR."
+#     exit 1
+# fi
