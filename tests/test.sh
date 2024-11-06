@@ -16,7 +16,7 @@ pause() {
 # Function to handle errors
 handle_error() {
     echo -e "\n${RED}Error: $1${NC}"
-    echo "Would you like to continue? (Y/n)"
+    echo "Would you like to continue the test? (Y/n)"
     read -n 1 continue_test
     if [[ ! $continue_test =~ ^[Yy]?$ ]]; then
         exit 1
