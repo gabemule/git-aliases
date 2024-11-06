@@ -147,19 +147,10 @@ else
     fi
 fi
 
-# Build commit message
-commit_title="${type}${scope_part}${breaking_change_marker}: ${description}"
+# Build commit message parts
+commit_title="${type}${scope_part}: ${description}"
 if [ -n "$ticket" ]; then
-    commit_title+=" [$ticket]"
-fi
-
-# Build full commit message
-commit_message="$commit_title"
-if [ -n "$body" ]; then
-    commit_message+="\n\n$body"
-fi
-if [ -n "$breaking_change_footer" ]; then
-    commit_message+="\n\n$breaking_change_footer"
+    commit_title+=" [${ticket}]"
 fi
 
 # Display final message
@@ -167,7 +158,15 @@ echo
 echo -e "\nFinal commit message:"
 echo "----------"
 echo
-echo -e "$commit_message"
+echo "$commit_title"
+if [ -n "$body" ]; then
+    echo
+    echo "$body"
+fi
+if [ -n "$breaking_change_footer" ]; then
+    echo
+    echo "$breaking_change_footer"
+fi
 echo
 echo "----------"
 echo
@@ -175,12 +174,31 @@ echo
 # Confirm and commit
 read -p "Do you want to commit with this message? (Y/n) " confirm
 if [[ $confirm =~ ^[Yy]?$ ]]; then
-    if ! echo -e "$commit_message" | git commit -F -; then
-        echo
-        echo "Error: Commit failed! This might be due to husky hooks or other git errors."
-        echo "Please check the error message above and try again."
-        echo
-        exit 1
+    if [ -n "$body" ] || [ -n "$breaking_change_footer" ]; then
+        # If we have a body or breaking change, use multiple -m arguments
+        commit_args=(-m "$commit_title")
+        if [ -n "$body" ]; then
+            commit_args+=(-m "$body")
+        fi
+        if [ -n "$breaking_change_footer" ]; then
+            commit_args+=(-m "$breaking_change_footer")
+        fi
+        if ! git commit "${commit_args[@]}"; then
+            echo
+            echo "Error: Commit failed! This might be due to husky hooks or other git errors."
+            echo "Please check the error message above and try again."
+            echo
+            exit 1
+        fi
+    else
+        # If we only have the title, use a single -m
+        if ! git commit -m "$commit_title"; then
+            echo
+            echo "Error: Commit failed! This might be due to husky hooks or other git errors."
+            echo "Please check the error message above and try again."
+            echo
+            exit 1
+        fi
     fi
 
     echo
