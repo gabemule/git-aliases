@@ -38,10 +38,10 @@ A collection of Git workflow automation scripts designed to streamline developme
 Creates new branches with standardized naming and stores ticket references.
 
 **Features:**
-- Clean, descriptive branch names
-- Ticket reference storage in Git config
+- Clean, descriptive branch names (see [Branch Types](#-branch-types))
+- Ticket reference storage in Git config (see [Ticket References](#-ticket-references))
 - Automatic stashing of changes
-- Main branch sync (defaults to 'production')
+- Main branch sync (defaults to 'production', see [Configuration](#%EF%B8%8F-configuration))
 - Configurable main branch per repository
 
 **Usage:**
@@ -58,10 +58,10 @@ git start-branch -t PROJ-123
 Creates standardized commits following the [Conventional Commits](https://www.conventionalcommits.org/) specification, with automatic ticket reference handling.
 
 **Features:**
-- Interactive type selection
+- Interactive type selection (see [Commit Types](#-commit-types))
 - Optional scope support
 - Breaking change detection
-- Ticket reference handling:
+- Ticket reference handling (see [Ticket References](#-ticket-references)):
   - Uses ticket from current branch (set by start-branch)
   - Optional one-time ticket override for single commit
 - Optional auto-push
@@ -89,7 +89,7 @@ Streamlines PR creation with automatic ticket reference inclusion.
 
 **Features:**
 - Target branch selection
-- Automatic ticket inclusion in title
+- Automatic ticket inclusion in title (see [Ticket References](#-ticket-references))
 - Duplicate PR detection
 - Web-based PR opening
 
@@ -99,6 +99,32 @@ git open-pr
 # Select target (development/production)
 # Enter title (ticket automatically included)
 # Enter description
+```
+
+## ⚙️ Custom Configuration
+
+### Branch Custom Configuration
+```bash
+# Set custom main branch for repository (defaults to 'production')
+git config workflow.mainBranch main
+
+# View current main branch configuration
+git config workflow.mainBranch
+```
+
+### Ticket Custom Configuration
+```bash
+# Set ticket for current branch
+git config branch.$(git rev-parse --abbrev-ref HEAD).ticket PROJ-123
+
+# View current branch's ticket
+git config branch.$(git rev-parse --abbrev-ref HEAD).ticket
+```
+
+### Commit Custom Configuration
+```bash
+# Use one-time ticket for single commit (not persisted)
+git cc -t PROJ-456
 ```
 
 ## 🎫 Ticket References
@@ -157,32 +183,6 @@ Tickets can be handled in several ways:
    # Title auto-includes: [PROJ-123]
 ```
 
-## ⚙️ Custom Configuration
-
-### Branch Custom Configuration
-```bash
-# Set custom main branch for repository (defaults to 'production')
-git config workflow.mainBranch main
-
-# View current main branch configuration
-git config workflow.mainBranch
-```
-
-### Ticket Custom Configuration
-```bash
-# Set ticket for current branch
-git config branch.$(git rev-parse --abbrev-ref HEAD).ticket PROJ-123
-
-# View current branch's ticket
-git config branch.$(git rev-parse --abbrev-ref HEAD).ticket
-```
-
-### Commit Custom Configuration
-```bash
-# Use one-time ticket for single commit (not persisted)
-git cc -t PROJ-456
-```
-
 ## 🔧 Troubleshooting
 
 ### Installation Issues
@@ -212,6 +212,7 @@ git cc -t PROJ-456
    # Solution: Ensure you're in the correct directory and initialize if needed
    git init
    ```
+   See [Configuration](#%EF%B8%8F-configuration) for repository setup.
 
 2. **Branch Creation Failed**
    ```bash
@@ -220,6 +221,7 @@ git cc -t PROJ-456
    git fetch origin
    git start-branch -t PROJ-123
    ```
+   See [Branch Types](#-branch-types) for naming conventions.
 
 3. **Merge Conflicts**
    ```bash
@@ -229,6 +231,7 @@ git cc -t PROJ-456
    git add .
    git commit -m "fix: resolve conflicts"
    ```
+   See [Commit Types](#-commit-types) for message format.
 
 ## ✨ Best Practices
 
@@ -251,7 +254,7 @@ git cc -t PROJ-456
    - Set when creating branch
    - Automatically included in commits
    - Visible in PR title and description
-
+   
 ## 📁 Project Structure
 
 ```
