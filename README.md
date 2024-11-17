@@ -2,7 +2,7 @@
 
 A collection of Git workflow automation scripts designed to streamline development processes and enforce consistent conventions with ticket tracking.
 
-## ⚡ Quick Start
+## ⚡ Installation
 
 1. Clone this repository:
 ```bash
@@ -29,29 +29,6 @@ A collection of Git workflow automation scripts designed to streamline developme
    - 🔒 Authenticated with GitHub CLI:
 ```bash
    gh auth login
-```
-
-## 📁 Project Structure
-
-```
-git-aliases/
-├── bin/              # Main executable scripts
-│   ├── conventional-commit.sh
-│   ├── start-branch.sh
-│   └── open-pr.sh
-├── tests/            # Testing scripts
-│   ├── test.sh              # Test runner
-│   ├── verify-installation.sh  # Tests setup/config
-│   └── verify-workflow.sh     # Tests functionality
-├── docs/             # Documentation
-│   ├── README.md            # Documentation index
-│   ├── sync-command.md      # Sync command specification
-│   ├── rollback-command.md  # Rollback command docs
-│   ├── review-command.md    # Review command docs
-│   ├── workspace-command.md # Workspace command docs
-│   └── standup-command.md   # Standup command docs
-├── .gitconfig        # Git configuration
-└── README.md         # Main documentation
 ```
 
 ## 🛠️ Available Commands
@@ -227,9 +204,9 @@ Tickets can be handled in several ways:
    - Automatically included in commits
    - Visible in PR title and description
 
-## ⚙️ Configuration
+## ⚙️ Custom Configuration
 
-### Branch Configuration
+### Branch Custom Configuration
 ```bash
 # Set custom main branch for repository (defaults to 'production')
 git config workflow.mainBranch main
@@ -238,7 +215,7 @@ git config workflow.mainBranch main
 git config workflow.mainBranch
 ```
 
-### Ticket Configuration
+### Ticket Custom Configuration
 ```bash
 # Set ticket for current branch
 git config branch.$(git rev-parse --abbrev-ref HEAD).ticket PROJ-123
@@ -247,7 +224,7 @@ git config branch.$(git rev-parse --abbrev-ref HEAD).ticket PROJ-123
 git config branch.$(git rev-parse --abbrev-ref HEAD).ticket
 ```
 
-### Commit Configuration
+### Commit Custom Configuration
 ```bash
 # Use one-time ticket for single commit (not persisted)
 git cc -t PROJ-456
@@ -299,6 +276,29 @@ git cc -t PROJ-456
    git add .
    git commit -m "fix: resolve conflicts"
    ```
+
+## 📁 Project Structure
+
+```
+git-aliases/
+├── bin/              # Main executable scripts
+│   ├── conventional-commit.sh
+│   ├── start-branch.sh
+│   └── open-pr.sh
+├── tests/            # Testing scripts
+│   ├── test.sh              # Test runner
+│   ├── verify-installation.sh  # Tests setup/config
+│   └── verify-workflow.sh     # Tests functionality
+├── docs/             # Documentation
+│   ├── README.md            # Documentation index
+│   ├── sync-command.md      # Sync command specification
+│   ├── rollback-command.md  # Rollback command docs
+│   ├── review-command.md    # Review command docs
+│   ├── workspace-command.md # Workspace command docs
+│   └── standup-command.md   # Standup command docs
+├── .gitconfig        # Git configuration
+└── README.md         # Main documentation
+```
 
 ## 🤝 Contributing
 
