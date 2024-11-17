@@ -78,13 +78,15 @@ git start-branch -t PROJ-123
 
 ### `git cc` (alias for bin/conventional-commit.sh)
 
-Creates standardized commits following the [Conventional Commits](https://www.conventionalcommits.org/) specification, automatically including ticket references.
+Creates standardized commits following the [Conventional Commits](https://www.conventionalcommits.org/) specification, with automatic ticket reference handling.
 
 **Features:**
 - Interactive type selection
 - Optional scope support
 - Breaking change detection
-- Automatic ticket reference inclusion
+- Ticket reference handling:
+  - Uses ticket from current branch (set by start-branch)
+  - Optional one-time ticket override for single commit
 - Optional auto-push
 
 **Usage:**
@@ -92,14 +94,16 @@ Creates standardized commits following the [Conventional Commits](https://www.co
 # Make changes and stage them
 git add .
 
-# Create commit
+# Create commit using branch's ticket (from start-branch)
 git cc
 # Select type (feat, fix, etc.)
 # Enter description
-# Automatically includes [PROJ-123]
+# Creates: feat(auth): implement login [PROJ-123]
 
-# Or set specific ticket
+# Override ticket for this commit only (not saved to branch)
 git cc -t PROJ-456
+# Creates: feat(auth): implement login [PROJ-456]
+# Next commit will use branch's ticket again
 ```
 
 ### `git open-pr` (alias for bin/open-pr.sh)
