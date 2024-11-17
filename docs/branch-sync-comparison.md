@@ -14,8 +14,9 @@ After analyzing both commands, we've decided to standardize on the sync command 
 
 2. **Safety Features**
    - --dry-run: Preview changes without execution
-   - --no-push: Update without pushing changes
    - --no-update: Skip main branch update
+   - --no-pull: Skip pulling from remote
+   - --no-push: Skip pushing changes
    - --continue: Resume after conflict resolution
 
 3. **Conflict Handling**
@@ -34,6 +35,7 @@ sync_branch() {
     local main_branch=$(git config workflow.mainBranch || echo "production")
     local continue_sync=false
     local skip_update=false
+    local skip_pull=false    # Added skip_pull
     local skip_push=false
     local dry_run=false
     local stashed=false
@@ -43,6 +45,7 @@ sync_branch() {
         case $1 in
             --continue) continue_sync=true ;;
             --no-update) skip_update=true ;;
+            --no-pull) skip_pull=true ;;    # Added --no-pull
             --no-push) skip_push=true ;;
             --dry-run) 
                 dry_run=true
@@ -120,39 +123,43 @@ sync_branch() {
         fi
     fi
     
-    # Pull latest for current branch
-    if [[ "$dry_run" == true ]]; then
-        echo "[DRY-RUN] Would pull latest changes"
-    else
-        echo "Pulling latest changes..."
-        if ! git pull origin $current_branch --ff-only; then
-            echo "Error: Your branch has diverged from origin/$current_branch"
-            echo "Local:  $(git rev-parse --short HEAD) $(git log -1 --pretty=%s HEAD)"
-            echo "Remote: $(git rev-parse --short origin/$current_branch) $(git log -1 --pretty=%s origin/$current_branch)"
-            echo "Attempting to resolve with rebase..."
-            
-            if ! git pull --rebase origin $current_branch; then
-                echo "Conflicts detected during rebase. Launching mergetool..."
-                if ! git mergetool; then
-                    echo "Error: Failed to launch mergetool"
-                    return 1
-                fi
+    # Pull latest for current branch if not skipped
+    if [[ "$skip_pull" == false ]]; then    # Added skip_pull check
+        if [[ "$dry_run" == true ]]; then
+            echo "[DRY-RUN] Would pull latest changes"
+        else
+            echo "Pulling latest changes..."
+            if ! git pull origin $current_branch --ff-only; then
+                echo "Error: Your branch has diverged from origin/$current_branch"
+                echo "Local:  $(git rev-parse --short HEAD) $(git log -1 --pretty=%s HEAD)"
+                echo "Remote: $(git rev-parse --short origin/$current_branch) $(git log -1 --pretty=%s origin/$current_branch)"
+                echo "Attempting to resolve with rebase..."
                 
-                # Check if conflicts remain
-                if [[ -n $(git diff --name-only --diff-filter=U) ]]; then
-                    echo "Some conflicts still need to be resolved manually."
-                    echo "Please resolve remaining conflicts and run 'git rebase --continue'"
-                    echo "Then run 'git sync' again"
-                    if [[ "$stashed" == true ]]; then
-                        echo "Your changes are safely stashed."
+                if ! git pull --rebase origin $current_branch; then
+                    echo "Conflicts detected during rebase. Launching mergetool..."
+                    if ! git mergetool; then
+                        echo "Error: Failed to launch mergetool"
+                        return 1
                     fi
-                    return 1
+                    
+                    # Check if conflicts remain
+                    if [[ -n $(git diff --name-only --diff-filter=U) ]]; then
+                        echo "Some conflicts still need to be resolved manually."
+                        echo "Please resolve remaining conflicts and run 'git rebase --continue'"
+                        echo "Then run 'git sync' again"
+                        if [[ "$stashed" == true ]]; then
+                            echo "Your changes are safely stashed."
+                        fi
+                        return 1
+                    fi
+                    
+                    # Continue rebase
+                    git rebase --continue
                 fi
-                
-                # Continue rebase
-                git rebase --continue
             fi
         fi
+    else
+        echo "Skipping pull (--no-pull specified)"
     fi
     
     # Push changes if not skipped
