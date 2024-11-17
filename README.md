@@ -1,8 +1,8 @@
-# Git Workflow Scripts
+# Git Workflow Scripts 🚀
 
 A collection of Git workflow automation scripts designed to streamline development processes and enforce consistent conventions with ticket tracking.
 
-## Quick Start
+## Quick Start ⚡
 
 1. Clone this repository:
 ```bash
@@ -24,14 +24,14 @@ A collection of Git workflow automation scripts designed to streamline developme
 ```
 
 4. Ensure you have:
-   - SSH key configured for GitHub ([Setup Guide](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent))
-   - GitHub CLI installed ([Installation Guide](https://cli.github.com/))
-   - Authenticated with GitHub CLI:
+   - 🔑 SSH key configured for GitHub ([Setup Guide](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent))
+   - 🛠️ GitHub CLI installed ([Installation Guide](https://cli.github.com/))
+   - 🔒 Authenticated with GitHub CLI:
 ```bash
    gh auth login
 ```
 
-## Project Structure
+## Project Structure 📁
 
 ```
 git-aliases/
@@ -45,7 +45,7 @@ git-aliases/
 │   └── verify-workflow.sh     # Tests functionality
 ├── docs/             # Documentation
 │   ├── README.md            # Documentation index
-│   ├── branch-sync-comparison.md  # Sync command analysis
+│   ├── sync-command.md      # Sync command specification
 │   ├── rollback-command.md  # Rollback command docs
 │   ├── review-command.md    # Review command docs
 │   ├── workspace-command.md # Workspace command docs
@@ -54,9 +54,9 @@ git-aliases/
 └── README.md         # Main documentation
 ```
 
-## Available Commands
+## Available Commands 🛠️
 
-### `git start-branch` (alias for bin/start-branch.sh)
+### `git start-branch` 🌿 (alias for bin/start-branch.sh)
 
 Creates new branches with standardized naming and stores ticket references.
 
@@ -76,7 +76,7 @@ git start-branch -t PROJ-123
 # Stores: PROJ-123 in branch config
 ```
 
-### `git cc` (alias for bin/conventional-commit.sh)
+### `git cc` ✍️ (alias for bin/conventional-commit.sh)
 
 Creates standardized commits following the [Conventional Commits](https://www.conventionalcommits.org/) specification, with automatic ticket reference handling.
 
@@ -106,7 +106,7 @@ git cc -t PROJ-456
 # Next commit will use branch's ticket again
 ```
 
-### `git open-pr` (alias for bin/open-pr.sh)
+### `git open-pr` 🔍 (alias for bin/open-pr.sh)
 
 Streamlines PR creation with automatic ticket reference inclusion.
 
@@ -124,7 +124,7 @@ git open-pr
 # Enter description
 ```
 
-## Ticket References
+## Ticket References 🎫
 
 Tickets can be handled in several ways:
 
@@ -154,7 +154,7 @@ Tickets can be handled in several ways:
    - Includes in title and description
    - Links to ticket tracking system
 
-## Branch Types
+## Branch Types 🌳
 
 | Type | Purpose | Example |
 |------|---------|---------|
@@ -164,7 +164,7 @@ Tickets can be handled in several ways:
 | release/ | Release preparation | release/v1.2.0 |
 | docs/ | Documentation updates | docs/api-endpoints |
 
-## Commit Types
+## Commit Types 📝
 
 | Type | Purpose | Example |
 |------|---------|---------|
@@ -179,7 +179,7 @@ Tickets can be handled in several ways:
 | ci | CI/CD changes | ci(deploy): update pipeline [PROJ-123] |
 | build | Build system changes | build(webpack): optimize config [PROJ-123] |
 
-## Workflow Example
+## Workflow Example 🔄
 
 1. Start new feature branch:
 ```bash
@@ -205,7 +205,7 @@ Tickets can be handled in several ways:
    # Title auto-includes: [PROJ-123]
 ```
 
-## Best Practices
+## Best Practices ✨
 
 1. **Branch Names**
    - Use descriptive names
@@ -227,7 +227,7 @@ Tickets can be handled in several ways:
    - Automatically included in commits
    - Visible in PR title and description
 
-## Configuration
+## Configuration ⚙️
 
 ### Branch Configuration
 ```bash
@@ -250,10 +250,10 @@ git config branch.$(git rev-parse --abbrev-ref HEAD).ticket
 ### Commit Configuration
 ```bash
 # Use one-time ticket for single commit (not persisted)
-git cc -t PROJ-123
+git cc -t PROJ-456
 ```
 
-## Troubleshooting
+## Troubleshooting 🔧
 
 ### Installation Issues
 1. **Git Aliases Not Working**
@@ -300,14 +300,13 @@ git cc -t PROJ-123
    git commit -m "fix: resolve conflicts"
    ```
 
-
-## Contributing
+## Contributing 🤝
 
 1. Fork the repository
 2. Create your feature branch
 3. Commit changes using `git cc`
 4. Open a Pull Request
 
-## License
+## License 📄
 
 This project is licensed under the MIT License - see the LICENSE file for details.
