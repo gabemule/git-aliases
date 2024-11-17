@@ -5,6 +5,30 @@ This documentation describes improvements and new features for our git workflow 
 
 ## Command Reference
 
+### Existing Command Updates
+
+#### [Start Branch Updates](update-start-branch.md)
+Improvements for branch creation workflow:
+- Shorter `git start` alias (automatically configured)
+- Non-interactive mode with direct arguments (-n, -b flags)
+- Branch source control (main by default, --current option)
+- Sync and stash control (--no-sync, --no-stash flags)
+
+#### [Conventional Commit Updates](update-conventional-commit.md)
+Enhancements for commit creation:
+- Direct message and scope flags (-m, -s)
+- Auto-push capability (-p)
+- Breaking change support (-b)
+- Skip commit hooks (--no-verify)
+
+#### [Open PR Updates](update-open-pr.md)
+Pull request creation improvements:
+- Non-interactive mode (-t, --title, --body)
+- Draft PR support (--draft)
+- Template integration
+- Label and reviewer management
+- Auto-merge settings
+
 ### Branch Management
 - [Sync Command](sync-command.md) - Complete branch synchronization with configurable behavior
 
@@ -31,21 +55,39 @@ This documentation describes improvements and new features for our git workflow 
 1. Critical Priority
    - Rollback command (production safety)
    - Sync command (daily workflow)
+   - Start branch improvements:
+     * Automatic git start alias
+     * Branch source control
+     * Non-interactive mode
 
 2. High Priority
    - Review command
+   - Conventional commit improvements:
+     * Direct arguments
+     * Auto-push support
+   - Open PR improvements:
+     * Draft PR support
+     * Template integration
 
 3. Medium Priority
    - Standup command
+   - Label management
+   - Breaking change support
 
 4. Nice to Have
    - Workspace command
+   - Custom hooks
+   - Auto-merge settings
 
 ## Next Steps
 
 1. Implement critical commands:
    - Rollback command first (production safety)
    - Then sync command for daily workflow
+   - Add start branch improvements:
+     * Configure automatic alias
+     * Add branch source control
+     * Implement non-interactive flags
 
 2. Add comprehensive testing:
    - Unit tests for each command
