@@ -41,7 +41,7 @@ Creates new branches with standardized naming and stores ticket references.
 - Clean, descriptive branch names
 - Ticket reference storage in Git config (see [Ticket References](#-ticket-references))
 - Automatic stashing of changes
-- Main branch sync (defaults to 'production', see [Custom Configuration](#-custom-configuration))
+- Main branch sync (defaults to 'production', see [Custom Configuration](#%EF%B8%8F-custom-configuration))
 - Configurable main branch per repository
 
 **Usage:**
@@ -212,7 +212,7 @@ Tickets can be handled in several ways:
    # Solution: Ensure you're in the correct directory and initialize if needed
    git init
    ```
-   See [Custom Configuration](#-custom-configuration) for repository setup.
+   See [Custom Configuration](#%EF%B8%8F-custom-configuration) for repository setup.
 
 2. **Branch Creation Failed**
    ```bash
