@@ -58,7 +58,7 @@ git start-branch -t PROJ-123
 Creates standardized commits following the [Conventional Commits](https://www.conventionalcommits.org/) specification, with automatic ticket reference handling.
 
 **Features:**
-- Interactive type selection (see [Commit Types](#-commit-types))
+- Interactive type selection
 - Optional scope support
 - Breaking change detection
 - Ticket reference handling (see [Ticket References](#-ticket-references)):
@@ -231,7 +231,6 @@ Tickets can be handled in several ways:
    git add .
    git commit -m "fix: resolve conflicts"
    ```
-   See [Commit Types](#-commit-types) for message format.
 
 ## ✨ Best Practices
 
