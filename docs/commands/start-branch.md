@@ -2,32 +2,52 @@
 
 Creates new branches with standardized naming and automatic ticket reference tracking.
 
-## Features
-
-- Standardized branch naming
-- Automatic ticket reference storage
-- Main branch synchronization
-- Automatic stash handling
-- Interactive branch type selection
-
 ## Usage
 
 ### Basic Usage
 
 ```bash
-git start-branch
+# Interactive mode (full command)
+git start-branch -t PROJ-123
+
+# Interactive mode (short alias)
+git start -t PROJ-123
+
+# Non-interactive mode (full command)
+git start-branch -t PROJ-123 -n user-authentication -b feature
+
+# Non-interactive mode (short alias)
+git start -t PROJ-123 -n user-authentication -b feature
 ```
 
 ### Options
 
-- `-t <ticket>` - Specify ticket reference (e.g., PROJ-123)
+- `-t, --ticket <id>` - Specify ticket reference (e.g., PROJ-123)
+- `-n, --name <name>` - Specify branch name (skip prompt)
+- `-b, --branch-type <type>` - Specify branch type (skip prompt)
+- `--current` - Create branch from current branch instead of main
+- `--no-sync` - Skip main branch sync
+- `--no-stash` - Skip stashing changes
 
 ## Examples
 
-### 1. With Ticket Argument
+### 1. Interactive Branch Creation
 
 ```bash
+# Using full command
 $ git start-branch -t PROJ-123
+Select branch type:
+   feature
+   bugfix
+   hotfix
+   release
+   docs
+? Enter the name of the new task: user-authentication
+✓ Created branch: feature/user-authentication
+✓ Stored ticket: PROJ-123
+
+# Using short alias
+$ git start -t PROJ-123
 Select branch type:
    feature
    bugfix
@@ -39,20 +59,58 @@ Select branch type:
 ✓ Stored ticket: PROJ-123
 ```
 
-### 2. Interactive Ticket Entry
+### 2. Quick Branch Creation
 
 ```bash
-$ git start-branch
+# Using full command
+$ git start-branch -t PROJ-456 -b hotfix -n fix-login
+✓ Created branch: hotfix/fix-login
+✓ Stored ticket: PROJ-456
+
+# Using short alias
+$ git start -t PROJ-456 -b hotfix -n fix-login
+✓ Created branch: hotfix/fix-login
+✓ Stored ticket: PROJ-456
+```
+
+### 3. Branch from Current
+
+```bash
+# Using full command
+$ git start-branch -t PROJ-789 --current
 Select branch type:
    feature
-   bugfix
-   hotfix
-   release
-   docs
-? Enter the name of the new task: login-fix
-? Enter ticket number (e.g., PROJ-123): PROJ-456
-✓ Created branch: bugfix/login-fix
-✓ Stored ticket: PROJ-456
+? Enter the name of the new task: add-tests
+✓ Created branch: feature/add-tests from current branch
+✓ Stored ticket: PROJ-789
+
+# Using short alias
+$ git start -t PROJ-789 --current
+Select branch type:
+   feature
+? Enter the name of the new task: add-tests
+✓ Created branch: feature/add-tests from current branch
+✓ Stored ticket: PROJ-789
+```
+
+### 4. Skip Sync and Stash
+
+```bash
+# Using full command
+$ git start-branch -t PROJ-321 --no-sync --no-stash
+Select branch type:
+   feature
+? Enter the name of the new task: quick-fix
+✓ Created branch: feature/quick-fix
+✓ Stored ticket: PROJ-321
+
+# Using short alias
+$ git start -t PROJ-321 --no-sync --no-stash
+Select branch type:
+   feature
+? Enter the name of the new task: quick-fix
+✓ Created branch: feature/quick-fix
+✓ Stored ticket: PROJ-321
 ```
 
 ## Branch Types

@@ -6,14 +6,43 @@ if ! git rev-parse --is-inside-work-tree > /dev/null 2>&1; then
     exit 1
 fi
 
-# Parse command line arguments for ticket
-while getopts "t:" opt; do
-    case $opt in
-        t)
-            ticket="$OPTARG"
+# Initialize flags with default values
+ticket=""
+branch_name=""
+branch_type=""
+use_current_branch=false
+no_sync=false
+no_stash=false
+
+# Parse command line arguments
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        -t|--ticket)
+            ticket="$2"
+            shift 2
             ;;
-        \?)
-            echo "Invalid option: -$OPTARG"
+        -n|--name)
+            branch_name="$2"
+            shift 2
+            ;;
+        -b|--branch-type)
+            branch_type="$2"
+            shift 2
+            ;;
+        --current)
+            use_current_branch=true
+            shift
+            ;;
+        --no-sync)
+            no_sync=true
+            shift
+            ;;
+        --no-stash)
+            no_stash=true
+            shift
+            ;;
+        *)
+            echo "Unknown option: $1"
             exit 1
             ;;
     esac
@@ -108,8 +137,11 @@ select_option() {
     return $selected
 }
 
-# Check for modified files and stash if needed
-if [[ -n $(git status -s) ]]; then
+# Get main branch from config or use default (production)
+main_branch=$(git config workflow.mainBranch || echo "production")
+
+# Handle stashing if needed
+if [[ "$no_stash" != true ]] && [[ -n $(git status -s) ]]; then
     echo "You have modified files. Creating a stash..."
     stash_description="Auto stash before start-branch on $(date '+%Y-%m-%d %H:%M:%S')"
     git stash save "$stash_description" -a
@@ -117,27 +149,39 @@ if [[ -n $(git status -s) ]]; then
     sleep 2
 fi
 
-# Get main branch from config or use default (production)
-main_branch=$(git config workflow.mainBranch || echo "production")
+# Handle branch source and sync
+if [[ "$use_current_branch" != true ]]; then
+    if [[ "$no_sync" != true ]]; then
+        # Switch to main branch and pull latest changes
+        git checkout $main_branch
+        git pull origin $main_branch
+    fi
+fi
 
-# Switch to main branch and pull latest changes
-git checkout $main_branch
-git pull origin $main_branch
+# Validate/prompt for branch type if not provided
+if [ -n "$branch_type" ]; then
+    if [[ ! " ${types[@]} " =~ " ${branch_type} " ]]; then
+        echo "Invalid branch type: $branch_type"
+        echo "Valid types: ${types[*]}"
+        exit 1
+    fi
+else
+    # Clear screen and select branch type
+    clear
+    echo "Select branch type:"
+    select_option "${types[@]}"
+    selected=$?
+    branch_type=${types[$selected]}
+    description=${descriptions[$selected]}
+    echo
+    echo "You selected: $branch_type - $description"
+    echo
+fi
 
-# Clear screen and select branch type
-clear
-echo "Select branch type:"
-select_option "${types[@]}"
-selected=$?
-branch_type=${types[$selected]}
-description=${descriptions[$selected]}
-
-echo
-echo "You selected: $branch_type - $description"
-echo
-
-# Get task name
-task_name=$(prompt_non_empty "Enter the name of the new task")
+# Get task name if not provided
+if [ -z "$branch_name" ]; then
+    branch_name=$(prompt_non_empty "Enter the name of the new task")
+fi
 
 # If ticket not provided via argument, prompt for it
 if [ -z "$ticket" ]; then
@@ -150,13 +194,13 @@ if [ -z "$ticket" ]; then
 fi
 
 # Create branch with descriptive name (without ticket)
-branch_name="${branch_type}/${task_name// /-}"
-if git checkout -b "$branch_name"; then
+final_branch_name="${branch_type}/${branch_name// /-}"
+if git checkout -b "$final_branch_name"; then
     # Store ticket reference in git config
-    git config branch."$branch_name".ticket "$ticket"
+    git config branch."$final_branch_name".ticket "$ticket"
     
     echo
-    echo "Successfully created and switched to new branch: $branch_name"
+    echo "Successfully created and switched to new branch: $final_branch_name"
     echo "Associated ticket: $ticket"
     echo "You can now start working on your task."
     echo
