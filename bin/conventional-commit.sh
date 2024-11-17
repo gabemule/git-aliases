@@ -1,17 +1,53 @@
 #!/bin/bash
 
-# Parse command line arguments for setting ticket
-while getopts "t:" opt; do
-    case $opt in
-        t)
-            one_time_ticket="$OPTARG"
+# Initialize variables
+one_time_ticket=""
+message=""
+scope=""
+type=""
+auto_push=false
+breaking=false
+no_verify=false
+non_interactive=false
+
+# Parse command line arguments
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        -t|--ticket)
+            one_time_ticket="$2"
             if [[ ! $one_time_ticket =~ ^[A-Z]+-[0-9]+$ ]]; then
                 echo "Invalid ticket format. Must match PROJECT-XXX (e.g., PROJ-123)"
                 exit 1
             fi
+            shift 2
             ;;
-        \?)
-            echo "Invalid option: -$OPTARG"
+        -m|--message)
+            message="$2"
+            non_interactive=true
+            shift 2
+            ;;
+        -s|--scope)
+            scope="$2"
+            shift 2
+            ;;
+        -p|--push)
+            auto_push=true
+            shift
+            ;;
+        -b|--breaking)
+            breaking=true
+            shift
+            ;;
+        --no-verify)
+            no_verify=true
+            shift
+            ;;
+        --type)
+            type="$2"
+            shift 2
+            ;;
+        *)
+            echo "Unknown option: $1"
             exit 1
             ;;
     esac
@@ -97,43 +133,54 @@ select_option() {
     return $selected
 }
 
-# Clear screen
-clear
+# If type not provided, select interactively
+if [ -z "$type" ]; then
+    clear
+    echo "Select commit type:"
+    select_option "${types[@]}"
+    selected=$?
+    type=${types[$selected]}
+    description=${descriptions[$selected]}
 
-# Select commit type
-echo "Select commit type:"
-select_option "${types[@]}"
-selected=$?
-type=${types[$selected]}
-description=${descriptions[$selected]}
+    echo
+    echo "You selected: $type - $description"
+    echo
+else
+    # Validate provided type
+    if [[ ! " ${types[@]} " =~ " ${type} " ]]; then
+        echo "Invalid type: $type"
+        echo "Valid types: ${types[*]}"
+        exit 1
+    fi
+fi
 
-echo
-echo "You selected: $type - $description"
-echo
+# Get scope if not provided
+if [ -z "$scope" ]; then
+    scope=$(prompt_with_default "Enter scope (optional)" "")
+fi
 
-# Get scope (optional)
-scope=$(prompt_with_default "Enter scope (optional)" "")
 scope_part=""
 if [ -n "$scope" ]; then
     scope_part="($scope)"
 fi
 
-# Get commit description
-description=$(prompt_with_default "Enter short description" "")
+# Get commit description if not provided
+if [ -z "$message" ]; then
+    message=$(prompt_with_default "Enter short description" "")
+fi
 
-# Get commit body (optional)
-echo "Enter commit body (optional, press Ctrl+D when finished):"
-body=$(cat)
+# Get commit body (optional) if in interactive mode
+if [ -z "$message" ]; then
+    echo "Enter commit body (optional, press Ctrl+D when finished):"
+    body=$(cat)
+fi
 
-# Check for breaking changes
-breaking_change=$(prompt_with_default "Is this a breaking change? (y/N)" "N")
+# Handle breaking change
 breaking_change_marker=""
 breaking_change_footer=""
-if [[ $breaking_change =~ ^[Yy]$ ]]; then
+if [ "$breaking" = true ]; then
     breaking_change_marker="!"
-    breaking_change_footer="BREAKING CHANGE: "
-    breaking_change_description=$(prompt_with_default "Describe the breaking change" "")
-    breaking_change_footer+="$breaking_change_description"
+    breaking_change_footer="BREAKING CHANGE: Breaking changes introduced"
 fi
 
 # Get ticket from branch config or one-time ticket
@@ -148,7 +195,7 @@ else
 fi
 
 # Build commit message parts
-commit_title="${type}${scope_part}: ${description}"
+commit_title="${type}${scope_part}${breaking_change_marker}: ${message}"
 if [ -n "$ticket" ]; then
     commit_title+=" [${ticket}]"
 fi
@@ -171,31 +218,58 @@ echo
 echo "----------"
 echo
 
-# Confirm and commit
-read -p "Do you want to commit with this message? (Y/n) " confirm
-if [[ $confirm =~ ^[Yy]?$ ]]; then
-    # Build commit command with multiple -m arguments
-    commit_args=(-m "$commit_title")
-    if [ -n "$body" ]; then
-        commit_args+=(-m "$body")
-    fi
-    if [ -n "$breaking_change_footer" ]; then
-        commit_args+=(-m "$breaking_change_footer")
-    fi
-
-    if ! git commit "${commit_args[@]}"; then
+# Confirm commit in interactive mode
+if [ "$non_interactive" = false ]; then
+    read -p "Do you want to commit with this message? (Y/n) " confirm
+    if [[ ! $confirm =~ ^[Yy]?$ ]]; then
         echo
-        echo "Error: Commit failed! This might be due to husky hooks or other git errors."
-        echo "Please check the error message above and try again."
+        echo "Commit aborted."
+        echo
+        exit 0
+    fi
+fi
+
+# Build commit command
+commit_args=()
+if [ "$no_verify" = true ]; then
+    commit_args+=(--no-verify)
+fi
+commit_args+=(-m "$commit_title")
+if [ -n "$body" ]; then
+    commit_args+=(-m "$body")
+fi
+if [ -n "$breaking_change_footer" ]; then
+    commit_args+=(-m "$breaking_change_footer")
+fi
+
+# Commit changes
+if ! git commit "${commit_args[@]}"; then
+    echo
+    echo "Error: Commit failed! This might be due to husky hooks or other git errors."
+    echo "Please check the error message above and try again."
+    echo
+    exit 1
+fi
+
+echo
+echo "Commit successful!"
+echo
+
+# Handle auto-push
+if [ "$auto_push" = true ]; then
+    echo "Auto-pushing changes..."
+    if git push origin $current_branch; then
+        echo
+        echo "Changes pushed successfully to $current_branch."
+        echo
+    else
+        echo
+        echo "Failed to push changes. Please push manually."
         echo
         exit 1
     fi
-
-    echo
-    echo "Commit successful!"
-    echo
-
-    # Offer to push
+elif [ "$non_interactive" = false ]; then
+    # Offer to push in interactive mode
     read -p "Do you want to push the changes now? (Y/n) " push_confirm
     if [[ $push_confirm =~ ^[Yy]?$ ]]; then
         echo
@@ -214,8 +288,4 @@ if [[ $confirm =~ ^[Yy]?$ ]]; then
         echo "Changes not pushed. Remember to push your changes later."
         echo
     fi
-else
-    echo
-    echo "Commit aborted."
-    echo
 fi
