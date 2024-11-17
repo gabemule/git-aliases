@@ -2,5 +2,6 @@
     cc = !bash "$(dirname "$(git config --get include.path)")/bin/conventional-commit.sh"
     start = !bash "$(dirname "$(git config --get include.path)")/bin/start-branch.sh"
     start-branch = !bash "$(dirname "$(git config --get include.path)")/bin/start-branch.sh"
+    pr = !bash "$(dirname "$(git config --get include.path)")/bin/open-pr.sh"
     open-pr = !bash "$(dirname "$(git config --get include.path)")/bin/open-pr.sh"
     # Add more aliases here as needed

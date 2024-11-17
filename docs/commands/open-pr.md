@@ -7,11 +7,17 @@ Streamlines PR creation with automatic ticket reference inclusion and target bra
 ### Basic Usage
 
 ```bash
-# Interactive mode
+# Interactive mode (full command)
 git open-pr
 
-# Non-interactive mode
+# Interactive mode (short alias)
+git pr
+
+# Non-interactive mode (full command)
 git open-pr -t production --title "Fix login bug" --body "Fixed authentication flow"
+
+# Non-interactive mode (short alias)
+git pr -t production --title "Fix login bug" --body "Fixed authentication flow"
 ```
 
 ### Options
@@ -27,6 +33,7 @@ git open-pr -t production --title "Fix login bug" --body "Fixed authentication f
 ### 1. Interactive PR Creation
 
 ```bash
+# Using full command
 $ git open-pr
 Select the target branch for your PR:
 1) development
@@ -38,12 +45,27 @@ Enter PR description (press Ctrl+D when finished):
 - Add password reset
 - Add session management
 ✓ Opening PR in browser...
+
+# Using short alias
+$ git pr
+Select the target branch for your PR:
+1) development
+2) production
+? 1
+Enter PR title: [PROJ-123] Add user authentication
+✓ Opening PR in browser...
 ```
 
 ### 2. Quick PR Creation
 
 ```bash
+# Using full command
 $ git open-pr -t development --title "Fix login bug"
+✓ Created PR: [PROJ-123] Fix login bug
+✓ Opening PR in browser...
+
+# Using short alias
+$ git pr -t development --title "Fix login bug"
 ✓ Created PR: [PROJ-123] Fix login bug
 ✓ Opening PR in browser...
 ```
@@ -51,7 +73,18 @@ $ git open-pr -t development --title "Fix login bug"
 ### 3. Draft PR
 
 ```bash
+# Using full command
 $ git open-pr --draft
+Select the target branch for your PR:
+1) development
+2) production
+? 1
+Enter PR title: [PROJ-456] WIP: Refactor auth system
+✓ Created draft PR
+✓ Opening PR in browser...
+
+# Using short alias
+$ git pr --draft
 Select the target branch for your PR:
 1) development
 2) production
@@ -64,13 +97,19 @@ Enter PR title: [PROJ-456] WIP: Refactor auth system
 ### 4. PR Without Browser
 
 ```bash
+# Using full command
 $ git open-pr -t production --title "Hotfix: Security patch" --no-browser
+✓ Created PR: [PROJ-789] Hotfix: Security patch
+
+# Using short alias
+$ git pr -t production --title "Hotfix: Security patch" --no-browser
 ✓ Created PR: [PROJ-789] Hotfix: Security patch
 ```
 
 ### 5. PR with Template
 
 ```bash
+# Using full command
 $ git open-pr
 Select the target branch for your PR:
 1) development
@@ -84,6 +123,15 @@ Changes:
 - Implement search functionality
 - Add search results page
 - Add pagination
+✓ Opening PR in browser...
+
+# Using short alias
+$ git pr
+Select the target branch for your PR:
+1) development
+2) production
+? 1
+Enter PR title: [PROJ-123] Add search feature
 ✓ Opening PR in browser...
 ```
 
@@ -113,7 +161,7 @@ The command automatically:
 Example:
 ```bash
 # Branch ticket: PROJ-123
-$ git open-pr --title "Add search"
+$ git pr --title "Add search"
 ✓ Created PR: [PROJ-123] Add search
 ```
 
