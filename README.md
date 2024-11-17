@@ -218,7 +218,6 @@ Tickets can be handled in several ways:
    # Solution: Ensure you're in the correct directory and initialize if needed
    git init
    ```
-   See [Custom Configuration](#%EF%B8%8F-custom-configuration) for repository setup.
 
 2. **Branch Creation Failed**
    ```bash
