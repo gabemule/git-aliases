@@ -6,7 +6,10 @@ This documentation describes improvements and new features for our git workflow 
 ## Command Reference
 
 ### Branch Management
-- [Branch Synchronization Analysis](branch-sync-comparison.md) - Comparison of update-branch and sync commands
+- [Sync Command](sync-command.md) - Complete branch synchronization with configurable behavior
+
+### Review Process
+- [Review Command](review-command.md) - Streamlined PR review process
 
 ### Production Management
 - [Rollback Command](rollback-command.md) - Safe production rollback process with:
@@ -15,10 +18,7 @@ This documentation describes improvements and new features for our git workflow 
   - Change verification and conflict detection
   - PR-based review process
   - Dry run support
-  - Uses same main branch configuration as start-branch
-
-### Review Process
-- [Review Command](review-command.md) - Streamlined PR review process
+  - Uses same main branch configuration as sync command
 
 ### Workspace Management
 - [Workspace Command](workspace-command.md) - Save and restore workspace states
@@ -30,7 +30,7 @@ This documentation describes improvements and new features for our git workflow 
 
 1. Critical Priority
    - Rollback command (production safety)
-   - Branch synchronization (sync command)
+   - Sync command (daily workflow)
 
 2. High Priority
    - Review command
