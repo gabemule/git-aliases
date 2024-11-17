@@ -44,7 +44,12 @@ git-aliases/
 │   ├── verify-installation.sh  # Tests setup/config
 │   └── verify-workflow.sh     # Tests functionality
 ├── docs/             # Documentation
-│   └── improvements.md
+│   ├── README.md            # Documentation index
+│   ├── branch-sync-comparison.md  # Sync command analysis
+│   ├── rollback-command.md  # Rollback command docs
+│   ├── review-command.md    # Review command docs
+│   ├── workspace-command.md # Workspace command docs
+│   └── standup-command.md   # Standup command docs
 ├── .gitconfig        # Git configuration
 └── README.md         # Main documentation
 ```
@@ -218,30 +223,79 @@ Tickets can be handled in several ways:
    - Automatically included in commits
    - Visible in PR title and description
 
+## Configuration
+
+### Branch Configuration
+```bash
+# Set custom main branch for repository (defaults to 'production')
+git config workflow.mainBranch main
+
+# View current main branch configuration
+git config workflow.mainBranch
+```
+
+### Ticket Configuration
+```bash
+# Set ticket for current branch
+git config branch.$(git rev-parse --abbrev-ref HEAD).ticket PROJ-123
+
+# View current branch's ticket
+git config branch.$(git rev-parse --abbrev-ref HEAD).ticket
+```
+
+### Commit Configuration
+```bash
+# Use one-time ticket for single commit (not persisted)
+git cc -t PROJ-123
+```
+
 ## Troubleshooting
 
-1. **Missing Ticket Reference**
-```bash
-   # Set ticket for current branch
-   git config branch.$(git rev-parse --abbrev-ref HEAD).ticket PROJ-123
-```
-
-2. **Branch Issues**
-```bash
-   # View current branch's ticket
-   git config branch.$(git rev-parse --abbrev-ref HEAD).ticket
+### Installation Issues
+1. **Git Aliases Not Working**
+   ```bash
+   # Verify git config include
+   git config --get include.path
    
-   # Set custom main branch for repository (defaults to 'production')
-   git config workflow.mainBranch main
-```
+   # Re-run installation if needed
+   echo -e "[include]\n    path = $(pwd)/.gitconfig" >> ~/.gitconfig
+   ```
 
-3. **Commit Issues**
-```bash
-   # Use a one-time ticket for single commit
-   git cc -t PROJ-123
+2. **GitHub CLI Issues**
+   ```bash
+   # Verify GitHub CLI installation
+   gh --version
    
-   # Note: -t flag tickets are not persisted and only apply to the current commit
-```
+   # Re-authenticate if needed
+   gh auth login
+   ```
+
+### Common Errors
+
+1. **Not a Git Repository**
+   ```bash
+   # Error: not a git repository
+   # Solution: Ensure you're in the correct directory and initialize if needed
+   git init
+   ```
+
+2. **Branch Creation Failed**
+   ```bash
+   # Error: cannot create branch
+   # Solution: Fetch latest changes and try again
+   git fetch origin
+   git start-branch -t PROJ-123
+   ```
+
+3. **Merge Conflicts**
+   ```bash
+   # Error: merge conflicts detected
+   # Solution: Resolve conflicts and continue
+   # Edit conflicted files, then:
+   git add .
+   git commit -m "fix: resolve conflicts"
+   ```
+
 
 ## Contributing
 
