@@ -227,7 +227,6 @@ Tickets can be handled in several ways:
    git fetch origin
    git start-branch -t PROJ-123
    ```
-   See [Branch Types](#-branch-types) for naming conventions.
 
 3. **Merge Conflicts**
    ```bash
