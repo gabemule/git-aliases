@@ -38,10 +38,10 @@ A collection of Git workflow automation scripts designed to streamline developme
 Creates new branches with standardized naming and stores ticket references.
 
 **Features:**
-- Clean, descriptive branch names (see [Branch Types](#-branch-types))
+- Clean, descriptive branch names
 - Ticket reference storage in Git config (see [Ticket References](#-ticket-references))
 - Automatic stashing of changes
-- Main branch sync (defaults to 'production', see [Configuration](#%EF%B8%8F-configuration))
+- Main branch sync (defaults to 'production', see [Custom Configuration](#-custom-configuration))
 - Configurable main branch per repository
 
 **Usage:**
@@ -212,7 +212,7 @@ Tickets can be handled in several ways:
    # Solution: Ensure you're in the correct directory and initialize if needed
    git init
    ```
-   See [Configuration](#%EF%B8%8F-configuration) for repository setup.
+   See [Custom Configuration](#-custom-configuration) for repository setup.
 
 2. **Branch Creation Failed**
    ```bash
@@ -288,3 +288,4 @@ git-aliases/
 ## 📄 License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
+
