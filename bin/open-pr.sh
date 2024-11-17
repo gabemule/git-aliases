@@ -1,5 +1,44 @@
 #!/bin/bash
 
+# Initialize variables
+target=""
+title=""
+body=""
+draft=false
+no_browser=false
+non_interactive=false
+
+# Parse command line arguments
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        -t|--target)
+            target="$2"
+            shift 2
+            ;;
+        --title)
+            title="$2"
+            non_interactive=true
+            shift 2
+            ;;
+        --body)
+            body="$2"
+            shift 2
+            ;;
+        --draft)
+            draft=true
+            shift
+            ;;
+        --no-browser)
+            no_browser=true
+            shift
+            ;;
+        *)
+            echo "Unknown option: $1"
+            exit 1
+            ;;
+    esac
+done
+
 # Check if we're in a git repository
 if ! git rev-parse --is-inside-work-tree > /dev/null 2>&1; then
     echo "Error: This script must be run in a git repository."
@@ -29,14 +68,26 @@ if [[ ! "$current_branch" =~ ^(feature|bugfix|hotfix|docs)/ ]]; then
     exit 1
 fi
 
-# Prompt for the target branch
-echo "Select the target branch for your PR:"
-select target in "development" "production"; do
-    case $target in
-        development|production) break;;
-        *) echo "Invalid option. Please try again.";;
-    esac
-done
+# Get target branch if not provided
+if [ -z "$target" ]; then
+    echo "Select the target branch for your PR:"
+    select target_choice in "development" "production"; do
+        case $target_choice in
+            development|production)
+                target=$target_choice
+                break
+                ;;
+            *) echo "Invalid option. Please try again.";;
+        esac
+    done
+else
+    # Validate provided target
+    if [[ ! "$target" =~ ^(development|production)$ ]]; then
+        echo "Invalid target branch: $target"
+        echo "Valid targets: development, production"
+        exit 1
+    fi
+fi
 
 # Check if PR already exists
 existing_pr=$(gh pr list --head "$current_branch" --base "$target" --json url --jq '.[0].url')
@@ -45,32 +96,62 @@ if [ -n "$existing_pr" ]; then
     exit 0
 fi
 
-# Prompt for PR title, including ticket if available
-if [ -n "$ticket" ]; then
-    default_title="[$ticket] "
-else
-    default_title=""
+# Handle PR title
+if [ -z "$title" ]; then
+    if [ -n "$ticket" ]; then
+        default_title="[$ticket] "
+    else
+        default_title=""
+    fi
+    read -p "Enter PR title: $default_title" title_input
+    title="$default_title$title_input"
+elif [ -n "$ticket" ] && [[ ! "$title" =~ \[$ticket\] ]]; then
+    # Add ticket to provided title if not present
+    title="[$ticket] $title"
 fi
-read -p "Enter PR title: $default_title" title_input
-title="$default_title$title_input"
 
-# Prompt for PR description
-echo "Enter PR description (press Ctrl+D when finished):"
-description=$(cat)
+# Handle PR description
+if [ -z "$body" ]; then
+    echo "Enter PR description (press Ctrl+D when finished):"
+    body=$(cat)
+fi
+
+# Check for PR template
+if [[ -f .github/pull_request_template.md ]]; then
+    template=$(cat .github/pull_request_template.md)
+    body="$template\n\n$body"
+fi
 
 # If we have a ticket, add it to the description
 if [ -n "$ticket" ]; then
-    description="Related ticket: $ticket\n\n$description"
+    body="Related ticket: $ticket\n\n$body"
 fi
 
-# Create the PR
-pr_url=$(gh pr create --base "$target" --head "$current_branch" --title "$title" --body "$description" --web)
+# Build PR command
+pr_args=()
+pr_args+=(--base "$target")
+pr_args+=(--head "$current_branch")
+pr_args+=(--title "$title")
+pr_args+=(--body "$body")
 
-# With the --web flag we wont get the $pr_url
-# if [ -n "$pr_url" ]; then
-#     echo "PR created successfully!"
-#     echo "PR URL: $pr_url"
-# else
-#     echo "Failed to create PR."
-#     exit 1
-# fi
+if [ "$draft" = true ]; then
+    pr_args+=(--draft)
+fi
+
+if [ "$no_browser" = true ]; then
+    # Create PR without opening browser
+    if ! gh pr create "${pr_args[@]}"; then
+        echo "Failed to create PR."
+        exit 1
+    fi
+else
+    # Create and open PR in browser
+    if ! gh pr create "${pr_args[@]}" --web; then
+        echo "Failed to create PR."
+        exit 1
+    fi
+fi
+
+echo
+echo "PR created successfully!"
+echo
