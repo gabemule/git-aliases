@@ -191,6 +191,12 @@ Tickets can be handled in several ways:
    # Verify git config include
    git config --get include.path
    
+   # Check .gitconfig content manually
+   cat ~/.gitconfig
+   # Should contain:
+   [include]
+       path = /path/to/repo/front-git-aliases/.gitconfig
+   
    # Re-run installation if needed
    echo -e "[include]\n    path = $(pwd)/.gitconfig" >> ~/.gitconfig
    ```
