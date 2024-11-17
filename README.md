@@ -131,31 +131,6 @@ Tickets can be handled in several ways:
    - Includes in title and description
    - Links to ticket tracking system
 
-## 🌳 Branch Types
-
-| Type | Purpose | Example |
-|------|---------|---------|
-| feature/ | New features | feature/user-authentication |
-| bugfix/ | Non-critical fixes | bugfix/login-validation |
-| hotfix/ | Critical production fixes | hotfix/security-vulnerability |
-| release/ | Release preparation | release/v1.2.0 |
-| docs/ | Documentation updates | docs/api-endpoints |
-
-## 📝 Commit Types
-
-| Type | Purpose | Example |
-|------|---------|---------|
-| feat | New features | feat(auth): add password reset [PROJ-123] |
-| fix | Bug fixes | fix(ui): correct button alignment [PROJ-123] |
-| docs | Documentation | docs(api): update endpoints [PROJ-123] |
-| style | Code style changes | style(lint): format according to rules [PROJ-123] |
-| refactor | Code improvements | refactor(core): optimize data flow [PROJ-123] |
-| perf | Performance improvements | perf(queries): optimize database calls [PROJ-123] |
-| test | Testing changes | test(auth): add login tests [PROJ-123] |
-| chore | Maintenance tasks | chore(deps): update packages [PROJ-123] |
-| ci | CI/CD changes | ci(deploy): update pipeline [PROJ-123] |
-| build | Build system changes | build(webpack): optimize config [PROJ-123] |
-
 ## 🔄 Workflow Example
 
 1. Start new feature branch:
@@ -181,28 +156,6 @@ Tickets can be handled in several ways:
    # Select: development
    # Title auto-includes: [PROJ-123]
 ```
-
-## ✨ Best Practices
-
-1. **Branch Names**
-   - Use descriptive names
-   - Follow type prefixes
-   - Keep it clean and readable
-
-2. **Commit Messages**
-   - Follow conventional commits format
-   - Include meaningful descriptions
-   - Ticket references are automatic
-
-3. **Pull Requests**
-   - One PR per feature/fix
-   - Clear descriptions
-   - Link related PRs if needed
-
-4. **Ticket References**
-   - Set when creating branch
-   - Automatically included in commits
-   - Visible in PR title and description
 
 ## ⚙️ Custom Configuration
 
@@ -276,6 +229,28 @@ git cc -t PROJ-456
    git add .
    git commit -m "fix: resolve conflicts"
    ```
+
+## ✨ Best Practices
+
+1. **Branch Names**
+   - Use descriptive names
+   - Follow type prefixes
+   - Keep it clean and readable
+
+2. **Commit Messages**
+   - Follow conventional commits format
+   - Include meaningful descriptions
+   - Ticket references are automatic
+
+3. **Pull Requests**
+   - One PR per feature/fix
+   - Clear descriptions
+   - Link related PRs if needed
+
+4. **Ticket References**
+   - Set when creating branch
+   - Automatically included in commits
+   - Visible in PR title and description
 
 ## 📁 Project Structure
 
