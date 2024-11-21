@@ -7,10 +7,15 @@
 <br/>
 
 <sub><sup>
-The hero represents a journey through time and technology, blending nostalgic design with modern Git practices.  The iconic floor-standing clock symbolizes branching Git workflows, with options like `commit`, `squash`, and `rebase` embedded in its timeline.
+The hero represents a journey through time and technology, blending nostalgic design with modern Git practices.  
+</sup></sub>
+<sub><sup>
+The iconic floor-standing clock symbolizes branching Git workflows, with options like `commit`, `squash`, and `rebase` embedded in its timeline.
 </sup></sub>
 
 </div>
+
+## 📝 Description
 
 **ChronoGit** is a collection of Git workflow automation tools designed to bring precision and clarity to your version control processes. Inspired by the iconic *Chrono Trigger*, ChronoGit integrates the principles of chronological versioning with a streamlined developer experience.
 
