@@ -1,4 +1,14 @@
+<div align="center">
+
 # 🕒 ChronoGit
+
+<img src="assets/chronogit-hero.png" alt="ChronoGit Logo" width="50%">  
+
+<small> 
+The hero represents a journey through time and technology, blending nostalgic design with modern Git practices. The iconic floor-standing clock symbolizes branching Git workflows, with options like `commit`, `squash`, and `rebase` embedded in its timeline.
+</small>
+
+</div>
 
 **ChronoGit** is a collection of Git workflow automation tools designed to bring precision and clarity to your version control processes. Inspired by the iconic *Chrono Trigger*, ChronoGit integrates the principles of chronological versioning with a streamlined developer experience.
 
@@ -9,12 +19,6 @@ ChronoGit embodies the spirit of adventure and precision, empowering teams to:
 - **Master Chronological Versioning**: Date-based versioning ensures clarity and consistency.
 - **Navigate Temporal Workflows**: Explore your Git history and manage branches as timelines.
 - **Enhance Collaboration**: Automate and standardize workflows with intuitive commands.
-
-## 🎨 Visual Identity
-
-![ChronoGit Hero](assets/chronogit-hero.png)
-
-The hero represents a journey through time and technology, blending nostalgic design with modern Git practices. The iconic floor-standing clock symbolizes branching Git workflows, with options like `commit`, `squash`, and `rebase` embedded in its timeline.
 
 ## 📂 Documentation
 
