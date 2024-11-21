@@ -55,6 +55,22 @@ check_config "scripts location" \
     "[ -f \"$ALIASES_DIR/bin/conventional-commit.sh\" ]" \
     "Scripts not found at configured path: $ALIASES_DIR"
 
+# Check configuration defaults
+check_config "configuration defaults" \
+    "[ \"$(git config workflow.mainBranch || echo 'production')\" = 'production' ] && \
+     [[ \"$(git config workflow.ticketPattern || echo '^[A-Z]+-[0-9]+$')\" =~ ^\^[A-Z]+-[0-9]+\$ ]] && \
+     [ \"$(git config workflow.defaultTarget || echo 'development')\" = 'development' ]" \
+    "Default configuration values are incorrect."
+
+# Check branch prefixes
+check_config "branch prefixes" \
+    "[ \"$(git config workflow.featurePrefix || echo 'feature/')\" = 'feature/' ] && \
+     [ \"$(git config workflow.bugfixPrefix || echo 'bugfix/')\" = 'bugfix/' ] && \
+     [ \"$(git config workflow.hotfixPrefix || echo 'hotfix/')\" = 'hotfix/' ] && \
+     [ \"$(git config workflow.releasePrefix || echo 'release/')\" = 'release/' ] && \
+     [ \"$(git config workflow.docsPrefix || echo 'docs/')\" = 'docs/' ]" \
+    "Default branch prefixes are incorrect."
+
 # Summary
 echo
 if [ $? -eq 0 ]; then
