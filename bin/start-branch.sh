@@ -1,8 +1,12 @@
 #!/bin/bash
 
+# Source common configuration
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/common/config.sh"
+
 # Check if script is run in a git repository
 if ! git rev-parse --is-inside-work-tree > /dev/null 2>&1; then
-    echo "Error: This script must be run in a git repository."
+    echo -e "${RED}Error: This script must be run in a git repository.${NC}"
     exit 1
 fi
 
@@ -42,7 +46,7 @@ while [[ $# -gt 0 ]]; do
             shift
             ;;
         *)
-            echo "Unknown option: $1"
+            echo -e "${RED}Unknown option: $1${NC}"
             exit 1
             ;;
     esac
@@ -58,102 +62,12 @@ descriptions=(
     "Write, update, or fix documentation"
 )
 
-# Get branch prefixes from config or use defaults
-feature_prefix=$(git config workflow.featurePrefix || echo "feature/")
-bugfix_prefix=$(git config workflow.bugfixPrefix || echo "bugfix/")
-hotfix_prefix=$(git config workflow.hotfixPrefix || echo "hotfix/")
-release_prefix=$(git config workflow.releasePrefix || echo "release/")
-docs_prefix=$(git config workflow.docsPrefix || echo "docs/")
-
-# Function to prompt for input with default value
-prompt_with_default() {
-    local prompt="$1"
-    local default="$2"
-    local input
-    read -p "$prompt [$default]: " input
-    echo "${input:-$default}"
-}
-
-# Function to prompt for non-empty input
-prompt_non_empty() {
-    local prompt="$1"
-    local input=""
-    while [ -z "$input" ]; do
-        read -p "$prompt: " input
-        if [ -z "$input" ]; then
-            echo "Input cannot be empty. Please try again."
-        fi
-    done
-    echo "$input"
-}
-
-# Function to validate ticket format
-validate_ticket() {
-    local pattern=$(git config workflow.ticketPattern || echo "^[A-Z]+-[0-9]+$")
-    if [[ ! $1 =~ $pattern ]]; then
-        echo "Invalid ticket format. Must match pattern: $pattern"
-        return 1
-    fi
-    return 0
-}
-
-# Function to display menu and handle selection
-select_option() {
-    ESC=$(printf '\033')
-    cursor_blink_on()  { printf "$ESC[?25h"; }
-    cursor_blink_off() { printf "$ESC[?25l"; }
-    cursor_to()        { printf "$ESC[$1;${2:-1}H"; }
-    print_option()     { printf "   $1 "; }
-    print_selected()   { printf "  $ESC[7m $1 $ESC[27m"; }
-    get_cursor_row()   { IFS=';' read -sdR -p $'\E[6n' ROW COL; echo ${ROW#*[}; }
-    key_input()        { read -s -n3 key 2>/dev/null >&2
-                         if [[ $key = $ESC[A ]]; then echo up;    fi
-                         if [[ $key = $ESC[B ]]; then echo down;  fi
-                         if [[ $key = ""     ]]; then echo enter; fi; }
-
-    local options=("$@")
-    local selected=0
-
-    cursor_blink_off
-
-    while true; do
-        echo
-        echo
-        local idx=0
-        for option in "${options[@]}"; do
-            cursor_to $((idx + 3))
-            if [ $idx -eq $selected ]; then
-                print_selected "$option"
-            else
-                print_option "$option"
-            fi
-            ((idx++))
-        done
-
-        case $(key_input) in
-            up)    ((selected--)); 
-                   if [ $selected -lt 0 ]; then selected=$((${#options[@]} - 1)); fi;;
-            down)  ((selected++));
-                   if [ $selected -ge ${#options[@]} ]; then selected=0; fi;;
-            enter) break;;
-        esac
-    done
-
-    cursor_to $((${#options[@]} + 3))
-    cursor_blink_on
-
-    return $selected
-}
-
-# Get main branch from config or use default (production)
-main_branch=$(git config workflow.mainBranch || echo "production")
-
 # Handle stashing if needed
 if [[ "$no_stash" != true ]] && [[ -n $(git status -s) ]]; then
-    echo "You have modified files. Creating a stash..."
+    echo -e "${BLUE}You have modified files. Creating a stash...${NC}"
     stash_description="Auto stash before start-branch on $(date '+%Y-%m-%d %H:%M:%S')"
     git stash save "$stash_description" -a
-    echo "Stash created with description: $stash_description"
+    echo -e "${GREEN}Stash created with description: $stash_description${NC}"
     sleep 2
 fi
 
@@ -161,28 +75,28 @@ fi
 if [[ "$use_current_branch" != true ]]; then
     if [[ "$no_sync" != true ]]; then
         # Switch to main branch and pull latest changes
-        git checkout $main_branch
-        git pull origin $main_branch
+        git checkout $MAIN_BRANCH
+        git pull origin $MAIN_BRANCH
     fi
 fi
 
 # Validate/prompt for branch type if not provided
 if [ -n "$branch_type" ]; then
     if [[ ! " ${types[@]} " =~ " ${branch_type} " ]]; then
-        echo "Invalid branch type: $branch_type"
+        echo -e "${RED}Invalid branch type: $branch_type${NC}"
         echo "Valid types: ${types[*]}"
         exit 1
     fi
 else
     # Clear screen and select branch type
     clear
-    echo "Select branch type:"
+    echo -e "${BLUE}Select branch type:${NC}"
     select_option "${types[@]}"
     selected=$?
     branch_type=${types[$selected]}
     description=${descriptions[$selected]}
     echo
-    echo "You selected: $branch_type - $description"
+    echo -e "${GREEN}You selected: $branch_type - $description${NC}"
     echo
 fi
 
@@ -203,11 +117,11 @@ fi
 
 # Get prefix based on branch type
 case $branch_type in
-    feature) prefix=$feature_prefix ;;
-    bugfix)  prefix=$bugfix_prefix ;;
-    hotfix)  prefix=$hotfix_prefix ;;
-    release) prefix=$release_prefix ;;
-    docs)    prefix=$docs_prefix ;;
+    feature) prefix=$FEATURE_PREFIX ;;
+    bugfix)  prefix=$BUGFIX_PREFIX ;;
+    hotfix)  prefix=$HOTFIX_PREFIX ;;
+    release) prefix=$RELEASE_PREFIX ;;
+    docs)    prefix=$DOCS_PREFIX ;;
     *)       prefix="$branch_type/" ;;
 esac
 
@@ -218,17 +132,17 @@ if git checkout -b "$final_branch_name"; then
     git config branch."$final_branch_name".ticket "$ticket"
     
     echo
-    echo "Successfully created and switched to new branch: $final_branch_name"
-    echo "Associated ticket: $ticket"
-    echo "You can now start working on your task."
+    echo -e "${GREEN}Successfully created and switched to new branch: $final_branch_name${NC}"
+    echo -e "${GREEN}Associated ticket: $ticket${NC}"
+    echo -e "${BLUE}You can now start working on your task.${NC}"
     echo
     echo "When you're done:"
     echo "1. Create a pull request to merge into 'development'"
-    echo "2. After testing, create another pull request to merge into '$main_branch'"
+    echo "2. After testing, create another pull request to merge into '$MAIN_BRANCH'"
     echo
 else
     echo
-    echo "Error: Failed to create new branch."
+    echo -e "${RED}Error: Failed to create new branch.${NC}"
     echo
     exit 1
 fi

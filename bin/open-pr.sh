@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# Source common configuration
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/common/config.sh"
+
 # Initialize variables
 target=""
 title=""
@@ -33,7 +37,7 @@ while [[ $# -gt 0 ]]; do
             shift
             ;;
         *)
-            echo "Unknown option: $1"
+            echo -e "${RED}Unknown option: $1${NC}"
             exit 1
             ;;
     esac
@@ -41,16 +45,16 @@ done
 
 # Check if we're in a git repository
 if ! git rev-parse --is-inside-work-tree > /dev/null 2>&1; then
-    echo "Error: This script must be run in a git repository."
+    echo -e "${RED}Error: This script must be run in a git repository.${NC}"
     exit 1
 fi
 
 # Check if gh CLI is installed
 if ! command -v gh &> /dev/null; then
-    echo "Error: GitHub CLI (gh) is not installed."
+    echo -e "${RED}Error: GitHub CLI (gh) is not installed.${NC}"
     echo "Please install it following the instructions at: https://cli.github.com/"
     echo
-    echo "Quick install commands:"
+    echo -e "${BLUE}Quick install commands:${NC}"
     echo "  Homebrew (macOS): brew install gh"
     echo "  Windows: winget install --id GitHub.cli"
     echo "  Linux: See https://github.com/cli/cli/blob/trunk/docs/install_linux.md"
@@ -61,16 +65,9 @@ fi
 current_branch=$(git rev-parse --abbrev-ref HEAD)
 ticket=$(git config branch."$current_branch".ticket)
 
-# Get branch prefixes from config or use defaults
-feature_prefix=$(git config workflow.featurePrefix || echo "feature/")
-bugfix_prefix=$(git config workflow.bugfixPrefix || echo "bugfix/")
-hotfix_prefix=$(git config workflow.hotfixPrefix || echo "hotfix/")
-release_prefix=$(git config workflow.releasePrefix || echo "release/")
-docs_prefix=$(git config workflow.docsPrefix || echo "docs/")
-
 # Check if we're on a valid branch type
 valid_prefix=false
-for prefix in "$feature_prefix" "$bugfix_prefix" "$hotfix_prefix" "$release_prefix" "$docs_prefix"; do
+for prefix in "$FEATURE_PREFIX" "$BUGFIX_PREFIX" "$HOTFIX_PREFIX" "$RELEASE_PREFIX" "$DOCS_PREFIX"; do
     if [[ "$current_branch" =~ ^"$prefix" ]]; then
         valid_prefix=true
         break
@@ -78,30 +75,27 @@ for prefix in "$feature_prefix" "$bugfix_prefix" "$hotfix_prefix" "$release_pref
 done
 
 if [ "$valid_prefix" = false ]; then
-    echo "Error: You must be on a feature, bugfix, hotfix, or docs branch to open a PR."
+    echo -e "${RED}Error: You must be on a feature, bugfix, hotfix, or docs branch to open a PR.${NC}"
     echo "Current branch: $current_branch"
     exit 1
 fi
 
-# Get default target from config or use development
-default_target=$(git config workflow.defaultTarget || echo "development")
-
 # Get target branch if not provided
 if [ -z "$target" ]; then
-    echo "Select the target branch for your PR:"
+    echo -e "${BLUE}Select the target branch for your PR:${NC}"
     select target_choice in "development" "production"; do
         case $target_choice in
             development|production)
                 target=$target_choice
                 break
                 ;;
-            *) echo "Invalid option. Please try again.";;
+            *) echo -e "${RED}Invalid option. Please try again.${NC}";;
         esac
     done
 else
     # Validate provided target
     if [[ ! "$target" =~ ^(development|production)$ ]]; then
-        echo "Invalid target branch: $target"
+        echo -e "${RED}Invalid target branch: $target${NC}"
         echo "Valid targets: development, production"
         exit 1
     fi
@@ -110,7 +104,7 @@ fi
 # Check if PR already exists
 existing_pr=$(gh pr list --head "$current_branch" --base "$target" --json url --jq '.[0].url')
 if [ -n "$existing_pr" ]; then
-    echo "A PR already exists for this branch: $existing_pr"
+    echo -e "${YELLOW}A PR already exists for this branch: $existing_pr${NC}"
     exit 0
 fi
 
@@ -130,16 +124,13 @@ fi
 
 # Handle PR description
 if [ -z "$body" ]; then
-    echo "Enter PR description (press Ctrl+D when finished):"
+    echo -e "${BLUE}Enter PR description (press Ctrl+D when finished):${NC}"
     body=$(cat)
 fi
 
-# Get PR template path from config or use default
-template_path=$(git config workflow.prTemplatePath || echo ".github/pull_request_template.md")
-
 # Check for PR template
-if [[ -f "$template_path" ]]; then
-    template=$(cat "$template_path")
+if [[ -f "$PR_TEMPLATE_PATH" ]]; then
+    template=$(cat "$PR_TEMPLATE_PATH")
     body="$template\n\n$body"
 fi
 
@@ -162,17 +153,17 @@ fi
 if [ "$no_browser" = true ]; then
     # Create PR without opening browser
     if ! gh pr create "${pr_args[@]}"; then
-        echo "Failed to create PR."
+        echo -e "${RED}Failed to create PR.${NC}"
         exit 1
     fi
 else
     # Create and open PR in browser
     if ! gh pr create "${pr_args[@]}" --web; then
-        echo "Failed to create PR."
+        echo -e "${RED}Failed to create PR.${NC}"
         exit 1
     fi
 fi
 
 echo
-echo "PR created successfully!"
+echo -e "${GREEN}PR created successfully!${NC}"
 echo

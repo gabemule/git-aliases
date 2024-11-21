@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# Source common configuration
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/common/config.sh"
+
 # Initialize variables
 one_time_ticket=""
 message=""
@@ -16,10 +20,7 @@ while [[ $# -gt 0 ]]; do
     case $1 in
         -t|--ticket)
             one_time_ticket="$2"
-            # Get ticket pattern from config or use default
-            pattern=$(git config workflow.ticketPattern || echo "^[A-Z]+-[0-9]+$")
-            if [[ ! $one_time_ticket =~ $pattern ]]; then
-                echo "Invalid ticket format. Must match pattern: $pattern"
+            if ! validate_ticket "$one_time_ticket"; then
                 exit 1
             fi
             shift 2
@@ -57,7 +58,7 @@ while [[ $# -gt 0 ]]; do
             shift
             ;;
         *)
-            echo "Unknown option: $1"
+            echo -e "${RED}Unknown option: $1${NC}"
             exit 1
             ;;
     esac
@@ -65,7 +66,7 @@ done
 
 # Check for staged files
 if [ -z "$(git diff --cached --name-only)" ]; then
-    echo "Error: No staged files. Stage your changes before committing."
+    echo -e "${RED}Error: No staged files. Stage your changes before committing.${NC}"
     echo
     git status
     exit 1
@@ -86,79 +87,22 @@ descriptions=(
     "Changes that affect the build system or external dependencies"
 )
 
-# Function to prompt for input with default value
-prompt_with_default() {
-    local prompt="$1"
-    local default="$2"
-    local input
-    read -p "$prompt [$default]: " input
-    echo "${input:-$default}"
-}
-
-# Function to display menu and handle selection
-select_option() {
-    ESC=$(printf '\033')
-    cursor_blink_on()  { printf "$ESC[?25h"; }
-    cursor_blink_off() { printf "$ESC[?25l"; }
-    cursor_to()        { printf "$ESC[$1;${2:-1}H"; }
-    print_option()     { printf "   $1 "; }
-    print_selected()   { printf "  $ESC[7m $1 $ESC[27m"; }
-    get_cursor_row()   { IFS=';' read -sdR -p $'\E[6n' ROW COL; echo ${ROW#*[}; }
-    key_input()        { read -s -n3 key 2>/dev/null >&2
-                         if [[ $key = $ESC[A ]]; then echo up;    fi
-                         if [[ $key = $ESC[B ]]; then echo down;  fi
-                         if [[ $key = ""     ]]; then echo enter; fi; }
-
-    local options=("$@")
-    local selected=0
-
-    cursor_blink_off
-
-    while true; do
-        echo
-        echo
-        local idx=0
-        for option in "${options[@]}"; do
-            cursor_to $((idx + 3))
-            if [ $idx -eq $selected ]; then
-                print_selected "$option"
-            else
-                print_option "$option"
-            fi
-            ((idx++))
-        done
-
-        case $(key_input) in
-            up)    ((selected--)); 
-                   if [ $selected -lt 0 ]; then selected=$((${#options[@]} - 1)); fi;;
-            down)  ((selected++));
-                   if [ $selected -ge ${#options[@]} ]; then selected=0; fi;;
-            enter) break;;
-        esac
-    done
-
-    cursor_to $((${#options[@]} + 3))
-    cursor_blink_on
-
-    return $selected
-}
-
 # If type not provided, select interactively
 if [ -z "$type" ]; then
     clear
-    echo "Select commit type:"
+    echo -e "${BLUE}Select commit type:${NC}"
     select_option "${types[@]}"
     selected=$?
     type=${types[$selected]}
     description=${descriptions[$selected]}
 
     echo
-    echo "You selected: $type - $description"
+    echo -e "${GREEN}You selected: $type - $description${NC}"
     echo
 else
     # Validate provided type
     if [[ ! " ${types[@]} " =~ " ${type} " ]]; then
-        echo "Invalid type: $type"
+        echo -e "${RED}Invalid type: $type${NC}"
         echo "Valid types: ${types[*]}"
         exit 1
     fi
@@ -212,7 +156,7 @@ fi
 
 # Display final message
 echo
-echo -e "\nFinal commit message:"
+echo -e "\n${BLUE}Final commit message:${NC}"
 echo "----------"
 echo
 echo "$commit_title"
@@ -233,7 +177,7 @@ if [ "$non_interactive" != true ]; then
     read -p "Do you want to commit with this message? (Y/n) " confirm
     if [[ ! $confirm =~ ^[Yy]?$ ]]; then
         echo
-        echo "Commit aborted."
+        echo -e "${YELLOW}Commit aborted.${NC}"
         echo
         exit 0
     fi
@@ -255,26 +199,26 @@ fi
 # Commit changes
 if ! git commit "${commit_args[@]}"; then
     echo
-    echo "Error: Commit failed! This might be due to husky hooks or other git errors."
+    echo -e "${RED}Error: Commit failed! This might be due to husky hooks or other git errors.${NC}"
     echo "Please check the error message above and try again."
     echo
     exit 1
 fi
 
 echo
-echo "Commit successful!"
+echo -e "${GREEN}Commit successful!${NC}"
 echo
 
 # Handle auto-push
 if [ "$auto_push" = true ]; then
-    echo "Auto-pushing changes..."
+    echo -e "${BLUE}Auto-pushing changes...${NC}"
     if git push origin $current_branch; then
         echo
-        echo "Changes pushed successfully to $current_branch."
+        echo -e "${GREEN}Changes pushed successfully to $current_branch.${NC}"
         echo
     else
         echo
-        echo "Failed to push changes. Please push manually."
+        echo -e "${RED}Failed to push changes. Please push manually.${NC}"
         echo
         exit 1
     fi
@@ -285,17 +229,17 @@ elif [ "$non_interactive" != true ]; then
         echo
         if git push origin $current_branch; then
             echo
-            echo "Changes pushed successfully to $current_branch."
+            echo -e "${GREEN}Changes pushed successfully to $current_branch.${NC}"
             echo
         else
             echo
-            echo "Failed to push changes. Please push manually."
+            echo -e "${RED}Failed to push changes. Please push manually.${NC}"
             echo
             exit 1
         fi
     else
         echo
-        echo "Changes not pushed. Remember to push your changes later."
+        echo -e "${YELLOW}Changes not pushed. Remember to push your changes later.${NC}"
         echo
     fi
 fi
