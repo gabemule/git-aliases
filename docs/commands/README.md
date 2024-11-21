@@ -1,81 +1,118 @@
-# Git Workflow Commands 📚
+# 🛠️ ChronoGit Commands
 
-This directory contains documentation for our currently available git workflow commands.
+ChronoGit provides a set of powerful Git commands to streamline your workflow. Each command is designed to be intuitive and follows consistent patterns.
 
 ## Available Commands
 
-### 🌿 [git start-branch](start-branch.md)
-Creates standardized branches with ticket tracking.
+### [🌿 Branch Creation](start-branch.md)
 ```bash
+# Full command
 git start-branch -t PROJ-123
+
+# Short alias
+git start -t PROJ-123
 ```
+Creates new branches with standardized naming and ticket tracking.
 
 **Key Features:**
-- Standardized branch naming
+- Clean, descriptive branch names
 - Automatic ticket reference storage
-- Main branch synchronization
+- Branch type selection (feature, bugfix, etc.)
+- Source branch control
 - Stash handling
-- Interactive branch type selection
 
-### ✍️ [git cc](conventional-commit.md)
-Creates standardized commits following the [Conventional Commits](https://www.conventionalcommits.org/) specification.
+### [✍️ Conventional Commits](conventional-commit.md)
 ```bash
+# Interactive mode
 git cc
+
+# With message
+git cc -m "implement feature"
 ```
+Creates standardized commits following the Conventional Commits specification.
 
 **Key Features:**
 - Interactive type selection
-- Optional scope support
+- Scope support
 - Breaking change detection
-- Automatic ticket reference inclusion
-- Optional one-time ticket override
+- Ticket reference handling
+- Auto-push option
 
-### 🔍 [git open-pr](open-pr.md)
-Streamlines PR creation with automatic ticket reference inclusion.
+### [🔍 Pull Requests](open-pr.md)
 ```bash
+# Full command
 git open-pr
+
+# Short alias
+git pr
 ```
+Streamlines PR creation with automatic ticket reference inclusion.
 
 **Key Features:**
-- Interactive target branch selection
-- Automatic ticket reference inclusion
-- Duplicate PR detection
-- Web-based PR opening
-- Title and description prompts
+- Target branch selection
+- Template support
+- Draft PR support
+- Ticket reference handling
+- Browser integration
 
-## Planned Improvements
+## Common Patterns
 
-Each command has planned improvements documented in our improvements directory:
-- [Start Branch Improvements](../improvements/update-start-branch.md)
-- [Conventional Commit Improvements](../improvements/update-conventional-commit.md)
-- [Open PR Improvements](../improvements/update-open-pr.md)
+All commands follow these consistent patterns:
 
-## Usage Examples
-
-### Complete Workflow
-
+### 1. Ticket Handling
 ```bash
-# Create new feature branch
+# Set with branch
 git start-branch -t PROJ-123
-# Select: feature
-# Name: user-authentication
 
-# Make changes and commit
-git add .
-git cc
-# Select: feat
-# Scope: auth
-# Description: implement login
+# Override for commit
+git cc -t PROJ-456
 
-# Create PR
-git open-pr
-# Select: development
-# Title auto-includes: [PROJ-123]
+# Automatically included in PR
+git open-pr  # Uses branch ticket
 ```
 
-## See Also
+### 2. Interactive vs Non-interactive
+```bash
+# Interactive (prompts for input)
+git cc
 
-- [Main Documentation](../README.md)
-- [Improvements Overview](../improvements/README.md)
-- [Installation Guide](../../README.md#-installation)
-- [Configuration Guide](../../README.md#%EF%B8%8F-custom-configuration)
+# Non-interactive (all flags)
+git cc -m "message" --type feat -s ui
+```
+
+### 3. Short Aliases
+```bash
+git start     # for start-branch
+git cc        # for conventional-commit
+git pr        # for open-pr
+```
+
+## Testing Commands
+
+```bash
+# Run test suite
+git test
+
+# Select test type:
+1) Interactive workflow tests
+2) Non-interactive flag tests
+3) Verification tests
+4) All tests
+5) Exit
+```
+
+## Related Documentation
+
+- [Installation Guide](../installation/README.md)
+- [Configuration Guide](../configuration/README.md)
+- [Workflow Guide](../workflow/README.md)
+- [Testing Guide](../testing/README.md)
+
+## Need Help?
+
+- See command-specific documentation:
+  - [start-branch](start-branch.md)
+  - [conventional-commit](conventional-commit.md)
+  - [open-pr](open-pr.md)
+- Check [troubleshooting guide](../installation/troubleshooting.md)
+- Run verification: `git test -v`

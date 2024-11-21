@@ -1,4 +1,4 @@
-# Start Branch Command 🌿
+# 🌿 Start Branch Command
 
 Creates new branches with standardized naming and automatic ticket reference tracking.
 

@@ -27,6 +27,26 @@ check_test() {
     fi
 }
 
+# Function to check configuration
+check_config() {
+    local name=$1
+    local key=$2
+    local default=$3
+    
+    echo -n "Checking $name... "
+    value=$(git config "$key" || echo "$default")
+    if [ "$value" = "$default" ]; then
+        echo -e "${GREEN}PASSED${NC}"
+        ((tests_passed++))
+        return 0
+    else
+        echo -e "${BLUE}CUSTOM${NC}"
+        echo "Using custom value: $value (default: $default)"
+        ((tests_passed++))
+        return 0
+    fi
+}
+
 # Function to cleanup
 cleanup() {
     git checkout production 2>/dev/null
@@ -35,6 +55,34 @@ cleanup() {
 }
 
 echo -e "${BLUE}=== Verifying Git Workflow Tests ===${NC}"
+
+# Check configuration defaults
+echo -e "\n${BLUE}Checking Configuration:${NC}"
+((total_tests+=6))
+
+check_config "main branch" \
+    "workflow.mainBranch" \
+    "production"
+
+check_config "default target" \
+    "workflow.defaultTarget" \
+    "development"
+
+check_config "ticket pattern" \
+    "workflow.ticketPattern" \
+    "^[A-Z]+-[0-9]+$"
+
+check_config "feature prefix" \
+    "workflow.featurePrefix" \
+    "feature/"
+
+check_config "bugfix prefix" \
+    "workflow.bugfixPrefix" \
+    "bugfix/"
+
+check_config "PR template" \
+    "workflow.prTemplatePath" \
+    ".github/pull_request_template.md"
 
 # Clean up any previous test state
 cleanup
@@ -91,7 +139,7 @@ echo "Tests passed: $tests_passed/$total_tests"
 if [ $tests_passed -eq $total_tests ]; then
     echo -e "${GREEN}All tests passed!${NC}"
     exit 0
-elif [ $tests_passed -eq 5 ] && [ $total_tests -eq 5 ]; then
+elif [ $tests_passed -eq 11 ] && [ $total_tests -eq 11 ]; then
     # All base tests passed, PR test skipped
     echo -e "${GREEN}All required tests passed! (PR test skipped)${NC}"
     exit 0

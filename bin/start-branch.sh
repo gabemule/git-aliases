@@ -58,6 +58,13 @@ descriptions=(
     "Write, update, or fix documentation"
 )
 
+# Get branch prefixes from config or use defaults
+feature_prefix=$(git config workflow.featurePrefix || echo "feature/")
+bugfix_prefix=$(git config workflow.bugfixPrefix || echo "bugfix/")
+hotfix_prefix=$(git config workflow.hotfixPrefix || echo "hotfix/")
+release_prefix=$(git config workflow.releasePrefix || echo "release/")
+docs_prefix=$(git config workflow.docsPrefix || echo "docs/")
+
 # Function to prompt for input with default value
 prompt_with_default() {
     local prompt="$1"
@@ -82,8 +89,9 @@ prompt_non_empty() {
 
 # Function to validate ticket format
 validate_ticket() {
-    if [[ ! $1 =~ ^[A-Z]+-[0-9]+$ ]]; then
-        echo "Invalid ticket format. Must match PROJECT-XXX (e.g., PROJ-123)"
+    local pattern=$(git config workflow.ticketPattern || echo "^[A-Z]+-[0-9]+$")
+    if [[ ! $1 =~ $pattern ]]; then
+        echo "Invalid ticket format. Must match pattern: $pattern"
         return 1
     fi
     return 0
@@ -193,8 +201,18 @@ if [ -z "$ticket" ]; then
     done
 fi
 
+# Get prefix based on branch type
+case $branch_type in
+    feature) prefix=$feature_prefix ;;
+    bugfix)  prefix=$bugfix_prefix ;;
+    hotfix)  prefix=$hotfix_prefix ;;
+    release) prefix=$release_prefix ;;
+    docs)    prefix=$docs_prefix ;;
+    *)       prefix="$branch_type/" ;;
+esac
+
 # Create branch with descriptive name (without ticket)
-final_branch_name="${branch_type}/${branch_name// /-}"
+final_branch_name="${prefix}${branch_name// /-}"
 if git checkout -b "$final_branch_name"; then
     # Store ticket reference in git config
     git config branch."$final_branch_name".ticket "$ticket"

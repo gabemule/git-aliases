@@ -1,4 +1,4 @@
-# Open PR Command 🔍
+# 🔍 Open PR Command
 
 Streamlines PR creation with automatic ticket reference inclusion and target branch selection.
 

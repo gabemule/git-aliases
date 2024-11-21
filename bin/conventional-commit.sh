@@ -16,8 +16,10 @@ while [[ $# -gt 0 ]]; do
     case $1 in
         -t|--ticket)
             one_time_ticket="$2"
-            if [[ ! $one_time_ticket =~ ^[A-Z]+-[0-9]+$ ]]; then
-                echo "Invalid ticket format. Must match PROJECT-XXX (e.g., PROJ-123)"
+            # Get ticket pattern from config or use default
+            pattern=$(git config workflow.ticketPattern || echo "^[A-Z]+-[0-9]+$")
+            if [[ ! $one_time_ticket =~ $pattern ]]; then
+                echo "Invalid ticket format. Must match pattern: $pattern"
                 exit 1
             fi
             shift 2

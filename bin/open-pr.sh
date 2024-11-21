@@ -61,12 +61,30 @@ fi
 current_branch=$(git rev-parse --abbrev-ref HEAD)
 ticket=$(git config branch."$current_branch".ticket)
 
-# Check if we're on a feature/bugfix/hotfix/docs branch
-if [[ ! "$current_branch" =~ ^(feature|bugfix|hotfix|docs)/ ]]; then
+# Get branch prefixes from config or use defaults
+feature_prefix=$(git config workflow.featurePrefix || echo "feature/")
+bugfix_prefix=$(git config workflow.bugfixPrefix || echo "bugfix/")
+hotfix_prefix=$(git config workflow.hotfixPrefix || echo "hotfix/")
+release_prefix=$(git config workflow.releasePrefix || echo "release/")
+docs_prefix=$(git config workflow.docsPrefix || echo "docs/")
+
+# Check if we're on a valid branch type
+valid_prefix=false
+for prefix in "$feature_prefix" "$bugfix_prefix" "$hotfix_prefix" "$release_prefix" "$docs_prefix"; do
+    if [[ "$current_branch" =~ ^"$prefix" ]]; then
+        valid_prefix=true
+        break
+    fi
+done
+
+if [ "$valid_prefix" = false ]; then
     echo "Error: You must be on a feature, bugfix, hotfix, or docs branch to open a PR."
     echo "Current branch: $current_branch"
     exit 1
 fi
+
+# Get default target from config or use development
+default_target=$(git config workflow.defaultTarget || echo "development")
 
 # Get target branch if not provided
 if [ -z "$target" ]; then
@@ -116,9 +134,12 @@ if [ -z "$body" ]; then
     body=$(cat)
 fi
 
+# Get PR template path from config or use default
+template_path=$(git config workflow.prTemplatePath || echo ".github/pull_request_template.md")
+
 # Check for PR template
-if [[ -f .github/pull_request_template.md ]]; then
-    template=$(cat .github/pull_request_template.md)
+if [[ -f "$template_path" ]]; then
+    template=$(cat "$template_path")
     body="$template\n\n$body"
 fi
 

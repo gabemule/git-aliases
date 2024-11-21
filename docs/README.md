@@ -1,55 +1,115 @@
-# Git Workflow Documentation 📚
+# 📚 ChronoGit Documentation
 
-## Available Commands
+Welcome to the ChronoGit documentation! Here you'll find comprehensive guides and references to help you master your Git workflow.
 
-### 🌿 git start-branch
-Creates standardized branches with ticket tracking.
-```bash
-git start-branch -t PROJ-123
+## 📖 Table of Contents
+
+### [🚀 Installation](installation/README.md)
+- Quick start guide
+- Prerequisites
+  - SSH key setup
+  - GitHub CLI
+  - Authentication
+- Verification steps
+- [Troubleshooting](installation/troubleshooting.md)
+
+### [🛠️ Commands](commands/README.md)
+- [`git start-branch`](commands/start-branch.md) - Create feature branches
+  - Branch naming
+  - Ticket tracking
+  - Source control
+- [`git cc`](commands/conventional-commit.md) - Create standardized commits
+  - Conventional commits
+  - Scope handling
+  - Breaking changes
+- [`git open-pr`](commands/open-pr.md) - Create pull requests
+  - Target selection
+  - Template support
+  - Draft PRs
+
+### [⚙️ Configuration](configuration/README.md)
+- [Custom settings](configuration/custom-config.md)
+  - Branch configuration
+  - Ticket handling
+  - Repository setup
+- Environment setup
+- Git aliases
+
+### [📋 Workflow](workflow/README.md)
+- [Best practices](workflow/best-practices.md)
+  - Branch naming
+  - Commit messages
+  - PR guidelines
+- [Workflow examples](workflow/examples.md)
+  - Feature development
+  - Bug fixes
+  - Documentation
+- [Contributing guide](workflow/contributing.md)
+- Ticket references
+
+### [🧪 Testing](testing/README.md)
+- [Test guide](testing/test-guide.md)
+  - Running tests
+  - Test types
+  - Adding tests
+- Interactive tests
+  - Workflow testing
+  - User interaction
+- Non-interactive tests
+  - Flag testing
+  - Automation
+- Verification tests
+  - Installation checks
+  - Basic functionality
+
+### [🔮 Future Improvements](improvements/README.md)
+- [Review command](improvements/review-command.md)
+- [Rollback command](improvements/rollback-command.md)
+- [Standup command](improvements/standup-command.md)
+- [Sync command](improvements/sync-command.md)
+- [Workspace command](improvements/workspace-command.md)
+
+## 🔍 Quick Links
+
+- [Installation Guide](installation/README.md)
+- [Command Reference](commands/README.md)
+- [Best Practices](workflow/best-practices.md)
+- [Troubleshooting](installation/troubleshooting.md)
+- [Contributing](workflow/contributing.md)
+
+## 📁 Project Structure
+
 ```
-[Full Documentation](commands/start-branch.md) | [Planned Improvements](improvements/update-start-branch.md)
-
-### ✍️ git cc
-Creates conventional commits with ticket references.
-```bash
-git cc
-```
-[Full Documentation](commands/conventional-commit.md) | [Planned Improvements](improvements/update-conventional-commit.md)
-
-### 🔍 git open-pr
-Streamlines PR creation process.
-```bash
-git open-pr
-```
-[Full Documentation](commands/open-pr.md) | [Planned Improvements](improvements/update-open-pr.md)
-
-## Future Commands
-
-See our [improvements documentation](improvements/README.md) for upcoming features:
-- [Sync Command](improvements/sync-command.md) - Branch synchronization
-- [Rollback Command](improvements/rollback-command.md) - Safe production rollbacks
-- [Review Command](improvements/review-command.md) - PR review workflow
-- [Workspace Command](improvements/workspace-command.md) - Workspace state management
-- [Standup Command](improvements/standup-command.md) - Work summary generation
-
-## Directory Structure
-
-```
-docs/
-├── README.md               # This file
-├── commands/              # Current command documentation
-│   ├── start-branch.md
-│   ├── conventional-commit.md
-│   └── open-pr.md
-└── improvements/          # Future improvements
-    ├── README.md         # Improvements overview
-    ├── update-*.md       # Current command improvements
-    └── *-command.md      # New command proposals
+chronogit/
+├── bin/              # Main executable scripts
+│   ├── conventional-commit.sh
+│   ├── start-branch.sh
+│   └── open-pr.sh
+├── tests/            # Testing scripts
+│   ├── run-tests.sh          # Test runner
+│   ├── interactive/          # Interactive tests
+│   ├── non-interactive/      # Flag tests
+│   └── verify/              # Setup tests
+├── docs/             # Documentation
+│   ├── installation/         # Installation guides
+│   ├── commands/            # Command docs
+│   ├── configuration/       # Config guides
+│   ├── workflow/           # Workflow guides
+│   ├── testing/            # Test docs
+│   └── improvements/       # Future features
+├── .gitconfig        # Git configuration
+└── README.md         # Project overview
 ```
 
-## Quick Links
+## 🎯 Getting Started
 
-- [Installation Guide](../README.md#-installation)
-- [Configuration Guide](../README.md#%EF%B8%8F-custom-configuration)
-- [Troubleshooting](../README.md#-troubleshooting)
-- [Best Practices](../README.md#-best-practices)
+1. [Install ChronoGit](installation/README.md)
+2. [Learn the commands](commands/README.md)
+3. [Follow best practices](workflow/best-practices.md)
+4. [Contribute](workflow/contributing.md)
+
+## 🆘 Need Help?
+
+- Check the [troubleshooting guide](installation/troubleshooting.md)
+- Review [common issues](workflow/common-issues.md)
+- See [configuration options](configuration/README.md)
