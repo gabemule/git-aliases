@@ -4,6 +4,19 @@
 
 This test suite provides comprehensive testing for the git workflow commands, covering both interactive workflows and non-interactive features.
 
+## Prerequisites
+
+### GitHub CLI
+Some tests (open-pr) require GitHub CLI:
+```bash
+# Install
+brew install gh  # macOS
+winget install GitHub.cli  # Windows
+
+# Authenticate
+gh auth login
+```
+
 ## Directory Structure
 
 ```
@@ -64,6 +77,31 @@ Located in `tests/verify/`, these tests:
 - Verify basic functionality
 - Ensure environment configuration
 - Test core workflows
+
+## Test Coverage
+
+### start-branch
+- Branch creation
+- Ticket storage
+- Branch types
+- Source control
+- Sync options
+
+### conventional-commit
+- Commit types
+- Scope handling
+- Breaking changes
+- Ticket references
+- Auto-push
+- Non-interactive mode
+
+### open-pr
+- PR creation
+- Draft PRs
+- Templates
+- Target branches
+- Browser control
+- GitHub CLI integration
 
 ## Adding New Tests
 
@@ -157,7 +195,16 @@ pause "message"
    ./tests/verify/installation.sh
    ```
 
-3. **Test Failures**
+3. **GitHub CLI Not Found**
+   ```bash
+   # Install GitHub CLI
+   brew install gh
+   
+   # Authenticate
+   gh auth login
+   ```
+
+4. **Test Failures**
    ```bash
    # Run verification tests
    ./tests/run-tests.sh -v

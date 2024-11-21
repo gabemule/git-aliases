@@ -2,6 +2,21 @@
 
 Streamlines PR creation with automatic ticket reference inclusion and target branch selection.
 
+## Prerequisites
+
+### GitHub CLI
+This command requires the GitHub CLI (gh) to be installed and authenticated:
+
+```bash
+# Install GitHub CLI
+brew install gh  # macOS
+winget install GitHub.cli  # Windows
+# See https://cli.github.com/ for other platforms
+
+# Authenticate with GitHub
+gh auth login
+```
+
 ## Usage
 
 ### Basic Usage
@@ -164,6 +179,19 @@ Example:
 $ git pr --title "Add search"
 ✓ Created PR: [PROJ-123] Add search
 ```
+
+## Troubleshooting
+
+### GitHub CLI Not Found
+If you see "GitHub CLI (gh) is not installed" error:
+1. Install gh CLI following instructions above
+2. Authenticate with `gh auth login`
+3. Try command again
+
+### Authentication Issues
+If you see authentication errors:
+1. Run `gh auth status` to check current auth
+2. Run `gh auth login` to re-authenticate if needed
 
 ## Related Commands
 

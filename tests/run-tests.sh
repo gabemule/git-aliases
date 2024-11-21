@@ -7,6 +7,15 @@ BLUE='\033[0;34m'
 YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
+# Get the git-aliases directory path
+ALIASES_DIR=$(dirname "$(git config --get include.path)")
+if [ -z "$ALIASES_DIR" ]; then
+    echo -e "${RED}Error: Could not determine git-aliases directory.${NC}"
+    echo "Please ensure git-aliases is properly configured with:"
+    echo "git config --global include.path /path/to/git-aliases/.gitconfig"
+    exit 1
+fi
+
 # Function to run tests
 run_tests() {
     local test_files=("$@")
@@ -14,7 +23,7 @@ run_tests() {
     
     for test in "${test_files[@]}"; do
         echo -e "\n${BLUE}Running $test...${NC}"
-        if ! $test; then
+        if ! "$test"; then
             ((failed_tests++))
         fi
     done
@@ -33,56 +42,92 @@ usage() {
     echo "  -h, --help          Show this help message"
 }
 
-# Parse arguments
-while [[ $# -gt 0 ]]; do
-    case $1 in
-        -i|--interactive)
+# Initialize test arrays
+interactive_tests=(
+    "$ALIASES_DIR/tests/interactive/workflow-test.sh"
+)
+non_interactive_tests=(
+    "$ALIASES_DIR/tests/non-interactive/start-branch-test.sh"
+    "$ALIASES_DIR/tests/non-interactive/conventional-commit-test.sh"
+    "$ALIASES_DIR/tests/non-interactive/open-pr-test.sh"
+)
+verify_tests=(
+    "$ALIASES_DIR/tests/verify/installation.sh"
+    "$ALIASES_DIR/tests/verify/workflow.sh"
+)
+
+# If no arguments provided, show selection menu
+if [ $# -eq 0 ]; then
+    echo -e "${BLUE}=== Git Workflow Tests ===${NC}"
+    echo
+    echo "Select tests to run:"
+    echo "1) Interactive workflow tests"
+    echo "2) Non-interactive flag tests"
+    echo "3) Verification tests"
+    echo "4) All tests"
+    echo "5) Exit"
+    echo
+    read -p "Enter your choice (1-5): " choice
+    echo
+
+    case $choice in
+        1)
             RUN_INTERACTIVE=true
-            shift
             ;;
-        -n|--non-interactive)
+        2)
             RUN_NON_INTERACTIVE=true
-            shift
             ;;
-        -v|--verify)
+        3)
             RUN_VERIFY=true
-            shift
             ;;
-        -a|--all)
+        4)
             RUN_INTERACTIVE=true
             RUN_NON_INTERACTIVE=true
             RUN_VERIFY=true
-            shift
             ;;
-        -h|--help)
-            usage
+        5)
+            echo "Exiting..."
             exit 0
             ;;
         *)
-            echo "Unknown option: $1"
-            usage
+            echo -e "${RED}Invalid choice${NC}"
             exit 1
             ;;
     esac
-done
-
-# If no options provided, show usage
-if [[ -z $RUN_INTERACTIVE && -z $RUN_NON_INTERACTIVE && -z $RUN_VERIFY ]]; then
-    usage
-    exit 1
+else
+    # Parse command line arguments
+    while [[ $# -gt 0 ]]; do
+        case $1 in
+            -i|--interactive)
+                RUN_INTERACTIVE=true
+                shift
+                ;;
+            -n|--non-interactive)
+                RUN_NON_INTERACTIVE=true
+                shift
+                ;;
+            -v|--verify)
+                RUN_VERIFY=true
+                shift
+                ;;
+            -a|--all)
+                RUN_INTERACTIVE=true
+                RUN_NON_INTERACTIVE=true
+                RUN_VERIFY=true
+                shift
+                ;;
+            -h|--help)
+                usage
+                exit 0
+                ;;
+            *)
+                echo "Unknown option: $1"
+                usage
+                exit 1
+                ;;
+        esac
+    done
 fi
-
-# Initialize test arrays
-interactive_tests=(tests/interactive/workflow-test.sh)
-non_interactive_tests=(
-    tests/non-interactive/start-branch-test.sh
-    tests/non-interactive/conventional-commit-test.sh
-    tests/non-interactive/open-pr-test.sh
-)
-verify_tests=(
-    tests/verify/installation.sh
-    tests/verify/workflow.sh
-)
 
 failed_suites=0
 

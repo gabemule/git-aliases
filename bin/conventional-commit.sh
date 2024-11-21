@@ -8,6 +8,7 @@ type=""
 auto_push=false
 breaking=false
 no_verify=false
+no_scope=false
 non_interactive=false
 
 # Parse command line arguments
@@ -23,12 +24,15 @@ while [[ $# -gt 0 ]]; do
             ;;
         -m|--message)
             message="$2"
-            non_interactive=true
             shift 2
             ;;
         -s|--scope)
             scope="$2"
             shift 2
+            ;;
+        --no-scope)
+            no_scope=true
+            shift
             ;;
         -p|--push)
             auto_push=true
@@ -45,6 +49,10 @@ while [[ $# -gt 0 ]]; do
         --type)
             type="$2"
             shift 2
+            ;;
+        --non-interactive)
+            non_interactive=true
+            shift
             ;;
         *)
             echo "Unknown option: $1"
@@ -154,8 +162,8 @@ else
     fi
 fi
 
-# Get scope if not provided
-if [ -z "$scope" ]; then
+# Get scope if not provided and not explicitly skipped
+if [ -z "$scope" ] && [ "$no_scope" != true ]; then
     scope=$(prompt_with_default "Enter scope (optional)" "")
 fi
 
@@ -170,7 +178,7 @@ if [ -z "$message" ]; then
 fi
 
 # Get commit body (optional) if in interactive mode
-if [ -z "$message" ]; then
+if [ "$non_interactive" != true ]; then
     echo "Enter commit body (optional, press Ctrl+D when finished):"
     body=$(cat)
 fi
@@ -219,7 +227,7 @@ echo "----------"
 echo
 
 # Confirm commit in interactive mode
-if [ "$non_interactive" = false ]; then
+if [ "$non_interactive" != true ]; then
     read -p "Do you want to commit with this message? (Y/n) " confirm
     if [[ ! $confirm =~ ^[Yy]?$ ]]; then
         echo
@@ -268,7 +276,7 @@ if [ "$auto_push" = true ]; then
         echo
         exit 1
     fi
-elif [ "$non_interactive" = false ]; then
+elif [ "$non_interactive" != true ]; then
     # Offer to push in interactive mode
     read -p "Do you want to push the changes now? (Y/n) " push_confirm
     if [[ $push_confirm =~ ^[Yy]?$ ]]; then

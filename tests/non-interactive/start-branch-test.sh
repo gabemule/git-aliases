@@ -10,7 +10,7 @@ NC='\033[0m' # No Color
 tests_passed=0
 total_tests=0
 
-# Function to check test result
+# Function to check test result with error output
 check_test() {
     local test_name=$1
     local command=$2
@@ -18,14 +18,53 @@ check_test() {
     
     ((total_tests++))
     echo -n "Testing $test_name... "
-    if eval "$command" | grep -q "$expected"; then
+    
+    # Capture both output and exit status
+    output=$(eval "$command" 2>&1)
+    status=$?
+    
+    # Check for specific error conditions
+    if echo "$output" | grep -q "couldn't find remote ref production"; then
+        echo -e "${RED}FAILED${NC}"
+        echo "Error: Remote production branch not found"
+        echo "Full output: $output"
+        return 1
+    fi
+    
+    if echo "$output" | grep -q "error: pathspec 'production'"; then
+        echo -e "${RED}FAILED${NC}"
+        echo "Error: Local production branch not properly set up"
+        echo "Full output: $output"
+        return 1
+    fi
+    
+    if [ $status -ne 0 ]; then
+        echo -e "${RED}FAILED${NC}"
+        echo "Command failed with status $status"
+        echo "Full output: $output"
+        return 1
+    fi
+    
+    if echo "$output" | grep -q "$expected"; then
         echo -e "${GREEN}PASSED${NC}"
         ((tests_passed++))
+        return 0
     else
         echo -e "${RED}FAILED${NC}"
         echo "Expected to find: $expected"
-        echo "Command: $command"
+        echo "Full output: $output"
+        return 1
     fi
+}
+
+# Function to verify remote branch
+verify_remote_branch() {
+    local branch=$1
+    if ! git ls-remote --heads origin "$branch" | grep -q "$branch"; then
+        echo -e "${RED}Error: Branch '$branch' not found in remote${NC}"
+        return 1
+    fi
+    return 0
 }
 
 # Function to cleanup branches
@@ -33,10 +72,16 @@ cleanup_branch() {
     local branch=$1
     git checkout production 2>/dev/null
     git branch -D $branch 2>/dev/null
-    git push origin --delete $branch 2>/dev/null
 }
 
 echo -e "${BLUE}=== Testing Start Branch Command (Non-Interactive) ===${NC}"
+
+# Verify production branch setup
+echo -e "\n${BLUE}Verifying branch setup...${NC}"
+if ! verify_remote_branch "production"; then
+    echo -e "${RED}Tests cannot proceed: production branch not properly set up in remote${NC}"
+    exit 1
+fi
 
 # Test 1: Basic branch creation with all flags
 cleanup_branch "feature/test-flags"

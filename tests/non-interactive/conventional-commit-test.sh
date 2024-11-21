@@ -18,20 +18,28 @@ check_test() {
     
     ((total_tests++))
     echo -n "Testing $test_name... "
-    if eval "$command" | grep -q "$expected"; then
+    
+    # Capture both output and exit status
+    output=$(eval "$command" 2>&1)
+    status=$?
+    
+    if [ $status -ne 0 ] && [[ ! "$output" =~ "failed to push" ]]; then
+        echo -e "${RED}FAILED${NC}"
+        echo "Command failed with status $status"
+        echo "Full output: $output"
+        return 1
+    fi
+    
+    if echo "$output" | grep -q "$expected"; then
         echo -e "${GREEN}PASSED${NC}"
         ((tests_passed++))
+        return 0
     else
         echo -e "${RED}FAILED${NC}"
         echo "Expected to find: $expected"
-        echo "Command: $command"
+        echo "Full output: $output"
+        return 1
     fi
-}
-
-# Function to create test commit
-create_test_commit() {
-    echo "test" > test.txt
-    git add test.txt
 }
 
 # Function to cleanup
@@ -48,41 +56,64 @@ cleanup
 git checkout -b feature/test-commits
 git config branch.feature/test-commits.ticket "TEST-123"
 
-# Test 1: Basic commit with message
-create_test_commit
-check_test "basic commit with message" \
-    "git cc -m 'add test file' --type feat && git log -1 --pretty=%B" \
+# Create test file for each test to ensure we have changes to commit
+create_test_file() {
+    echo "test content $1" > test.txt
+    git add test.txt
+}
+
+# Test 1: Basic commit with message and type
+create_test_file "1"
+check_test "basic commit with message and type" \
+    "git cc -m 'add test file' --type feat --no-scope --non-interactive" \
     "feat: add test file \[TEST-123\]"
 
-# Test 2: Commit with scope
-create_test_commit
+# Test 2: Commit with explicit scope
+create_test_file "2"
 check_test "commit with scope" \
-    "git cc -m 'update test' -s test --type fix && git log -1 --pretty=%B" \
+    "git cc -m 'update test' -s test --type fix --non-interactive" \
     "fix(test): update test \[TEST-123\]"
 
-# Test 3: Breaking change
-create_test_commit
-check_test "breaking change" \
-    "git cc -m 'change api' -s api -b --type feat && git log -1 --pretty=%B" \
+# Test 3: Commit with no scope
+create_test_file "3"
+check_test "commit without scope" \
+    "git cc -m 'simple update' --type docs --no-scope --non-interactive" \
+    "docs: simple update \[TEST-123\]"
+
+# Test 4: Breaking change with scope
+create_test_file "4"
+check_test "breaking change with scope" \
+    "git cc -m 'change api' -s api -b --type feat --non-interactive" \
     "feat(api)!: change api \[TEST-123\]"
 
-# Test 4: Override ticket
-create_test_commit
-check_test "ticket override" \
-    "git cc -m 'override ticket' -t TEST-456 --type docs && git log -1 --pretty=%B" \
+# Test 5: Breaking change without scope
+create_test_file "5"
+check_test "breaking change without scope" \
+    "git cc -m 'major change' -b --type feat --no-scope --non-interactive" \
+    "feat!: major change \[TEST-123\]"
+
+# Test 6: Override ticket with scope
+create_test_file "6"
+check_test "ticket override with scope" \
+    "git cc -m 'override ticket' -t TEST-456 --type docs -s readme --non-interactive" \
+    "docs(readme): override ticket \[TEST-456\]"
+
+# Test 7: Override ticket without scope
+create_test_file "7"
+check_test "ticket override without scope" \
+    "git cc -m 'override ticket' -t TEST-456 --type docs --no-scope --non-interactive" \
     "docs: override ticket \[TEST-456\]"
 
-# Test 5: No verify
-create_test_commit
-check_test "no verify flag" \
-    "git cc -m 'skip hooks' --no-verify --type chore && git log -1 --pretty=%B" \
-    "chore: skip hooks \[TEST-123\]"
+# Test 8: No verify with scope
+create_test_file "8"
+check_test "no verify with scope" \
+    "git cc -m 'skip hooks' --no-verify --type chore -s deps --non-interactive" \
+    "chore(deps): skip hooks \[TEST-123\]"
 
-# Test 6: Auto push
-# Note: This test assumes remote exists and is accessible
-create_test_commit
-check_test "auto push" \
-    "git cc -m 'test auto push' -p --type test && git log -1 --pretty=%B" \
+# Test 9: Auto push without scope (only verify commit message, ignore push result)
+create_test_file "9"
+check_test "auto push without scope" \
+    "git cc -m 'test auto push' -p --type test --no-scope --non-interactive" \
     "test: test auto push \[TEST-123\]"
 
 # Cleanup

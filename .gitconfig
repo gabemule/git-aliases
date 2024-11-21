@@ -4,4 +4,5 @@
     start-branch = !bash "$(dirname "$(git config --get include.path)")/bin/start-branch.sh"
     pr = !bash "$(dirname "$(git config --get include.path)")/bin/open-pr.sh"
     open-pr = !bash "$(dirname "$(git config --get include.path)")/bin/open-pr.sh"
+    test = !bash "$(dirname "$(git config --get include.path)")/tests/run-tests.sh"
     # Add more aliases here as needed

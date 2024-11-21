@@ -7,15 +7,37 @@ YELLOW='\033[1;33m'
 RED='\033[0;31m'
 NC='\033[0m' # No Color
 
+# Get the git-aliases directory path from git config
+ALIASES_DIR=$(dirname "$(git config --get include.path)")
+if [ -z "$ALIASES_DIR" ]; then
+    echo -e "${RED}Error: Could not determine git-aliases directory.${NC}"
+    echo "Please ensure git-aliases is properly configured with:"
+    echo "git config --global include.path /path/to/git-aliases/.gitconfig"
+    exit 1
+fi
+
 # Function to pause and wait for user
 pause() {
     echo -e "\n${YELLOW}Press Enter to continue...${NC}"
     read
 }
 
+# Function to show guide message
+show_guide() {
+    clear
+    echo -e "${BLUE}=== $1 ===${NC}\n"
+    echo -e "$2\n"
+    pause
+}
+
 # Function to handle errors
 handle_error() {
     echo -e "\n${RED}Error: $1${NC}"
+    if [[ "$1" == *"GitHub CLI"* ]]; then
+        # For GitHub CLI errors, just show warning and continue
+        echo -e "${YELLOW}PR creation will be skipped. Install GitHub CLI to test this feature.${NC}"
+        return 0
+    fi
     echo "Would you like to continue the test? (Y/n)"
     read -n 1 continue_test
     if [[ ! $continue_test =~ ^[Yy]?$ ]]; then
@@ -71,10 +93,15 @@ restore_uncommitted() {
     fi
 }
 
-# Clear screen and show header
-clear
-echo -e "${BLUE}=== Git Workflow Test ===${NC}"
-echo -e "This script will run all commands in sequence.\n"
+# Show welcome message
+show_guide "Welcome to Git Workflow Test" "This interactive test will guide you through our git workflow:
+
+1. Creating a feature branch
+2. Making changes and committing
+3. Creating a pull request
+
+Each step will be explained before execution, and you'll be prompted to continue.
+This helps you understand the workflow while testing it works correctly."
 
 # Handle any uncommitted changes
 had_changes=1
@@ -82,84 +109,157 @@ handle_uncommitted
 had_changes=$?
 
 # Ensure development branch exists
+show_guide "Branch Setup" "First, we'll ensure the required branches exist:
+
+1. Checking production branch
+2. Creating development branch if needed
+3. Setting up test environment
+
+This step is usually handled by repository maintainers."
+
 echo -e "${BLUE}Checking required branches...${NC}"
 git checkout production || handle_error "Failed to checkout production"
 ensure_branch "development"
 git checkout production || handle_error "Failed to checkout production"
 
 # Step 1: Create branch
-echo -e "\n${BLUE}Step 1: Creating feature branch${NC}"
-echo "You will be prompted to:"
-echo "1. Select 'feature' using arrow keys"
-echo "2. Enter 'test-feature' as the name"
-pause
+show_guide "Step 1: Creating Feature Branch" "Now we'll create a new feature branch:
+
+1. You'll be prompted to select branch type (feature)
+2. Enter branch name (test-feature)
+3. Branch will be created with ticket reference
+
+This demonstrates the branch creation workflow."
 
 # Delete existing branch if it exists
 cleanup_branch "feature/test-feature"
 
-./bin/start-branch.sh -t TEST-123 || handle_error "Failed to create branch"
+echo -e "${YELLOW}Creating feature branch...${NC}"
+"$ALIASES_DIR/bin/start-branch.sh" -t TEST-123 || handle_error "Failed to create branch"
 
 # Verify branch creation
-echo -e "\n${YELLOW}Verifying branch creation:${NC}"
+show_guide "Branch Creation Result" "Let's verify the branch was created correctly:
+
+1. Branch should be named 'feature/test-feature'
+2. Ticket TEST-123 should be associated
+3. Branch should be checked out
+
+Current branches:"
 git branch
 pause
 
 # Step 2: Create and commit file
-echo -e "\n${BLUE}Step 2: Creating test file and committing${NC}"
-echo "You will be prompted to:"
-echo "1. Select 'feat' type"
-echo "2. Enter 'test' as scope"
-echo "3. Enter 'add test file' as description"
-echo "4. Enter 'this is a test commit' as body"
-echo "5. Select 'N' for breaking change"
-echo "6. Select 'Y' to push changes"
-pause
+show_guide "Step 2: Making Changes" "Now we'll create and commit changes:
 
+1. Creating a test file
+2. Select 'feat' type (for new feature)
+3. Enter 'test' as scope
+4. Enter 'add test file' as description
+5. Add 'Testing commit workflow' as body
+6. Choose to push changes
+
+Important: Please select 'feat' type for this test to pass verification."
+
+# Remove any existing test file
+rm -f test.txt
+
+# Create and commit test file
 echo "test content" > test.txt
 git add test.txt
-./bin/conventional-commit.sh || handle_error "Failed to create commit"
+"$ALIASES_DIR/bin/conventional-commit.sh" || handle_error "Failed to create commit"
 
 # Handle push
 handle_push "feature/test-feature"
 
 # Verify commit
-echo -e "\n${YELLOW}Verifying commit:${NC}"
+show_guide "Commit Result" "Let's verify the commit:
+
+1. Should follow conventional commit format
+2. Should include ticket reference
+3. Should be pushed to remote
+
+Latest commit:"
 git log -1
 pause
 
 # Step 3: Create PR
-echo -e "\n${BLUE}Step 3: Creating Pull Request${NC}"
-echo "You will be prompted to:"
-echo "1. Select 'development' as target"
-echo "2. Enter 'Test PR' as title"
-echo "3. Enter 'Testing PR creation' as description"
-pause
+show_guide "Step 3: Creating Pull Request" "Finally, we'll create a pull request:
 
-# Stash any changes before PR creation
-handle_uncommitted
-./bin/open-pr.sh || handle_error "Failed to create PR"
-restore_uncommitted $?
+1. Select target branch (development)
+2. Enter PR title
+3. Enter PR description
+4. PR will be created and opened in browser
 
-# Verify PR
-echo -e "\n${YELLOW}Verifying PR:${NC}"
-gh pr list
-pause
+Note: This step requires GitHub CLI (gh). If not installed, it will be skipped."
+
+# Check for gh CLI
+if ! command -v gh &> /dev/null; then
+    handle_error "GitHub CLI (gh) is not installed. Install it with:
+    
+macOS: brew install gh
+Windows: winget install GitHub.cli
+Linux: See https://cli.github.com/
+
+After installation:
+1. Run: gh auth login
+2. Follow the authentication steps"
+else
+    # Stash any changes before PR creation
+    handle_uncommitted
+    "$ALIASES_DIR/bin/open-pr.sh" || handle_error "Failed to create PR"
+    restore_uncommitted $?
+
+    # Verify PR
+    show_guide "Pull Request Result" "Let's verify the PR:
+
+    1. Should be created with correct title
+    2. Should target development branch
+    3. Should include ticket reference
+
+    Current PRs:"
+    gh pr list
+    pause
+fi
 
 # Step 4: Run verification
-echo -e "\n${BLUE}Step 4: Running verification${NC}"
-pause
-./tests/verify-workflow.sh || handle_error "Verification failed"
+show_guide "Step 4: Verification" "Now we'll verify everything:
+
+1. Branch structure
+2. Commit format
+3. Ticket references
+
+This ensures all parts of the workflow are working correctly."
+
+"$ALIASES_DIR/tests/verify/workflow.sh" || handle_error "Verification failed"
 
 # Cleanup
-echo -e "\n${BLUE}Step 5: Cleanup${NC}"
-echo -e "Would you like to clean up (delete test branch locally and remotely)? (Y/n)"
+show_guide "Step 5: Cleanup" "Finally, we'll clean up our test:
+
+1. Delete test branch
+2. Restore any stashed changes
+3. Return to production branch
+
+Would you like to clean up (delete test branch locally and remotely)? (Y/n)"
 read -n 1 cleanup
 echo
 if [[ $cleanup =~ ^[Yy]?$ ]]; then
+    # Remove test file first
+    rm -f test.txt
     cleanup_branch "feature/test-feature"
 fi
 
 # Restore any stashed changes
 restore_uncommitted $had_changes
 
-echo -e "\n${GREEN}Test sequence complete!${NC}"
+show_guide "Test Complete" "Interactive workflow test completed successfully!
+
+What we tested:
+1. Branch creation ✓
+2. Conventional commits ✓
+3. Pull requests (requires gh CLI)
+4. Ticket handling ✓
+
+You can now use these commands in your daily workflow:
+- git start-branch
+- git cc (conventional-commit)
+- git open-pr"

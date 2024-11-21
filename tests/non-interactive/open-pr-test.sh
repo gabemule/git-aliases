@@ -4,11 +4,50 @@
 GREEN='\033[0;32m'
 RED='\033[0;31m'
 BLUE='\033[0;34m'
+YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
 # Test counter
 tests_passed=0
 total_tests=0
+
+# Function to check prerequisites
+check_prerequisites() {
+    echo -e "${BLUE}Checking prerequisites...${NC}"
+    
+    # Check for gh CLI
+    if ! command -v gh &> /dev/null; then
+        echo -e "${RED}Error: GitHub CLI (gh) is not installed.${NC}"
+        echo -e "${YELLOW}Please install it following the instructions at: https://cli.github.com/${NC}"
+        echo
+        echo "Quick install commands:"
+        echo "  Homebrew (macOS): brew install gh"
+        echo "  Windows: winget install GitHub.cli"
+        echo "  Linux: See https://github.com/cli/cli/blob/trunk/docs/install_linux.md"
+        echo
+        echo "After installation:"
+        echo "1. Run: gh auth login"
+        echo "2. Follow the authentication steps"
+        echo "3. Run this test again"
+        exit 1
+    fi
+    
+    # Check gh authentication
+    if ! gh auth status &> /dev/null; then
+        echo -e "${RED}Error: GitHub CLI is not authenticated.${NC}"
+        echo -e "${YELLOW}Please run: gh auth login${NC}"
+        echo
+        echo "Authentication steps:"
+        echo "1. Run: gh auth login"
+        echo "2. Choose GitHub.com"
+        echo "3. Choose HTTPS protocol"
+        echo "4. Authenticate with your GitHub credentials"
+        exit 1
+    fi
+    
+    echo -e "${GREEN}Prerequisites check passed!${NC}"
+    echo
+}
 
 # Function to check test result
 check_test() {
@@ -18,13 +57,27 @@ check_test() {
     
     ((total_tests++))
     echo -n "Testing $test_name... "
-    if eval "$command" | grep -q "$expected"; then
+    
+    # Capture both output and exit status
+    output=$(eval "$command" 2>&1)
+    status=$?
+    
+    if [ $status -ne 0 ]; then
+        echo -e "${RED}FAILED${NC}"
+        echo "Command failed with status $status"
+        echo "Full output: $output"
+        return 1
+    fi
+    
+    if echo "$output" | grep -q "$expected"; then
         echo -e "${GREEN}PASSED${NC}"
         ((tests_passed++))
+        return 0
     else
         echo -e "${RED}FAILED${NC}"
         echo "Expected to find: $expected"
-        echo "Command: $command"
+        echo "Full output: $output"
+        return 1
     fi
 }
 
@@ -33,16 +86,13 @@ cleanup() {
     git checkout production 2>/dev/null
     git branch -D feature/test-pr 2>/dev/null
     git push origin --delete feature/test-pr 2>/dev/null
+    rm -rf .github
 }
 
-# Check if gh CLI is installed
-if ! command -v gh &> /dev/null; then
-    echo "Error: GitHub CLI (gh) is not installed."
-    echo "Please install it following the instructions at: https://cli.github.com/"
-    exit 1
-fi
-
 echo -e "${BLUE}=== Testing Open PR Command (Non-Interactive) ===${NC}"
+
+# Check prerequisites first
+check_prerequisites
 
 # Setup test branch
 cleanup
@@ -100,8 +150,6 @@ check_test "PR to production (short alias)" \
 
 # Cleanup
 cleanup
-rm -rf .github
-rm -f test.txt
 
 # Print summary
 echo -e "\n${BLUE}=== Test Summary ===${NC}"
