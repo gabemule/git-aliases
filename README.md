@@ -6,9 +6,9 @@
 
 <br/>
 
-<small style="font-size: 10px"> 
+<sub><sup>
 The hero represents a journey through time and technology, blending nostalgic design with modern Git practices. The iconic floor-standing clock symbolizes branching Git workflows, with options like `commit`, `squash`, and `rebase` embedded in its timeline.
-</small>
+</sup></sub>
 
 </div>
 
