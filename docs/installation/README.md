@@ -24,7 +24,7 @@ git clone https://github.com/your-username/chronogit.git
 cd chronogit
 
 # 2. Configure git aliases
-echo -e "[include]\n    path = $(pwd)/.gitconfig" >> ~/.gitconfig
+echo -e "[include]\n    path = $(pwd)/.gitconfig" >> ~/.gitconfig && git config --get include.path >/dev/null && echo "✓ Git aliases configured successfully" || echo "✗ Configuration failed"
 
 # 3. Verify installation
 git test -v
