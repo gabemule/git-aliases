@@ -295,9 +295,9 @@ Run these checks to verify your setup:
 git test -v
 
 # 2. Check commands
-git start-branch --help
-git cc --help
-git pr --help
+git start-branch -h
+git cc -h
+git pr -h
 
 # 3. Check configuration
 git config --get include.path

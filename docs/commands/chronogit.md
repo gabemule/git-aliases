@@ -6,7 +6,7 @@ Interactive configuration manager for ChronoGit.
 
 ```bash
 # Show help and available options
-git chronogit --help
+git chronogit -h
 
 # Start interactive configuration
 git chronogit
@@ -14,7 +14,7 @@ git chronogit
 
 ## Options
 
-- `-h, --help` - Show help message and available configurations
+- `-h` - Show help message and available configurations
 
 ## Interactive Menu
 

@@ -22,7 +22,7 @@ show_help() {
     echo "      --no-verify       Skip commit hooks"
     echo "      --type <type>     Specify commit type"
     echo "      --non-interactive Skip all prompts"
-    echo "  -h, --help            Show this help message"
+    echo "  -h                    Show this help message"
     echo
     echo "Types:"
     echo "  feat     - New feature"
@@ -54,7 +54,7 @@ non_interactive=false
 # Parse command line arguments
 while [[ $# -gt 0 ]]; do
     case $1 in
-        -h|--help)
+        -h)
             show_help
             ;;
         -t|--ticket)
@@ -106,7 +106,7 @@ while [[ $# -gt 0 ]]; do
             ;;
         *)
             echo -e "${RED}Unknown option: $1${NC}"
-            echo "Use --help to see available options"
+            echo "Use -h to see available options"
             exit 1
             ;;
     esac

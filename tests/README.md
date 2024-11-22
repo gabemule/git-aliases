@@ -53,7 +53,7 @@ tests/
 - `-n, --non-interactive` - Run non-interactive flag tests
 - `-v, --verify` - Run verification tests
 - `-a, --all` - Run all tests
-- `-h, --help` - Show help message
+- `-h` - Show help message
 
 ## Test Types
 

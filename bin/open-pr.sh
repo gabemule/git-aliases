@@ -19,7 +19,7 @@ show_help() {
     echo "      --no-browser       Don't open in browser"
     echo "      --no-template      Skip PR template"
     echo "      --no-ticket        Skip ticket references"
-    echo "  -h, --help            Show this help message"
+    echo "  -h                     Show this help message"
     echo
     echo "Examples:"
     echo "  git pr -t development              # Interactive PR to development"
@@ -41,7 +41,7 @@ non_interactive=false
 # Parse command line arguments
 while [[ $# -gt 0 ]]; do
     case $1 in
-        -h|--help)
+        -h)
             show_help
             ;;
         -t|--target)
@@ -75,7 +75,7 @@ while [[ $# -gt 0 ]]; do
             ;;
         *)
             echo -e "${RED}Unknown option: $1${NC}"
-            echo "Use --help to see available options"
+            echo "Use -h to see available options"
             exit 1
             ;;
     esac

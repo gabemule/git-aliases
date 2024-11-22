@@ -7,8 +7,8 @@ Creates standardized commits following the [Conventional Commits](https://www.co
 ### Basic Usage
 
 ```bash
-# Show help and available options
-git cc --help
+# Show help
+git cc -h
 
 # Fully interactive mode (prompts for everything)
 git cc
@@ -22,7 +22,7 @@ git cc -m "implement login" --type feat -s auth --non-interactive
 
 ### Options
 
-- `-h, --help` - Show help message
+- `-h` - Show help message
 - `-m, --message <msg>` - Specify commit message
 - `-s, --scope <scope>` - Specify commit scope
 - `--no-scope` - Skip scope prompt and create commit without scope

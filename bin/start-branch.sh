@@ -18,7 +18,7 @@ show_help() {
     echo "      --current          Create branch from current branch"
     echo "      --no-sync          Skip syncing with main branch"
     echo "      --no-stash         Skip stashing changes"
-    echo "  -h, --help             Show this help message"
+    echo "  -h                      Show this help message"
     echo
     echo "Branch Types:"
     echo "  feature  - New feature development"
@@ -46,7 +46,7 @@ no_stash=false
 # Parse command line arguments
 while [[ $# -gt 0 ]]; do
     case $1 in
-        -h|--help)
+        -h)
             show_help
             ;;
         -t|--ticket)
@@ -75,7 +75,7 @@ while [[ $# -gt 0 ]]; do
             ;;
         *)
             echo -e "${RED}Unknown option: $1${NC}"
-            echo "Use --help to see available options"
+            echo "Use -h to see available options"
             exit 1
             ;;
     esac

@@ -23,9 +23,9 @@ gh auth login
 
 ```bash
 # Show help and available options
-git open-pr --help
+git open-pr -h
 # or
-git pr --help
+git pr -h
 
 # Interactive mode (full command)
 git open-pr
@@ -42,7 +42,7 @@ git pr -t production --title "Fix login bug" --body "Fixed authentication flow"
 
 ### Options
 
-- `-h, --help` - Show help message
+- `-h` - Show help message
 - `-t, --target <branch>` - Specify target branch (development/production)
 - `--title <title>` - Specify PR title
 - `--body <description>` - Specify PR description

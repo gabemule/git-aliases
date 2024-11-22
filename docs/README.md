@@ -12,6 +12,7 @@ Welcome to the ChronoGit documentation! Here you'll find comprehensive guides an
   - Authentication
 - Verification steps
 - [Troubleshooting](installation/troubleshooting.md)
+- [Known Issues](known-issues.md)
 
 ### [🛠️ Commands](commands/README.md)
 - [`git start-branch`](commands/start-branch.md) - Create feature branches
@@ -75,6 +76,7 @@ Welcome to the ChronoGit documentation! Here you'll find comprehensive guides an
 - [Command Reference](commands/README.md)
 - [Best Practices](workflow/best-practices.md)
 - [Troubleshooting](installation/troubleshooting.md)
+- [Known Issues](known-issues.md)
 - [Contributing](workflow/contributing.md)
 
 ## 📁 Project Structure
@@ -96,7 +98,8 @@ chronogit/
 │   ├── configuration/       # Config guides
 │   ├── workflow/           # Workflow guides
 │   ├── testing/            # Test docs
-│   └── improvements/       # Future features
+│   ├── improvements/       # Future features
+│   └── known-issues.md     # Known issues & behaviors
 ├── .gitconfig        # Git configuration
 └── README.md         # Project overview
 ```
@@ -111,5 +114,5 @@ chronogit/
 ## 🆘 Need Help?
 
 - Check the [troubleshooting guide](installation/troubleshooting.md)
-- Review [common issues](workflow/common-issues.md)
+- Review [known issues](known-issues.md)
 - See [configuration options](configuration/README.md)

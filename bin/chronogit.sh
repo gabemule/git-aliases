@@ -6,12 +6,12 @@ source "$SCRIPT_DIR/common/config.sh"
 
 # Show help message
 show_help() {
-    echo "Usage: git chronogit [options]"
+    echo "Usage: git chronogit [-h]"
     echo
     echo "Interactive configuration manager for git workflow settings"
     echo
     echo "Options:"
-    echo "  -h, --help             Show this help message"
+    echo "  -h    Show this help message"
     echo
     echo "Interactive Menu:"
     echo "  1) Show all configurations"
@@ -35,15 +35,16 @@ show_help() {
 # Parse command line arguments
 while [[ $# -gt 0 ]]; do
     case $1 in
-        -h|--help)
+        -h)
             show_help
             ;;
         *)
             echo -e "${RED}Unknown option: $1${NC}"
-            echo "Use --help to see available options"
+            echo "Use -h to see available options"
             exit 1
             ;;
     esac
+    shift
 done
 
 # Function to show current configuration
@@ -312,7 +313,7 @@ reset_config_interactive() {
     read -p "Press Enter to continue..."
 }
 
-# Main loop
+# Start interactive menu if no arguments provided
 while true; do
     show_menu
 done

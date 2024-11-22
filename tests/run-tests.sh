@@ -39,7 +39,7 @@ usage() {
     echo "  -n, --non-interactive Run non-interactive flag tests"
     echo "  -v, --verify        Run verification tests"
     echo "  -a, --all           Run all tests"
-    echo "  -h, --help          Show this help message"
+    echo "  -h                  Show this help message"
 }
 
 # Initialize test arrays
@@ -116,7 +116,7 @@ else
                 RUN_VERIFY=true
                 shift
                 ;;
-            -h|--help)
+            -h)
                 usage
                 exit 0
                 ;;

@@ -73,9 +73,9 @@ ls -l bin/*.sh
 git test -v
 
 # Check commands
-git start-branch --help
-git cc --help
-git pr --help
+git start-branch -h
+git cc -h
+git pr -h
 ```
 
 ## Optional Setup
@@ -122,9 +122,9 @@ Run these checks to verify your setup:
 git config --get include.path
 
 # 2. Check commands
-git start-branch --help
-git cc --help
-git pr --help
+git start-branch -h
+git cc -h
+git pr -h
 
 # 3. Run tests
 git test -v
