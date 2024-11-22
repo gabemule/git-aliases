@@ -9,10 +9,12 @@ one_time_ticket=""
 message=""
 scope=""
 type=""
+body=""
 auto_push=false
 breaking=false
 no_verify=false
 no_scope=false
+no_body=false
 non_interactive=false
 
 # Parse command line arguments
@@ -35,6 +37,14 @@ while [[ $# -gt 0 ]]; do
             ;;
         --no-scope)
             no_scope=true
+            shift
+            ;;
+        --body)
+            body="$2"
+            shift 2
+            ;;
+        --no-body)
+            no_body=true
             shift
             ;;
         -p|--push)
@@ -123,10 +133,14 @@ if [ -z "$message" ]; then
     message=$(prompt_with_default "Enter short description" "")
 fi
 
-# Get commit body (optional) if in interactive mode
-if [ "$non_interactive" != true ]; then
-    echo "Enter commit body (optional, press Ctrl+D when finished):"
-    body=$(cat)
+# Handle commit body
+if [ "$no_body" != true ]; then
+    if [ -z "$body" ]; then
+        if [ "$non_interactive" != true ]; then
+            echo "Enter commit body (optional, press Ctrl+D when finished):"
+            body=$(cat)
+        fi
+    fi
 fi
 
 # Handle breaking change
