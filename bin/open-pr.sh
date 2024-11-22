@@ -10,6 +10,8 @@ title=""
 body=""
 draft=false
 no_browser=false
+no_template=false
+no_ticket=false
 non_interactive=false
 
 # Parse command line arguments
@@ -34,6 +36,14 @@ while [[ $# -gt 0 ]]; do
             ;;
         --no-browser)
             no_browser=true
+            shift
+            ;;
+        --no-template)
+            no_template=true
+            shift
+            ;;
+        --no-ticket)
+            no_ticket=true
             shift
             ;;
         *)
@@ -63,7 +73,10 @@ fi
 
 # Get current branch and ticket
 current_branch=$(git rev-parse --abbrev-ref HEAD)
-ticket=$(git config branch."$current_branch".ticket)
+ticket=""
+if [ "$no_ticket" != true ]; then
+    ticket=$(git config branch."$current_branch".ticket)
+fi
 
 # Check if we're on a valid branch type
 valid_prefix=false
@@ -110,14 +123,14 @@ fi
 
 # Handle PR title
 if [ -z "$title" ]; then
-    if [ -n "$ticket" ]; then
+    if [ -n "$ticket" ] && [ "$no_ticket" != true ]; then
         default_title="[$ticket] "
     else
         default_title=""
     fi
     read -p "Enter PR title: $default_title" title_input
     title="$default_title$title_input"
-elif [ -n "$ticket" ] && [[ ! "$title" =~ \[$ticket\] ]]; then
+elif [ -n "$ticket" ] && [ "$no_ticket" != true ] && [[ ! "$title" =~ \[$ticket\] ]]; then
     # Add ticket to provided title if not present
     title="[$ticket] $title"
 fi
@@ -128,14 +141,14 @@ if [ -z "$body" ]; then
     body=$(cat)
 fi
 
-# Check for PR template
-if [[ -f "$PR_TEMPLATE_PATH" ]]; then
+# Check for PR template if not explicitly skipped
+if [ "$no_template" != true ] && [[ -f "$PR_TEMPLATE_PATH" ]]; then
     template=$(cat "$PR_TEMPLATE_PATH")
     body="$template\n\n$body"
 fi
 
-# If we have a ticket, add it to the description
-if [ -n "$ticket" ]; then
+# If we have a ticket and it's not skipped, add it to the description
+if [ -n "$ticket" ] && [ "$no_ticket" != true ]; then
     body="Related ticket: $ticket\n\n$body"
 fi
 
