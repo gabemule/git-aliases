@@ -1,45 +1,50 @@
 #!/bin/bash
 
-# Colors for output
-GREEN='\033[0;32m'
-BLUE='\033[0;34m'
-YELLOW='\033[1;33m'
-RED='\033[0;31m'
-NC='\033[0m' # No Color
+# Source common configuration
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$SCRIPT_DIR/common/config.sh"
 
-# Function to get default value
-get_default() {
-    local key=$1
-    case $key in
-        workflow.mainBranch)     echo "production" ;;
-        workflow.defaultTarget)   echo "development" ;;
-        workflow.ticketPattern)   echo "^[A-Z]+-[0-9]+$" ;;
-        workflow.featurePrefix)   echo "feature/" ;;
-        workflow.bugfixPrefix)    echo "bugfix/" ;;
-        workflow.hotfixPrefix)    echo "hotfix/" ;;
-        workflow.releasePrefix)   echo "release/" ;;
-        workflow.docsPrefix)      echo "docs/" ;;
-        workflow.prTemplatePath)  echo ".github/pull_request_template.md" ;;
-        *)                       echo "No default value" ;;
-    esac
+# Show help message
+show_help() {
+    echo "Usage: git chronogit [options]"
+    echo
+    echo "Interactive configuration manager for git workflow settings"
+    echo
+    echo "Options:"
+    echo "  -h, --help             Show this help message"
+    echo
+    echo "Interactive Menu:"
+    echo "  1) Show all configurations"
+    echo "  2) Set configuration"
+    echo "  3) Reset configuration"
+    echo "  4) Exit"
+    echo
+    echo "Available Configurations:"
+    echo "  workflow.mainBranch     - Main branch for repository"
+    echo "  workflow.defaultTarget   - Default target for PRs"
+    echo "  workflow.ticketPattern   - Pattern for ticket references"
+    echo "  workflow.featurePrefix   - Prefix for feature branches"
+    echo "  workflow.bugfixPrefix    - Prefix for bugfix branches"
+    echo "  workflow.hotfixPrefix    - Prefix for hotfix branches"
+    echo "  workflow.releasePrefix   - Prefix for release branches"
+    echo "  workflow.docsPrefix      - Prefix for documentation branches"
+    echo "  workflow.prTemplatePath  - Path to PR template"
+    exit 0
 }
 
-# Function to get description
-get_description() {
-    local key=$1
-    case $key in
-        workflow.mainBranch)     echo "Main branch for repository" ;;
-        workflow.defaultTarget)   echo "Default target for PRs" ;;
-        workflow.ticketPattern)   echo "Pattern for ticket references" ;;
-        workflow.featurePrefix)   echo "Prefix for feature branches" ;;
-        workflow.bugfixPrefix)    echo "Prefix for bugfix branches" ;;
-        workflow.hotfixPrefix)    echo "Prefix for hotfix branches" ;;
-        workflow.releasePrefix)   echo "Prefix for release branches" ;;
-        workflow.docsPrefix)      echo "Prefix for documentation branches" ;;
-        workflow.prTemplatePath)  echo "Path to PR template" ;;
-        *)                       echo "No description available" ;;
+# Parse command line arguments
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        -h|--help)
+            show_help
+            ;;
+        *)
+            echo -e "${RED}Unknown option: $1${NC}"
+            echo "Use --help to see available options"
+            exit 1
+            ;;
     esac
-}
+done
 
 # Function to show current configuration
 show_config() {
@@ -274,7 +279,7 @@ reset_config_interactive() {
     echo "Current values for $selected_key:"
     show_config "$selected_key"
     
-    # Select scope
+    # Select scope to reset
     echo "Select scope to reset:"
     echo "1) Global"
     echo "2) Local"

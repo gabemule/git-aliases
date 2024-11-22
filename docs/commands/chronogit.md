@@ -5,10 +5,19 @@ Interactive configuration manager for ChronoGit.
 ## Usage
 
 ```bash
+# Show help and available options
+git chronogit --help
+
+# Start interactive configuration
 git chronogit
 ```
 
-Shows interactive menu:
+## Options
+
+- `-h, --help` - Show help message and available configurations
+
+## Interactive Menu
+
 ```
 ChronoGit Configuration
 
@@ -136,6 +145,31 @@ git chronogit
 # Choose: workflow.defaultTarget
 # Scope: branch
 # Value: production
+```
+
+## Configuration Files
+
+### Global Configuration
+Located in `~/.gitconfig`:
+```ini
+[workflow]
+    mainBranch = main
+    ticketPattern = ^[A-Z]+-[0-9]+$
+```
+
+### Local Configuration
+Located in `.git/config`:
+```ini
+[workflow]
+    mainBranch = develop
+    prTemplatePath = .github/PULL_REQUEST_TEMPLATE.md
+```
+
+### Branch Configuration
+Stored in local git config:
+```ini
+[branch "feature/task"]
+    ticket = PROJ-123
 ```
 
 ## Related Commands
