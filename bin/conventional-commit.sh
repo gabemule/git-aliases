@@ -4,6 +4,40 @@
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/common/config.sh"
 
+# Show help message
+show_help() {
+    echo "Usage: git cc [options]"
+    echo
+    echo "Create a commit following conventional commit format"
+    echo
+    echo "Options:"
+    echo "  -t, --ticket <id>      Override ticket for this commit"
+    echo "  -m, --message <msg>    Specify commit message"
+    echo "  -s, --scope <scope>    Specify commit scope"
+    echo "      --no-scope        Skip scope prompt"
+    echo "      --body <text>     Specify commit body"
+    echo "      --no-body         Skip body prompt"
+    echo "  -p, --push            Push changes after commit"
+    echo "  -b, --breaking        Mark as breaking change"
+    echo "      --no-verify       Skip commit hooks"
+    echo "      --type <type>     Specify commit type"
+    echo "      --non-interactive Skip all prompts"
+    echo "  -h, --help            Show this help message"
+    echo
+    echo "Types:"
+    echo "  feat     - New feature"
+    echo "  fix      - Bug fix"
+    echo "  docs     - Documentation only changes"
+    echo "  style    - Changes not affecting code"
+    echo "  refactor - Code change that neither fixes a bug nor adds a feature"
+    echo "  perf     - Code change that improves performance"
+    echo "  test     - Adding missing tests or correcting existing tests"
+    echo "  chore    - Changes to the build process or auxiliary tools"
+    echo "  ci       - Changes to CI configuration files and scripts"
+    echo "  build    - Changes that affect the build system"
+    exit 0
+}
+
 # Initialize variables
 one_time_ticket=""
 message=""
@@ -20,6 +54,9 @@ non_interactive=false
 # Parse command line arguments
 while [[ $# -gt 0 ]]; do
     case $1 in
+        -h|--help)
+            show_help
+            ;;
         -t|--ticket)
             one_time_ticket="$2"
             if ! validate_ticket "$one_time_ticket"; then
@@ -69,6 +106,7 @@ while [[ $# -gt 0 ]]; do
             ;;
         *)
             echo -e "${RED}Unknown option: $1${NC}"
+            echo "Use --help to see available options"
             exit 1
             ;;
     esac

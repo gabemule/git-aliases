@@ -7,6 +7,11 @@ Creates new branches with standardized naming and automatic ticket reference tra
 ### Basic Usage
 
 ```bash
+# Show help and available options
+git start-branch --help
+# or
+git start --help
+
 # Interactive mode (full command)
 git start-branch -t PROJ-123
 
@@ -22,6 +27,7 @@ git start -t PROJ-123 -n user-authentication -b feature
 
 ### Options
 
+- `-h, --help` - Show help message
 - `-t, --ticket <id>` - Specify ticket reference (e.g., PROJ-123)
 - `-n, --name <name>` - Specify branch name (skip prompt)
 - `-b, --branch-type <type>` - Specify branch type (skip prompt)

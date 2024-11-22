@@ -4,6 +4,31 @@
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/common/config.sh"
 
+# Show help message
+show_help() {
+    echo "Usage: git start-branch [options]"
+    echo "   or: git start [options]"
+    echo
+    echo "Create a new branch with standardized naming and ticket tracking"
+    echo
+    echo "Options:"
+    echo "  -t, --ticket <id>       Specify ticket reference (e.g., PROJ-123)"
+    echo "  -n, --name <name>       Specify branch name"
+    echo "  -b, --branch-type <type> Specify branch type"
+    echo "      --current          Create branch from current branch"
+    echo "      --no-sync          Skip syncing with main branch"
+    echo "      --no-stash         Skip stashing changes"
+    echo "  -h, --help             Show this help message"
+    echo
+    echo "Branch Types:"
+    echo "  feature  - New feature development"
+    echo "  bugfix   - Bug fix in the code"
+    echo "  hotfix   - Critical fix for production"
+    echo "  release  - Prepare for a new production release"
+    echo "  docs     - Documentation changes"
+    exit 0
+}
+
 # Check if script is run in a git repository
 if ! git rev-parse --is-inside-work-tree > /dev/null 2>&1; then
     echo -e "${RED}Error: This script must be run in a git repository.${NC}"
@@ -21,6 +46,9 @@ no_stash=false
 # Parse command line arguments
 while [[ $# -gt 0 ]]; do
     case $1 in
+        -h|--help)
+            show_help
+            ;;
         -t|--ticket)
             ticket="$2"
             shift 2
@@ -47,6 +75,7 @@ while [[ $# -gt 0 ]]; do
             ;;
         *)
             echo -e "${RED}Unknown option: $1${NC}"
+            echo "Use --help to see available options"
             exit 1
             ;;
     esac

@@ -4,17 +4,46 @@
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/common/config.sh"
 
+# Show help message
+show_help() {
+    echo "Usage: git open-pr [options]"
+    echo "   or: git pr [options]"
+    echo
+    echo "Create a pull request with automatic ticket reference inclusion"
+    echo
+    echo "Options:"
+    echo "  -t, --target <branch>  Target branch (development/production)"
+    echo "      --title <title>    PR title"
+    echo "      --body <text>      PR description"
+    echo "      --draft            Create as draft PR"
+    echo "      --no-browser       Don't open in browser"
+    echo "      --no-template      Skip PR template"
+    echo "      --no-ticket        Skip ticket references"
+    echo "  -h, --help            Show this help message"
+    echo
+    echo "Examples:"
+    echo "  git pr -t development              # Interactive PR to development"
+    echo "  git pr -t production --draft       # Draft PR to production"
+    echo "  git pr --title \"Fix bug\" --no-browser  # PR with title, no browser"
+    exit 0
+}
+
 # Initialize variables
 target=""
 title=""
 body=""
 draft=false
 no_browser=false
+no_template=false
+no_ticket=false
 non_interactive=false
 
 # Parse command line arguments
 while [[ $# -gt 0 ]]; do
     case $1 in
+        -h|--help)
+            show_help
+            ;;
         -t|--target)
             target="$2"
             shift 2
@@ -36,8 +65,17 @@ while [[ $# -gt 0 ]]; do
             no_browser=true
             shift
             ;;
+        --no-template)
+            no_template=true
+            shift
+            ;;
+        --no-ticket)
+            no_ticket=true
+            shift
+            ;;
         *)
             echo -e "${RED}Unknown option: $1${NC}"
+            echo "Use --help to see available options"
             exit 1
             ;;
     esac
@@ -56,14 +94,17 @@ if ! command -v gh &> /dev/null; then
     echo
     echo -e "${BLUE}Quick install commands:${NC}"
     echo "  Homebrew (macOS): brew install gh"
-    echo "  Windows: winget install --id GitHub.cli"
+    echo "  Windows: winget install GitHub.cli"
     echo "  Linux: See https://github.com/cli/cli/blob/trunk/docs/install_linux.md"
     exit 1
 fi
 
 # Get current branch and ticket
 current_branch=$(git rev-parse --abbrev-ref HEAD)
-ticket=$(git config branch."$current_branch".ticket)
+ticket=""
+if [ "$no_ticket" != true ]; then
+    ticket=$(git config branch."$current_branch".ticket)
+fi
 
 # Check if we're on a valid branch type
 valid_prefix=false
@@ -110,14 +151,14 @@ fi
 
 # Handle PR title
 if [ -z "$title" ]; then
-    if [ -n "$ticket" ]; then
+    if [ -n "$ticket" ] && [ "$no_ticket" != true ]; then
         default_title="[$ticket] "
     else
         default_title=""
     fi
     read -p "Enter PR title: $default_title" title_input
     title="$default_title$title_input"
-elif [ -n "$ticket" ] && [[ ! "$title" =~ \[$ticket\] ]]; then
+elif [ -n "$ticket" ] && [ "$no_ticket" != true ] && [[ ! "$title" =~ \[$ticket\] ]]; then
     # Add ticket to provided title if not present
     title="[$ticket] $title"
 fi
@@ -128,14 +169,14 @@ if [ -z "$body" ]; then
     body=$(cat)
 fi
 
-# Check for PR template
-if [[ -f "$PR_TEMPLATE_PATH" ]]; then
+# Check for PR template if not explicitly skipped
+if [ "$no_template" != true ] && [[ -f "$PR_TEMPLATE_PATH" ]]; then
     template=$(cat "$PR_TEMPLATE_PATH")
     body="$template\n\n$body"
 fi
 
-# If we have a ticket, add it to the description
-if [ -n "$ticket" ]; then
+# If we have a ticket and it's not skipped, add it to the description
+if [ -n "$ticket" ] && [ "$no_ticket" != true ]; then
     body="Related ticket: $ticket\n\n$body"
 fi
 

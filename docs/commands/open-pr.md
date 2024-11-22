@@ -22,6 +22,11 @@ gh auth login
 ### Basic Usage
 
 ```bash
+# Show help and available options
+git open-pr --help
+# or
+git pr --help
+
 # Interactive mode (full command)
 git open-pr
 
@@ -37,11 +42,14 @@ git pr -t production --title "Fix login bug" --body "Fixed authentication flow"
 
 ### Options
 
+- `-h, --help` - Show help message
 - `-t, --target <branch>` - Specify target branch (development/production)
 - `--title <title>` - Specify PR title
 - `--body <description>` - Specify PR description
 - `--draft` - Create as draft PR
 - `--no-browser` - Don't open in browser
+- `--no-template` - Skip PR template
+- `--no-ticket` - Skip ticket references
 
 ## Examples
 
@@ -121,7 +129,23 @@ $ git pr -t production --title "Hotfix: Security patch" --no-browser
 ✓ Created PR: [PROJ-789] Hotfix: Security patch
 ```
 
-### 5. PR with Template
+### 5. PR Without Template
+
+```bash
+# Skip loading PR template
+$ git open-pr --no-template
+✓ Created PR without template
+```
+
+### 6. PR Without Ticket
+
+```bash
+# Skip ticket references
+$ git open-pr --no-ticket
+✓ Created PR without ticket references
+```
+
+### 7. PR with Template
 
 ```bash
 # Using full command
@@ -163,7 +187,7 @@ The command automatically loads PR templates from:
 .github/pull_request_template.md
 ```
 
-If a template exists, it will be included in the PR description.
+If a template exists, it will be included in the PR description unless --no-template is used.
 
 ## Ticket Handling
 
@@ -178,6 +202,10 @@ Example:
 # Branch ticket: PROJ-123
 $ git pr --title "Add search"
 ✓ Created PR: [PROJ-123] Add search
+
+# Skip ticket references
+$ git pr --title "Add search" --no-ticket
+✓ Created PR: Add search
 ```
 
 ## Troubleshooting

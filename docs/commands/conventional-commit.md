@@ -7,6 +7,9 @@ Creates standardized commits following the [Conventional Commits](https://www.co
 ### Basic Usage
 
 ```bash
+# Show help and available options
+git cc --help
+
 # Fully interactive mode (prompts for everything)
 git cc
 
@@ -19,9 +22,12 @@ git cc -m "implement login" --type feat -s auth --non-interactive
 
 ### Options
 
+- `-h, --help` - Show help message
 - `-m, --message <msg>` - Specify commit message
 - `-s, --scope <scope>` - Specify commit scope
 - `--no-scope` - Skip scope prompt and create commit without scope
+- `--body <text>` - Specify commit body directly
+- `--no-body` - Skip body prompt
 - `-t, --ticket <id>` - Override ticket for this commit only
 - `-p, --push` - Push changes after commit
 - `-b, --breaking` - Mark as breaking change
@@ -97,14 +103,28 @@ $ git cc -m "update test" -s test
 $ git cc -m "update readme" --no-scope
 ```
 
-### 4. Breaking Change
+### 4. With Body
+
+```bash
+# Provide message and body directly
+$ git cc -m "add feature" --body "- Added new feature\n- Updated tests"
+```
+
+### 5. Without Body
+
+```bash
+# Skip body prompt
+$ git cc -m "quick fix" --no-body
+```
+
+### 6. Breaking Change
 
 ```bash
 # Mark as breaking change
 $ git cc -m "change api" -s api -b
 ```
 
-### 5. Auto-push
+### 7. Auto-push
 
 ```bash
 # Push after commit
@@ -140,6 +160,21 @@ $ git cc -m "update docs" -p
 3. With --no-scope:
    - Skips scope prompt
    - No scope: feat: message
+
+## Body Handling
+
+1. Interactive Mode:
+   - Prompts for body unless --no-body is used
+   - Press Ctrl+D for no body
+   - Enter text for body
+
+2. With --body flag:
+   - Uses provided body text
+   - Adds as separate paragraphs in commit
+
+3. With --no-body:
+   - Skips body prompt
+   - Creates commit without body
 
 ## Ticket Handling
 
