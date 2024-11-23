@@ -237,7 +237,13 @@ git push origin feature/task
 
 ## Conflict Management
 
-### Preventing Conflicts
+### Conflict Prevention
+
+Our tools help prevent conflicts through:
+1. Auto-stashing changes (start-branch)
+2. Auto-syncing with main branch (start-branch)
+3. Standardized branch naming
+4. Early conflict detection (PR creation)
 
 ✅ **Do**:
 - Keep branches short-lived
@@ -259,7 +265,7 @@ git start-branch -t PROJ-123 --no-stash
 ### Common Conflict Scenarios
 
 #### 1. PR Creation Conflicts
-When your PR can't be automatically merged:
+When GitHub reports your PR can't be automatically merged:
 
 1. Sync with target branch
 ```bash
