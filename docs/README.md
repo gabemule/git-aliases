@@ -116,3 +116,4 @@ chronogit/
 - Check the [troubleshooting guide](installation/troubleshooting.md)
 - Review [known issues](known-issues.md)
 - See [configuration options](configuration/README.md)
+- Learn about [conflict handling](workflow/best-practices.md#conflict-management)

@@ -29,8 +29,8 @@ git start-branch -t PROJ-123 -n user-authentication -b feature
 - `-n, --name <name>` - Specify branch name
 - `-b, --branch-type <type>` - Specify branch type
 - `--current` - Create branch from current branch instead of main
-- `--no-sync` - Skip main branch sync
-- `--no-stash` - Skip stashing changes
+- `--no-sync` - Skip main branch sync (use with caution, see [Conflict Management](../workflow/best-practices.md#conflict-management))
+- `--no-stash` - Skip stashing changes (use with caution, see [Stash Pop Conflicts](../workflow/best-practices.md#3-stash-pop-conflicts))
 
 ## Branch Types
 
@@ -47,11 +47,17 @@ Select branch type:
 ## Automatic Features
 
 ### 1. Stash Handling
-By default, modified files are automatically stashed:
+By default, modified files are automatically stashed to prevent conflicts:
 ```bash
 $ git start-branch -t PROJ-123
 You have modified files. Creating a stash...
 ✓ Stash created with description: Auto stash before start-branch on 2024-01-20 10:30:45
+```
+
+Skip only when you're sure your changes won't interfere:
+```bash
+# Use with caution - see Conflict Management guide
+git start-branch -t PROJ-123 --no-stash
 ```
 
 ### 2. Main Branch Sync
@@ -59,6 +65,18 @@ Unless --current or --no-sync is used:
 1. Switches to main branch
 2. Pulls latest changes
 3. Creates new branch from updated main
+
+This prevents future merge conflicts:
+```bash
+# Recommended: let sync happen
+git start-branch -t PROJ-123
+
+# Skip sync only when needed - see Branch Sync Conflicts guide
+git start-branch -t PROJ-123 --no-sync
+
+# Branch from current instead of main
+git start-branch -t PROJ-123 --current  # For dependent features
+```
 
 ### 3. Branch Naming
 - Spaces converted to hyphens automatically

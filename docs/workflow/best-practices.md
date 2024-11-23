@@ -235,6 +235,119 @@ git cc -m "address feedback" -s ui
 git push origin feature/task
 ```
 
+## Conflict Management
+
+### Preventing Conflicts
+
+✅ **Do**:
+- Keep branches short-lived
+- Sync with main branch regularly
+- Use `--no-stash` only when needed
+```bash
+# Let start-branch handle stashing
+git start-branch -t PROJ-123
+
+# Only skip stash when needed
+git start-branch -t PROJ-123 --no-stash
+```
+
+❌ **Don't**:
+- Work on outdated branches
+- Skip main branch sync
+- Mix unrelated changes
+
+### Common Conflict Scenarios
+
+#### 1. PR Creation Conflicts
+When your PR can't be automatically merged:
+
+1. Sync with target branch
+```bash
+# Get latest changes
+git checkout development
+git pull origin development
+
+# Update your branch
+git checkout feature/task
+git merge development
+```
+
+2. Resolve conflicts
+```bash
+# After fixing conflicts
+git add .
+git cc -m "merge development" -s merge
+```
+
+3. Update PR
+```bash
+git push origin feature/task
+```
+
+#### 2. Branch Sync Conflicts
+When pulling main branch updates:
+
+1. Stash your changes
+```bash
+git stash save "WIP: current changes"
+```
+
+2. Update main
+```bash
+git checkout main
+git pull origin main
+```
+
+3. Update your branch
+```bash
+git checkout feature/task
+git merge main
+# Resolve conflicts if any
+git add .
+git cc -m "merge main" -s merge
+```
+
+4. Restore changes
+```bash
+git stash pop
+# If conflicts with stashed changes:
+# 1. Resolve conflicts
+# 2. git add .
+# 3. git stash drop
+```
+
+#### 3. Stash Pop Conflicts
+When restoring stashed changes:
+
+1. If stash pop fails
+```bash
+# Stash pop failed with conflicts
+git status  # Check conflicted files
+```
+
+2. Resolve conflicts
+```bash
+# Edit conflicted files
+git add .  # Mark as resolved
+```
+
+3. Clean up
+```bash
+git stash drop  # Remove stash after resolving
+```
+
+### Sync Strategies
+
+✅ **Do**:
+- Sync before starting work
+- Use start-branch's auto-sync
+- Resolve conflicts early
+
+❌ **Don't**:
+- Work on stale branches
+- Skip sync with --no-sync
+- Let conflicts accumulate
+
 ## Related Documentation
 
 - [Workflow Guide](README.md)

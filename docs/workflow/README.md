@@ -167,6 +167,34 @@ git cc -m "change API" -s core -b
    - Urgent review
    - Backport needed
 
+## Conflict Handling
+
+### Auto-Sync
+
+By default, start-branch:
+1. Stashes your changes
+2. Updates main branch
+3. Creates new branch
+4. Restores changes
+
+```bash
+# Default behavior (recommended)
+git start-branch -t PROJ-123
+
+# Skip auto-sync (use with caution)
+git start-branch -t PROJ-123 --no-sync
+```
+
+### Merge Conflicts
+
+When conflicts occur:
+1. Sync with target branch
+2. Resolve conflicts
+3. Create merge commit
+4. Update PR
+
+See [Best Practices](best-practices.md#conflict-management) for detailed conflict handling.
+
 ## Best Practices
 
 See our detailed guides:
