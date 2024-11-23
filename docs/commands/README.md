@@ -6,6 +6,9 @@ ChronoGit provides a set of powerful Git commands to streamline your workflow. E
 
 ### [🌿 Branch Creation](start-branch.md)
 ```bash
+# Show help
+git start -h
+
 # Full command
 git start-branch -t PROJ-123
 
@@ -23,6 +26,9 @@ Creates new branches with standardized naming and ticket tracking.
 
 ### [✍️ Conventional Commits](conventional-commit.md)
 ```bash
+# Show help
+git cc -h
+
 # Interactive mode
 git cc
 
@@ -40,6 +46,9 @@ Creates standardized commits following the Conventional Commits specification.
 
 ### [🔍 Pull Requests](open-pr.md)
 ```bash
+# Show help
+git pr -h
+
 # Full command
 git open-pr
 
@@ -59,7 +68,18 @@ Streamlines PR creation with automatic ticket reference inclusion.
 
 All commands follow these consistent patterns:
 
-### 1. Ticket Handling
+### 1. Help Messages
+```bash
+# View command help
+git start -h
+git cc -h
+git pr -h
+
+# Note: Using --help shows alias definition
+# See known-issues.md for details
+```
+
+### 2. Ticket Handling
 ```bash
 # Set with branch
 git start-branch -t PROJ-123
@@ -71,7 +91,7 @@ git cc -t PROJ-456
 git open-pr  # Uses branch ticket
 ```
 
-### 2. Interactive vs Non-interactive
+### 3. Interactive vs Non-interactive
 ```bash
 # Interactive (prompts for input)
 git cc
@@ -80,7 +100,7 @@ git cc
 git cc -m "message" --type feat -s ui
 ```
 
-### 3. Short Aliases
+### 4. Short Aliases
 ```bash
 git start     # for start-branch
 git cc        # for conventional-commit
@@ -90,6 +110,9 @@ git pr        # for open-pr
 ## Testing Commands
 
 ```bash
+# Show test help
+git test -h
+
 # Run test suite
 git test
 
@@ -107,6 +130,7 @@ git test
 - [Configuration Guide](../configuration/README.md)
 - [Workflow Guide](../workflow/README.md)
 - [Testing Guide](../testing/README.md)
+- [Known Issues](../known-issues.md)
 
 ## Need Help?
 
@@ -115,4 +139,5 @@ git test
   - [conventional-commit](conventional-commit.md)
   - [open-pr](open-pr.md)
 - Check [troubleshooting guide](../installation/troubleshooting.md)
+- Review [known issues](../known-issues.md)
 - Run verification: `git test -v`

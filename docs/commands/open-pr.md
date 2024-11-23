@@ -13,7 +13,7 @@ brew install gh  # macOS
 winget install GitHub.cli  # Windows
 # See https://cli.github.com/ for other platforms
 
-# Authenticate with GitHub
+# Authenticate
 gh auth login
 ```
 
@@ -22,7 +22,7 @@ gh auth login
 ### Basic Usage
 
 ```bash
-# Show help and available options
+# Show help
 git open-pr -h
 # or
 git pr -h
@@ -33,10 +33,10 @@ git open-pr
 # Interactive mode (short alias)
 git pr
 
-# Non-interactive mode (full command)
+# With target branch
 git open-pr -t production --title "Fix login bug" --body "Fixed authentication flow"
 
-# Non-interactive mode (short alias)
+# Short alias with target
 git pr -t production --title "Fix login bug" --body "Fixed authentication flow"
 ```
 
@@ -51,9 +51,18 @@ git pr -t production --title "Fix login bug" --body "Fixed authentication flow"
 - `--no-template` - Skip PR template
 - `--no-ticket` - Skip ticket references
 
-## Examples
+## Branch Requirements
 
-### 1. Interactive PR Creation
+Your current branch must:
+1. Be a valid branch type with correct prefix:
+   - feature/ - For new features
+   - bugfix/ - For bug fixes
+   - hotfix/ - For critical fixes
+   - release/ - For releases
+   - docs/ - For documentation
+2. Not have an existing PR to the target branch
+
+## Interactive PR Creation
 
 ```bash
 # Using full command
@@ -79,7 +88,9 @@ Enter PR title: [PROJ-123] Add user authentication
 ✓ Opening PR in browser...
 ```
 
-### 2. Quick PR Creation
+## Examples
+
+### 1. Quick PR Creation
 
 ```bash
 # Using full command
@@ -93,7 +104,7 @@ $ git pr -t development --title "Fix login bug"
 ✓ Opening PR in browser...
 ```
 
-### 3. Draft PR
+### 2. Draft PR
 
 ```bash
 # Using full command
@@ -117,7 +128,7 @@ Enter PR title: [PROJ-456] WIP: Refactor auth system
 ✓ Opening PR in browser...
 ```
 
-### 4. PR Without Browser
+### 3. PR Without Browser
 
 ```bash
 # Using full command
@@ -129,7 +140,7 @@ $ git pr -t production --title "Hotfix: Security patch" --no-browser
 ✓ Created PR: [PROJ-789] Hotfix: Security patch
 ```
 
-### 5. PR Without Template
+### 4. PR Without Template
 
 ```bash
 # Skip loading PR template
@@ -137,7 +148,7 @@ $ git open-pr --no-template
 ✓ Created PR without template
 ```
 
-### 6. PR Without Ticket
+### 5. PR Without Ticket
 
 ```bash
 # Skip ticket references
@@ -145,56 +156,52 @@ $ git open-pr --no-ticket
 ✓ Created PR without ticket references
 ```
 
-### 7. PR with Template
+## Error Handling
 
+### Not in Git Repository
 ```bash
-# Using full command
-$ git open-pr
-Select the target branch for your PR:
-1) development
-2) production
-? 1
-Enter PR title: [PROJ-123] Add search feature
-Enter PR description (press Ctrl+D when finished):
-[Template loaded from .github/pull_request_template.md]
-
-Changes:
-- Implement search functionality
-- Add search results page
-- Add pagination
-✓ Opening PR in browser...
-
-# Using short alias
 $ git pr
-Select the target branch for your PR:
-1) development
-2) production
-? 1
-Enter PR title: [PROJ-123] Add search feature
-✓ Opening PR in browser...
+Error: This script must be run in a git repository.
 ```
 
-## Target Branches
+### GitHub CLI Not Found
+```bash
+$ git pr
+Error: GitHub CLI (gh) is not installed.
+Please install it following the instructions at: https://cli.github.com/
 
-Available target branches:
-- `development` - For feature development
-- `production` - For production releases
-
-## PR Templates
-
-The command automatically loads PR templates from:
+Quick install commands:
+  Homebrew (macOS): brew install gh
+  Windows: winget install GitHub.cli
+  Linux: See https://github.com/cli/cli/blob/trunk/docs/install_linux.md
 ```
-.github/pull_request_template.md
+
+### Invalid Branch Type
+```bash
+$ git pr
+Error: You must be on a feature, bugfix, hotfix, or docs branch to open a PR.
+Current branch: main
 ```
 
-If a template exists, it will be included in the PR description unless --no-template is used.
+### Invalid Target Branch
+```bash
+$ git pr -t invalid
+Invalid target branch: invalid
+Valid targets: development, production
+```
+
+### Existing PR
+```bash
+$ git pr
+A PR already exists for this branch: https://github.com/org/repo/pull/123
+```
 
 ## Ticket Handling
 
 The command automatically:
 1. Gets ticket from branch config
 2. Adds ticket reference to PR title `[PROJ-123]`
-3. Adds ticket reference to PR description
+3. Adds "Related ticket: PROJ-123" to PR description
 4. Links PR to ticket system
 
 Example:
@@ -208,20 +215,21 @@ $ git pr --title "Add search" --no-ticket
 ✓ Created PR: Add search
 ```
 
-## Troubleshooting
+## Template Handling
 
-### GitHub CLI Not Found
-If you see "GitHub CLI (gh) is not installed" error:
-1. Install gh CLI following instructions above
-2. Authenticate with `gh auth login`
-3. Try command again
-
-### Authentication Issues
-If you see authentication errors:
-1. Run `gh auth status` to check current auth
-2. Run `gh auth login` to re-authenticate if needed
+1. Default template location: `.github/pull_request_template.md`
+2. Template is automatically loaded and prepended to PR description
+3. Can be skipped with --no-template flag
+4. Custom template path can be configured using chronogit:
+   ```bash
+   git chronogit
+   # Select: 2) Set configuration
+   # Choose: workflow.prTemplatePath
+   # Enter: custom/template.md
+   ```
 
 ## Related Commands
 
 - [git start-branch](start-branch.md) - Create branches with ticket tracking
 - [git cc](conventional-commit.md) - Create commits for PR
+- [git chronogit](chronogit.md) - Configure PR settings

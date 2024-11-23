@@ -15,9 +15,6 @@ git cc
 
 # Semi-interactive mode (message provided, prompts for type)
 git cc -m "implement login"
-
-# Non-interactive mode (for testing)
-git cc -m "implement login" --type feat -s auth --non-interactive
 ```
 
 ### Options
@@ -36,23 +33,28 @@ git cc -m "implement login" --type feat -s auth --non-interactive
 
 ## Interactive Mode
 
-### Full Interactive
-
-When running without any flags, prompts for everything:
-
+### Type Selection
+Use arrow keys (↑/↓) to select commit type:
 ```bash
 $ git cc
 Select commit type:
-   feat
-   fix
-   docs
-   style
-   refactor
-   perf
-   test
-   chore
-   ci
-   build
+   feat     - New feature
+   fix      - Bug fix
+   docs     - Documentation only changes
+   style    - Changes not affecting code
+   refactor - Code change that neither fixes a bug nor adds a feature
+   perf     - Code change that improves performance
+   test     - Adding missing tests
+   chore    - Changes to build process or auxiliary tools
+   ci       - Changes to CI configuration
+   build    - Changes that affect the build system
+```
+
+### Full Interactive Flow
+
+```bash
+$ git cc
+Select commit type: [Use arrow keys to select]
 ? Enter scope (optional) []: auth
 ? Enter short description []: implement login
 ? Enter commit body (optional, press Ctrl+D when finished):
@@ -63,17 +65,13 @@ Select commit type:
 ? Do you want to push the changes now? (Y/n)
 ```
 
-### Semi-interactive
+### Semi-interactive Flow
 
 When providing message with -m, prompts for remaining options:
 
 ```bash
 $ git cc -m "implement login"
-Select commit type:
-   feat
-   fix
-   docs
-   ...
+Select commit type: [Use arrow keys to select]
 ? Enter scope (optional) []: auth
 ? Enter commit body (optional, press Ctrl+D when finished):
 ✓ Created commit: feat(auth): implement login [PROJ-123]
@@ -122,6 +120,10 @@ $ git cc -m "quick fix" --no-body
 ```bash
 # Mark as breaking change
 $ git cc -m "change api" -s api -b
+# Results in:
+# feat(api)!: change api [PROJ-123]
+# 
+# BREAKING CHANGE: Breaking changes introduced
 ```
 
 ### 7. Auto-push
@@ -145,6 +147,40 @@ $ git cc -m "update docs" -p
 | chore | Maintenance | chore(deps): update packages |
 | ci | CI changes | ci(deploy): update pipeline |
 | build | Build system | build(webpack): optimize config |
+
+## Error Handling
+
+### No Staged Files
+```bash
+$ git cc -m "fix bug"
+Error: No staged files. Stage your changes before committing.
+
+# Status of your changes:
+[git status output]
+```
+
+### Invalid Commit Type
+```bash
+$ git cc --type invalid
+Invalid type: invalid
+Valid types: feat fix docs style refactor perf test chore ci build
+```
+
+### Failed Commit
+```bash
+$ git cc -m "fix bug"
+Error: Commit failed! This might be due to husky hooks or other git errors.
+Please check the error message above and try again.
+```
+
+### Failed Push
+```bash
+$ git cc -m "fix bug" -p
+Commit successful!
+
+Auto-pushing changes...
+Failed to push changes. Please push manually.
+```
 
 ## Scope Handling
 
@@ -194,10 +230,12 @@ $ git cc -m "fix bug" -t PROJ-456
 
 ## Breaking Changes
 
-Breaking changes can be marked with -b flag:
+Breaking changes are marked in two ways:
+1. Exclamation mark after type/scope
+2. BREAKING CHANGE footer
 
+Example:
 ```bash
-# Will still prompt for type
 $ git cc -m "change api" -b -s api
 ✓ Created commit: feat(api)!: change api [PROJ-123]
 BREAKING CHANGE: Breaking changes introduced
@@ -207,3 +245,4 @@ BREAKING CHANGE: Breaking changes introduced
 
 - [git start-branch](start-branch.md) - Create branches with ticket tracking
 - [git open-pr](open-pr.md) - Create PR with commit history
+- [git chronogit](chronogit.md) - Configure commit settings and ticket patterns

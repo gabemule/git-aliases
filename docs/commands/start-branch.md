@@ -18,140 +18,154 @@ git start-branch -t PROJ-123
 # Interactive mode (short alias)
 git start -t PROJ-123
 
-# Non-interactive mode (full command)
+# With branch type and name
 git start-branch -t PROJ-123 -n user-authentication -b feature
-
-# Non-interactive mode (short alias)
-git start -t PROJ-123 -n user-authentication -b feature
 ```
 
 ### Options
 
 - `-h` - Show help message
 - `-t, --ticket <id>` - Specify ticket reference (e.g., PROJ-123)
-- `-n, --name <name>` - Specify branch name (skip prompt)
-- `-b, --branch-type <type>` - Specify branch type (skip prompt)
+- `-n, --name <name>` - Specify branch name
+- `-b, --branch-type <type>` - Specify branch type
 - `--current` - Create branch from current branch instead of main
 - `--no-sync` - Skip main branch sync
 - `--no-stash` - Skip stashing changes
 
-## Examples
-
-### 1. Interactive Branch Creation
-
-```bash
-# Using full command
-$ git start-branch -t PROJ-123
-Select branch type:
-   feature
-   bugfix
-   hotfix
-   release
-   docs
-? Enter the name of the new task: user-authentication
-✓ Created branch: feature/user-authentication
-✓ Stored ticket: PROJ-123
-
-# Using short alias
-$ git start -t PROJ-123
-Select branch type:
-   feature
-   bugfix
-   hotfix
-   release
-   docs
-? Enter the name of the new task: user-authentication
-✓ Created branch: feature/user-authentication
-✓ Stored ticket: PROJ-123
-```
-
-### 2. Quick Branch Creation
-
-```bash
-# Using full command
-$ git start-branch -t PROJ-456 -b hotfix -n fix-login
-✓ Created branch: hotfix/fix-login
-✓ Stored ticket: PROJ-456
-
-# Using short alias
-$ git start -t PROJ-456 -b hotfix -n fix-login
-✓ Created branch: hotfix/fix-login
-✓ Stored ticket: PROJ-456
-```
-
-### 3. Branch from Current
-
-```bash
-# Using full command
-$ git start-branch -t PROJ-789 --current
-Select branch type:
-   feature
-? Enter the name of the new task: add-tests
-✓ Created branch: feature/add-tests from current branch
-✓ Stored ticket: PROJ-789
-
-# Using short alias
-$ git start -t PROJ-789 --current
-Select branch type:
-   feature
-? Enter the name of the new task: add-tests
-✓ Created branch: feature/add-tests from current branch
-✓ Stored ticket: PROJ-789
-```
-
-### 4. Skip Sync and Stash
-
-```bash
-# Using full command
-$ git start-branch -t PROJ-321 --no-sync --no-stash
-Select branch type:
-   feature
-? Enter the name of the new task: quick-fix
-✓ Created branch: feature/quick-fix
-✓ Stored ticket: PROJ-321
-
-# Using short alias
-$ git start -t PROJ-321 --no-sync --no-stash
-Select branch type:
-   feature
-? Enter the name of the new task: quick-fix
-✓ Created branch: feature/quick-fix
-✓ Stored ticket: PROJ-321
-```
-
 ## Branch Types
 
-| Type | Purpose | Example |
-|------|---------|---------|
-| feature | New features | feature/user-authentication |
-| bugfix | Non-critical fixes | bugfix/login-validation |
-| hotfix | Critical fixes | hotfix/security-vulnerability |
-| release | Release preparation | release/v1.2.0 |
-| docs | Documentation | docs/api-endpoints |
+Use arrow keys (↑/↓) to select branch type:
+```bash
+Select branch type:
+   feature  - New feature development
+   bugfix   - Bug fix in the code
+   hotfix   - Critical fix for production
+   release  - Prepare for a new production release
+   docs     - Documentation changes
+```
+
+## Automatic Features
+
+### 1. Stash Handling
+By default, modified files are automatically stashed:
+```bash
+$ git start-branch -t PROJ-123
+You have modified files. Creating a stash...
+✓ Stash created with description: Auto stash before start-branch on 2024-01-20 10:30:45
+```
+
+### 2. Main Branch Sync
+Unless --current or --no-sync is used:
+1. Switches to main branch
+2. Pulls latest changes
+3. Creates new branch from updated main
+
+### 3. Branch Naming
+- Spaces converted to hyphens automatically
+- Appropriate prefix added based on type
+- Examples:
+  ```bash
+  git start -t PROJ-123 -n "user authentication"
+  # Creates: feature/user-authentication
+  
+  git start -t PROJ-123 -n "fix login bug" -b bugfix
+  # Creates: bugfix/fix-login-bug
+  ```
+
+## Interactive Usage
+
+### Full Interactive Flow
+
+```bash
+$ git start-branch
+Select branch type: [Use arrow keys to select]
+Enter the name of the new task: user authentication
+Enter ticket number (e.g., PROJ-123): PROJ-123
+
+✓ Successfully created and switched to new branch: feature/user-authentication
+✓ Associated ticket: PROJ-123
+
+You can now start working on your task.
+
+When you're done:
+1. Create a pull request to merge into 'development'
+2. After testing, create another pull request to merge into 'production'
+```
+
+### With Ticket Specified
+
+```bash
+$ git start -t PROJ-123
+Select branch type: [Use arrow keys to select]
+Enter the name of the new task: fix login
+✓ Successfully created and switched to new branch: bugfix/fix-login
+✓ Associated ticket: PROJ-123
+```
+
+## Error Handling
+
+### Not in Git Repository
+```bash
+$ git start
+Error: This script must be run in a git repository.
+```
+
+### Invalid Branch Type
+```bash
+$ git start -b invalid -t PROJ-123
+Invalid branch type: invalid
+Valid types: feature bugfix hotfix release docs
+```
+
+### Invalid Ticket Format
+```bash
+$ git start -t invalid
+Invalid ticket format. Must match pattern: ^[A-Z]+-[0-9]+$
+```
+
+### Branch Creation Failed
+```bash
+$ git start -t PROJ-123
+Error: Failed to create new branch.
+```
 
 ## Configuration
 
-### Main Branch
+Branch prefixes, main branch, and other settings can be configured using the chronogit command:
 
 ```bash
-# Set custom main branch (defaults to 'production')
-git config workflow.mainBranch main
+# Show current configuration
+git chronogit
 
-# View current setting
-git config workflow.mainBranch
+# Update configuration
+git chronogit
+# Select: 2) Set configuration
+# Choose setting to modify
 ```
 
-### Ticket Reference
+See [chronogit command](chronogit.md) for detailed configuration options.
 
-```bash
-# View stored ticket
-git config branch.feature/user-authentication.ticket
+## Workflow Steps
 
-# Manually set ticket
-git config branch.feature/user-authentication.ticket PROJ-123
-```
+After branch creation, you should:
+
+1. Make your changes and commit them:
+   ```bash
+   git cc -m "implement feature"
+   ```
+
+2. Create a PR to development:
+   ```bash
+   git pr -t development
+   ```
+
+3. After testing, create PR to production:
+   ```bash
+   git pr -t production
+   ```
 
 ## Related Commands
 
-- [git cc](conventional-commit.md) - Create commits with ticket references
-- [git open-pr](open-pr.md) - Create PR from branch
+- [git cc](conventional-commit.md) - Create commits in your branch
+- [git open-pr](open-pr.md) - Create PR when ready
+- [git chronogit](chronogit.md) - Configure branch settings

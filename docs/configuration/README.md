@@ -5,13 +5,13 @@ ChronoGit provides various configuration options to customize your workflow.
 ## Quick Reference
 
 ```bash
-# Branch Configuration
-git config workflow.mainBranch main  # Set main branch
-git config workflow.mainBranch       # View main branch
+# View all configurations
+git chronogit
 
-# Ticket Configuration
-git config branch.feature/task.ticket PROJ-123  # Set ticket
-git config branch.feature/task.ticket           # View ticket
+# Set configuration
+git chronogit
+# Select: 2) Set configuration
+# Choose setting to modify
 ```
 
 ## Available Aliases
@@ -28,6 +28,9 @@ git cc           # Create conventional commit
 git open-pr      # Create pull request (full command)
 git pr          # Create pull request (short alias)
 
+# Configuration
+git chronogit    # Manage workflow settings
+
 # Testing
 git test        # Run tests (shows interactive menu)
 ```
@@ -36,14 +39,17 @@ git test        # Run tests (shows interactive menu)
 
 ### Main Branch
 
-By default, ChronoGit uses 'production' as the main branch, but you can customize this per repository:
+By default, ChronoGit uses 'production' as the main branch, but you can customize this:
 
 ```bash
-# Set custom main branch
-git config workflow.mainBranch main
+# View current configuration
+git chronogit
+# Select: 1) Show all configurations
 
-# View current setting
-git config workflow.mainBranch
+# Change main branch
+git chronogit
+# Select: 2) Set configuration
+# Choose: workflow.mainBranch
 ```
 
 This affects:
@@ -60,21 +66,13 @@ Available branch types:
 - `release/` - Release preparation
 - `docs/` - Documentation
 
+Each prefix can be customized using the chronogit command.
+
 ## Ticket Configuration
 
 ### Branch Tickets
 
-Each branch can have an associated ticket:
-
-```bash
-# Set ticket for current branch
-git config branch.$(git rev-parse --abbrev-ref HEAD).ticket PROJ-123
-
-# View current branch's ticket
-git config branch.$(git rev-parse --abbrev-ref HEAD).ticket
-```
-
-This affects:
+Each branch automatically stores its associated ticket when created with `git start-branch`. The ticket is then used for:
 - Commit messages
 - PR titles
 - PR descriptions
@@ -117,35 +115,75 @@ git cc
 
 ```
 .
-├── .gitconfig           # Git aliases
+├── .gitconfig           # Git configuration
 ├── bin/                 # Command scripts
 ├── docs/               # Documentation
 └── tests/              # Test files
 ```
 
-## Custom Configuration
+## Configuration Files
 
-### Repository-specific Settings
+### .gitconfig
 
-Create a `.git/config` file in your repository:
+The workflow settings can be configured at different levels:
 
+#### 1. Global (~/.gitconfig)
+For settings that apply to all repositories:
 ```ini
 [workflow]
-    mainBranch = main
+    # Branch settings
+    mainBranch = production
+    defaultTarget = development
+    
+    # Branch prefixes
+    featurePrefix = feature/
+    bugfixPrefix = bugfix/
+    hotfixPrefix = hotfix/
+    releasePrefix = release/
+    docsPrefix = docs/
+    
+    # Ticket settings
+    ticketPattern = ^[A-Z]+-[0-9]+$
+    
+    # PR settings
+    prTemplatePath = .github/pull_request_template.md
 ```
 
-### Global Settings
-
-Edit your global `.gitconfig`:
-
+#### 2. Local (.git/config)
+For repository-specific settings:
 ```ini
-[include]
-    path = /path/to/chronogit/.gitconfig
-
 [workflow]
+    # Override global settings for this repository
     mainBranch = main
-    ticketPattern = "^[A-Z]+-[0-9]+$"
+    defaultTarget = staging
+    ticketPattern = ^TEAM-[0-9]+$
 ```
+
+#### 3. Branch
+For branch-specific settings:
+```ini
+[branch "feature/task"]
+    # Settings specific to this branch
+    ticket = PROJ-123
+```
+
+### Configuration Precedence
+
+When a setting is requested, it's resolved in this order:
+1. Branch configuration (if applicable)
+2. Local repository configuration
+3. Global configuration
+4. Default values
+
+To manage these settings at any level, use:
+```bash
+git chronogit
+# Select: 2) Set configuration
+# Choose setting to modify
+# Select scope (global/local/branch)
+```
+
+See [chronogit command](../commands/chronogit.md) for detailed configuration options.
 
 ## Testing Configuration
 
@@ -155,9 +193,8 @@ Verify your configuration:
 # Run verification tests
 git test -v
 
-# Check specific settings
-git config --get include.path
-git config --get workflow.mainBranch
+# View current settings
+git chronogit
 ```
 
 ## Related Documentation

@@ -1,219 +1,169 @@
 # 🛠️ Custom Configuration
 
-Complete guide to all available ChronoGit configurations.
+Complete guide to all available ChronoGit configurations and their underlying git commands.
 
-## Branch Configuration
+## Configuration Structure
 
-### Main Branch
-
-```bash
-# Set main branch (default: production)
-git config workflow.mainBranch main
-
-# Repository-specific
-git config --local workflow.mainBranch develop
-
-# Global default
-git config --global workflow.mainBranch main
-```
-
-### Branch Prefixes
-
-```bash
-# Feature branches (default: feature/)
-git config workflow.featurePrefix "feat/"
-
-# Bugfix branches (default: bugfix/)
-git config workflow.bugfixPrefix "fix/"
-
-# Hotfix branches (default: hotfix/)
-git config workflow.hotfixPrefix "hotfix/"
-
-# Release branches (default: release/)
-git config workflow.releasePrefix "release/"
-
-# Documentation branches (default: docs/)
-git config workflow.docsPrefix "docs/"
-```
-
-## Ticket Configuration
-
-### Ticket Pattern
-
-```bash
-# Set ticket pattern (default: ^[A-Z]+-[0-9]+$)
-git config workflow.ticketPattern "^TEAM-[0-9]+$"
-
-# Examples:
-# Default: PROJ-123
-# Custom: TEAM-456
-```
-
-### Branch Tickets
-
-```bash
-# Set ticket for current branch
-git config branch.$(git rev-parse --abbrev-ref HEAD).ticket PROJ-123
-
-# Set ticket for specific branch
-git config branch.feature/task.ticket PROJ-123
-
-# Remove ticket
-git config --unset branch.feature/task.ticket
-```
-
-## PR Configuration
-
-### Target Branch
-
-```bash
-# Set default target (default: development)
-git config workflow.defaultTarget main
-
-# Repository-specific
-git config --local workflow.defaultTarget develop
-```
-
-### PR Template
-
-```bash
-# Set custom template path (default: .github/pull_request_template.md)
-git config workflow.prTemplatePath ".github/custom-template.md"
-```
-
-## Configuration Levels
-
-### 1. Repository Level
-In `.git/config`:
+### Global Configuration (~/.gitconfig)
 ```ini
 [workflow]
     # Branch settings
-    mainBranch = main
-    defaultTarget = development
+    mainBranch = production      # Default branch for repository
+    defaultTarget = development  # Default PR target
     
     # Branch prefixes
-    featurePrefix = feature/
-    bugfixPrefix = fix/
-    hotfixPrefix = hotfix/
-    releasePrefix = release/
-    docsPrefix = docs/
+    featurePrefix = feature/     # Feature branch prefix
+    bugfixPrefix = bugfix/      # Bugfix branch prefix
+    hotfixPrefix = hotfix/      # Hotfix branch prefix
+    releasePrefix = release/    # Release branch prefix
+    docsPrefix = docs/         # Documentation branch prefix
     
     # Ticket settings
-    ticketPattern = "^[A-Z]+-[0-9]+$"
+    ticketPattern = ^[A-Z]+-[0-9]+$  # Ticket reference pattern
     
     # PR settings
-    prTemplatePath = ".github/pull_request_template.md"
+    prTemplatePath = .github/pull_request_template.md  # PR template location
 ```
 
-### 2. Global Level
-In `~/.gitconfig`:
+### Local Configuration (.git/config)
 ```ini
 [workflow]
-    # Global defaults
+    # Repository-specific overrides
     mainBranch = main
-    ticketPattern = "^[A-Z]+-[0-9]+$"
-    defaultTarget = development
+    defaultTarget = staging
+    ticketPattern = ^TEAM-[0-9]+$
 ```
 
-### 3. System Level
-In `/etc/gitconfig`:
+### Branch Configuration
 ```ini
-[workflow]
-    # System-wide defaults
-    mainBranch = main
-    ticketPattern = "^[A-Z]+-[0-9]+$"
+[branch "feature/task"]
+    ticket = PROJ-123  # Ticket reference for this branch
 ```
 
-## Configuration Precedence
+## Direct Git Commands
 
-1. Repository config (highest)
-2. Global config
-3. System config (lowest)
-
-## Viewing Configuration
-
-### View All Settings
+### View Configuration
 
 ```bash
-# All settings
+# View all workflow settings
 git config --list | grep workflow
 
-# Specific setting
+# View specific setting (checks all levels)
 git config workflow.mainBranch
-```
 
-### View Setting Source
+# View global setting only
+git config --global workflow.mainBranch
 
-```bash
-# Show where setting is defined
+# View local setting only
+git config --local workflow.mainBranch
+
+# View branch setting
+git config branch.feature/task.ticket
+
+# Show setting source
 git config --show-origin workflow.mainBranch
 ```
 
-## Default Values
+### Set Configuration
 
-```ini
-[workflow]
-    # Branch defaults
-    mainBranch = production
-    defaultTarget = development
-    
-    # Branch prefix defaults
-    featurePrefix = feature/
-    bugfixPrefix = bugfix/
-    hotfixPrefix = hotfix/
-    releasePrefix = release/
-    docsPrefix = docs/
-    
-    # Ticket defaults
-    ticketPattern = "^[A-Z]+-[0-9]+$"
-    
-    # PR defaults
-    prTemplatePath = .github/pull_request_template.md
+```bash
+# Set global setting
+git config --global workflow.mainBranch main
+
+# Set local setting
+git config --local workflow.defaultTarget staging
+
+# Set branch ticket
+git config branch.feature/task.ticket PROJ-123
 ```
+
+### Remove Configuration
+
+```bash
+# Remove global setting
+git config --global --unset workflow.mainBranch
+
+# Remove local setting
+git config --local --unset workflow.defaultTarget
+
+# Remove branch setting
+git config --unset branch.feature/task.ticket
+```
+
+## Available Settings
+
+### Branch Settings
+
+| Setting | Default | Description | Command to View | Command to Set |
+|---------|---------|-------------|-----------------|----------------|
+| workflow.mainBranch | production | Main branch for repository | `git config workflow.mainBranch` | `git config workflow.mainBranch main` |
+| workflow.defaultTarget | development | Default target for PRs | `git config workflow.defaultTarget` | `git config workflow.defaultTarget staging` |
+| workflow.featurePrefix | feature/ | Feature branch prefix | `git config workflow.featurePrefix` | `git config workflow.featurePrefix feat/` |
+| workflow.bugfixPrefix | bugfix/ | Bugfix branch prefix | `git config workflow.bugfixPrefix` | `git config workflow.bugfixPrefix fix/` |
+| workflow.hotfixPrefix | hotfix/ | Hotfix branch prefix | `git config workflow.hotfixPrefix` | `git config workflow.hotfixPrefix hotfix/` |
+| workflow.releasePrefix | release/ | Release branch prefix | `git config workflow.releasePrefix` | `git config workflow.releasePrefix rel/` |
+| workflow.docsPrefix | docs/ | Documentation branch prefix | `git config workflow.docsPrefix` | `git config workflow.docsPrefix docs/` |
+
+### Ticket Settings
+
+| Setting | Default | Description | Command to View | Command to Set |
+|---------|---------|-------------|-----------------|----------------|
+| workflow.ticketPattern | ^[A-Z]+-[0-9]+$ | Pattern for ticket references | `git config workflow.ticketPattern` | `git config workflow.ticketPattern "^TEAM-[0-9]+$"` |
+| branch.*.ticket | - | Branch's ticket reference | `git config branch.feature/task.ticket` | `git config branch.feature/task.ticket PROJ-123` |
+
+### PR Settings
+
+| Setting | Default | Description | Command to View | Command to Set |
+|---------|---------|-------------|-----------------|----------------|
+| workflow.prTemplatePath | .github/pull_request_template.md | Path to PR template | `git config workflow.prTemplatePath` | `git config workflow.prTemplatePath .github/custom-template.md` |
+
+## Under the Hood
+
+### Branch Creation
+- `workflow.mainBranch`: Used by start-branch to determine source branch
+- `workflow.*Prefix`: Used to prefix branch names based on type
+- Branch ticket is stored using `branch.<name>.ticket`
+
+### Commit Creation
+- Branch ticket is read from `branch.<name>.ticket`
+- Can be overridden with -t flag
+- Ticket pattern validated against `workflow.ticketPattern`
+
+### PR Creation
+- Default target from `workflow.defaultTarget`
+- Template loaded from `workflow.prTemplatePath`
+- Ticket reference from `branch.<name>.ticket`
 
 ## Examples
 
-### 1. Custom Team Setup
-
-```bash
-# Main branch
-git config workflow.mainBranch main
-
-# Team ticket pattern
-git config workflow.ticketPattern "^TEAM-[0-9]+$"
-
-# Custom prefixes
-git config workflow.featurePrefix "feat/"
-git config workflow.bugfixPrefix "fix/"
-```
-
-### 2. Multiple Projects
-
-```bash
-# Project A (.git/config)
-[workflow]
-    mainBranch = main
-    ticketPattern = "^PROJA-[0-9]+$"
-
-# Project B (.git/config)
-[workflow]
-    mainBranch = master
-    ticketPattern = "^PROJB-[0-9]+$"
-```
-
-### 3. Personal Defaults
-
-```bash
-# ~/.gitconfig
+### Team Setup
+```ini
+# In ~/.gitconfig
 [workflow]
     mainBranch = main
     defaultTarget = development
-    ticketPattern = "^[A-Z]+-[0-9]+$"
+    ticketPattern = ^TEAM-[0-9]+$
+```
+
+### Project Setup
+```ini
+# In .git/config
+[workflow]
+    mainBranch = develop
+    defaultTarget = staging
+    featurePrefix = feat/
+```
+
+### Branch Ticket
+```ini
+# In git config
+[branch "feat/login"]
+    ticket = TEAM-123
 ```
 
 ## Related Documentation
 
-- [Installation Guide](../installation/README.md)
-- [Command Reference](../commands/README.md)
-- [Workflow Guide](../workflow/README.md)
-- [Troubleshooting](../installation/troubleshooting.md)
+- [Configuration Guide](README.md) - Main configuration guide
+- [chronogit command](../commands/chronogit.md) - Interactive configuration management
+- [Installation Guide](../installation/README.md) - Initial setup
+- [Troubleshooting](../installation/troubleshooting.md) - Common issues

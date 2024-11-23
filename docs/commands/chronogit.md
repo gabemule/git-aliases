@@ -1,11 +1,11 @@
 # ⚙️ ChronoGit Command
 
-Interactive configuration manager for ChronoGit.
+Interactive configuration manager for ChronoGit. Provides a user-friendly way to view and manage all workflow settings.
 
 ## Usage
 
 ```bash
-# Show help and available options
+# Show help
 git chronogit -h
 
 # Start interactive configuration
@@ -14,7 +14,7 @@ git chronogit
 
 ## Options
 
-- `-h` - Show help message and available configurations
+- `-h` - Show help message
 
 ## Interactive Menu
 
@@ -27,20 +27,6 @@ ChronoGit Configuration
 4) Exit
 ```
 
-## Available Configurations
-
-| Key | Default | Description |
-|-----|---------|-------------|
-| workflow.mainBranch | production | Main branch for repository |
-| workflow.defaultTarget | development | Default target for PRs |
-| workflow.ticketPattern | ^[A-Z]+-[0-9]+$ | Pattern for ticket references |
-| workflow.featurePrefix | feature/ | Prefix for feature branches |
-| workflow.bugfixPrefix | bugfix/ | Prefix for bugfix branches |
-| workflow.hotfixPrefix | hotfix/ | Prefix for hotfix branches |
-| workflow.releasePrefix | release/ | Prefix for release branches |
-| workflow.docsPrefix | docs/ | Prefix for documentation branches |
-| workflow.prTemplatePath | .github/pull_request_template.md | Path to PR template |
-
 ## Configuration Scopes
 
 Each setting can be configured at different scopes:
@@ -51,7 +37,8 @@ Each setting can be configured at different scopes:
 
 ## Configuration Display
 
-Each setting shows:
+Each setting shows its values across all scopes and the effective value:
+
 ```
 workflow.mainBranch - Main branch for repository
   Global:    main
@@ -67,21 +54,47 @@ The effective value follows this precedence:
 3. Global configuration
 4. Default values (lowest)
 
+## Available Configurations
+
+| Key | Default | Description |
+|-----|---------|-------------|
+| workflow.mainBranch | production | Main branch for repository |
+| workflow.defaultTarget | development | Default target for PRs |
+| workflow.ticketPattern | ^[A-Z]+-[0-9]+$ | Pattern for ticket references |
+| workflow.featurePrefix | feature/ | Prefix for feature branches |
+| workflow.bugfixPrefix | bugfix/ | Prefix for bugfix branches |
+| workflow.hotfixPrefix | hotfix/ | Prefix for hotfix branches |
+| workflow.releasePrefix | release/ | Prefix for release branches |
+| workflow.docsPrefix | docs/ | Prefix for documentation branches |
+| workflow.prTemplatePath | .github/pull_request_template.md | Path to PR template |
+
 ## Interactive Usage
 
 ### 1. Show Configurations
 
 1. Run `git chronogit`
 2. Select `1) Show all configurations`
-3. View current settings at all scopes
+3. View current settings at all scopes:
+   - Global (applies to all repositories)
+   - Local (applies to current repository)
+   - Branch (applies to current branch)
+   - Default (built-in defaults)
+   - Effective (currently active value)
 4. Press Enter to return to menu
 
 ### 2. Set Configuration
 
 1. Run `git chronogit`
 2. Select `2) Set configuration`
-3. Choose configuration to set
-4. Select scope (global/local/branch)
+3. Choose configuration to set:
+   - Main branch
+   - Default target
+   - Branch prefixes
+   - etc.
+4. Select scope:
+   - Global (for all repositories)
+   - Local (for current repository)
+   - Branch (for current branch)
 5. Enter new value
 6. Press Enter to return to menu
 
@@ -90,7 +103,10 @@ The effective value follows this precedence:
 1. Run `git chronogit`
 2. Select `3) Reset configuration`
 3. Choose configuration to reset
-4. Select scope to reset
+4. Select scope to reset:
+   - Global
+   - Local
+   - Branch
 5. Press Enter to return to menu
 
 ## Examples
@@ -98,23 +114,20 @@ The effective value follows this precedence:
 ### Team Setup
 
 ```bash
-# View current settings
+# Start configuration
 git chronogit
-# Select: 1) Show all configurations
 
 # Set main branch
-git chronogit
-# Select: 2) Set configuration
-# Choose: workflow.mainBranch
-# Scope: global
-# Value: main
+1. Select: 2) Set configuration
+2. Choose: workflow.mainBranch
+3. Select scope: global
+4. Enter: main
 
 # Set ticket pattern
-git chronogit
-# Select: 2) Set configuration
-# Choose: workflow.ticketPattern
-# Scope: global
-# Value: ^TEAM-[0-9]+$
+1. Select: 2) Set configuration
+2. Choose: workflow.ticketPattern
+3. Select scope: global
+4. Enter: ^TEAM-[0-9]+$
 ```
 
 ### Project Setup
@@ -122,14 +135,13 @@ git chronogit
 ```bash
 # View project settings
 git chronogit
-# Select: 1) Show all configurations
+Select: 1) Show all configurations
 
 # Set project branch prefixes
-git chronogit
-# Select: 2) Set configuration
-# Choose: workflow.featurePrefix
-# Scope: local
-# Value: feat/
+1. Select: 2) Set configuration
+2. Choose: workflow.featurePrefix
+3. Select scope: local
+4. Enter: feat/
 ```
 
 ### Branch Setup
@@ -137,39 +149,13 @@ git chronogit
 ```bash
 # View branch settings
 git chronogit
-# Select: 1) Show all configurations
+Select: 1) Show all configurations
 
 # Set branch target
-git chronogit
-# Select: 2) Set configuration
-# Choose: workflow.defaultTarget
-# Scope: branch
-# Value: production
-```
-
-## Configuration Files
-
-### Global Configuration
-Located in `~/.gitconfig`:
-```ini
-[workflow]
-    mainBranch = main
-    ticketPattern = ^[A-Z]+-[0-9]+$
-```
-
-### Local Configuration
-Located in `.git/config`:
-```ini
-[workflow]
-    mainBranch = develop
-    prTemplatePath = .github/PULL_REQUEST_TEMPLATE.md
-```
-
-### Branch Configuration
-Stored in local git config:
-```ini
-[branch "feature/task"]
-    ticket = PROJ-123
+1. Select: 2) Set configuration
+2. Choose: workflow.defaultTarget
+3. Select scope: branch
+4. Enter: production
 ```
 
 ## Related Commands
