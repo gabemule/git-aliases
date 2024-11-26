@@ -98,7 +98,8 @@ show_guide "Welcome to Git Workflow Test" "This interactive test will guide you 
 
 1. Creating a feature branch
 2. Making changes and committing
-3. Creating a pull request
+3. Syncing changes
+4. Creating a pull request
 
 Each step will be explained before execution, and you'll be prompted to continue.
 This helps you understand the workflow while testing it works correctly."
@@ -182,8 +183,31 @@ Latest commit:"
 git log -1
 pause
 
-# Step 3: Create PR
-show_guide "Step 3: Creating Pull Request" "Finally, we'll create a pull request:
+# Step 3: Sync changes
+show_guide "Step 3: Syncing Changes" "Now we'll sync our changes:
+
+1. Update from main branch
+2. Pull latest changes from remote
+3. Push local changes
+
+This demonstrates the sync workflow."
+
+echo -e "${YELLOW}Syncing changes...${NC}"
+"$ALIASES_DIR/bin/sync.sh" || handle_error "Failed to sync changes"
+
+# Verify sync
+show_guide "Sync Result" "Let's verify the sync:
+
+1. Should be up-to-date with main branch
+2. Should be up-to-date with remote
+3. Local changes should be pushed
+
+Current status:"
+git status
+pause
+
+# Step 4: Create PR
+show_guide "Step 4: Creating Pull Request" "Finally, we'll create a pull request:
 
 1. Select target branch (development)
 2. Enter PR title
@@ -221,19 +245,20 @@ else
     pause
 fi
 
-# Step 4: Run verification
-show_guide "Step 4: Verification" "Now we'll verify everything:
+# Step 5: Run verification
+show_guide "Step 5: Verification" "Now we'll verify everything:
 
 1. Branch structure
 2. Commit format
 3. Ticket references
+4. Sync status
 
 This ensures all parts of the workflow are working correctly."
 
 "$ALIASES_DIR/tests/verify/workflow.sh" || handle_error "Verification failed"
 
 # Cleanup
-show_guide "Step 5: Cleanup" "Finally, we'll clean up our test:
+show_guide "Step 6: Cleanup" "Finally, we'll clean up our test:
 
 1. Delete test branch
 2. Restore any stashed changes
@@ -256,10 +281,12 @@ show_guide "Test Complete" "Interactive workflow test completed successfully!
 What we tested:
 1. Branch creation ✓
 2. Conventional commits ✓
-3. Pull requests (requires gh CLI)
-4. Ticket handling ✓
+3. Branch synchronization ✓
+4. Pull requests (requires gh CLI)
+5. Ticket handling ✓
 
 You can now use these commands in your daily workflow:
 - git start-branch
 - git cc (conventional-commit)
+- git sync
 - git open-pr"

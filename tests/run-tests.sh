@@ -50,6 +50,7 @@ non_interactive_tests=(
     "$ALIASES_DIR/tests/non-interactive/start-branch-test.sh"
     "$ALIASES_DIR/tests/non-interactive/conventional-commit-test.sh"
     "$ALIASES_DIR/tests/non-interactive/open-pr-test.sh"
+    "$ALIASES_DIR/tests/non-interactive/sync-test.sh"
 )
 verify_tests=(
     "$ALIASES_DIR/tests/verify/installation.sh"

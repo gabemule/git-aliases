@@ -26,7 +26,8 @@ tests/
 ├── non-interactive/      # Non-interactive feature tests
 │   ├── start-branch-test.sh
 │   ├── conventional-commit-test.sh
-│   └── open-pr-test.sh
+│   ├── open-pr-test.sh
+│   └── sync-test.sh
 ├── verify/               # Setup and verification tests
 │   ├── installation.sh
 │   └── workflow.sh
@@ -102,6 +103,14 @@ Located in `tests/verify/`, these tests:
 - Target branches
 - Browser control
 - GitHub CLI integration
+
+### sync
+- Branch synchronization
+- Main branch update
+- Remote sync
+- Conflict handling
+- Dry-run mode
+- Stash management
 
 ## Adding New Tests
 

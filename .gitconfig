@@ -6,4 +6,5 @@
     open-pr = !bash "$(dirname "$(git config --get include.path)")/bin/open-pr.sh"
     test = !bash "$(dirname "$(git config --get include.path)")/tests/run-tests.sh"
     chronogit = !bash "$(dirname "$(git config --get include.path)")/bin/chronogit.sh"
+    sync = !bash "$(dirname "$(git config --get include.path)")/bin/sync.sh"
     # Add more aliases here as needed

@@ -64,6 +64,26 @@ Streamlines PR creation with automatic ticket reference inclusion.
 - Ticket reference handling
 - Browser integration
 
+### [🔄 Branch Synchronization](sync.md)
+```bash
+# Show help
+git sync -h
+
+# Full sync
+git sync
+
+# Sync without pushing
+git sync --no-push
+```
+Synchronizes the current branch with the main branch and remote.
+
+**Key Features:**
+- Updates from main branch
+- Syncs with remote branch
+- Handles stashing automatically
+- Conflict resolution support
+- Dry-run option for safety
+
 ## Common Patterns
 
 All commands follow these consistent patterns:
@@ -74,6 +94,7 @@ All commands follow these consistent patterns:
 git start -h
 git cc -h
 git pr -h
+git sync -h
 
 # Note: Using --help shows alias definition
 # See known-issues.md for details
@@ -105,6 +126,7 @@ git cc -m "message" --type feat -s ui
 git start     # for start-branch
 git cc        # for conventional-commit
 git pr        # for open-pr
+git sync      # for branch synchronization
 ```
 
 ## Testing Commands
@@ -138,6 +160,7 @@ git test
   - [start-branch](start-branch.md)
   - [conventional-commit](conventional-commit.md)
   - [open-pr](open-pr.md)
+  - [sync](sync.md)
 - Check [troubleshooting guide](../installation/troubleshooting.md)
 - Review [known issues](../known-issues.md)
 - Run verification: `git test -v`
