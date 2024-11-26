@@ -1,10 +1,12 @@
 [alias]
+    chronogit = !bash "$(dirname "$(git config --get include.path)")/bin/chronogit.sh"
     cc = !bash "$(dirname "$(git config --get include.path)")/bin/conventional-commit.sh"
     start = !bash "$(dirname "$(git config --get include.path)")/bin/start-branch.sh"
     start-branch = !bash "$(dirname "$(git config --get include.path)")/bin/start-branch.sh"
     pr = !bash "$(dirname "$(git config --get include.path)")/bin/open-pr.sh"
     open-pr = !bash "$(dirname "$(git config --get include.path)")/bin/open-pr.sh"
     test = !bash "$(dirname "$(git config --get include.path)")/tests/run-tests.sh"
-    chronogit = !bash "$(dirname "$(git config --get include.path)")/bin/chronogit.sh"
     sync = !bash "$(dirname "$(git config --get include.path)")/bin/sync.sh"
+    rollback = !bash "$(dirname "$(git config --get include.path)")/bin/rollback.sh"
+    jerrypick = !bash "$(dirname "$(git config --get include.path)")/bin/jerrypick.sh"
     # Add more aliases here as needed
