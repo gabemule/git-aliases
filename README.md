@@ -27,6 +27,16 @@ ChronoGit embodies the spirit of adventure and precision, empowering teams to:
 - **Navigate Temporal Workflows**: Explore your Git history and manage branches as timelines.
 - **Enhance Collaboration**: Automate and standardize workflows with intuitive commands.
 
+## 🛠️ Key Features
+
+- **Customizable Configs**: Tailor ChronoGit to your team's needs with `git chronogit`. 
+- **Conventional Commits**: Standardize commit messages with `git cc`
+- **Branch Management**: Create and manage branches easily with `git start`
+- **Pull Requests**: Streamline PR creation with `git pr`
+- **Branch Synchronization**: Keep your branches up-to-date with `git sync`
+- **Rollback**: Safely revert changes with `git rollback`
+- **Cherry-pick**: Selectively apply commits with `git jerrypick`
+
 ## 📂 Documentation
 
 Find detailed instructions and information in our comprehensive documentation:

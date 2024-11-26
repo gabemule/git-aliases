@@ -84,6 +84,43 @@ Synchronizes the current branch with the main branch and remote.
 - Conflict resolution support
 - Dry-run option for safety
 
+### [🔙 Rollback](rollback.md)
+```bash
+# Show help
+git rollback -h
+
+# Interactive rollback
+git rollback
+
+# Dry run mode
+git rollback --dry-run
+```
+Provides a safe and interactive way to revert changes in the main branch.
+
+**Key Features:**
+- Interactive commit selection
+- Automatic rollback branch creation
+- Verification step
+- Dry-run option for safety
+
+### [🍒 Cherry-pick (Jerrypick)](jerrypick.md)
+```bash
+# Show help
+git jerrypick -h
+
+# Interactive cherry-pick
+git jerrypick
+
+# From a specific branch
+git jerrypick feature-branch
+```
+Provides an interactive way to cherry-pick commits from one branch to another.
+
+**Key Features:**
+- Interactive branch and commit selection
+- Multiple commit selection
+- Dry-run option for safety
+
 ## Common Patterns
 
 All commands follow these consistent patterns:
@@ -95,6 +132,8 @@ git start -h
 git cc -h
 git pr -h
 git sync -h
+git rollback -h
+git jerrypick -h
 
 # Note: Using --help shows alias definition
 # See known-issues.md for details
@@ -127,6 +166,8 @@ git start     # for start-branch
 git cc        # for conventional-commit
 git pr        # for open-pr
 git sync      # for branch synchronization
+git rollback  # for rollback
+git jerrypick # for cherry-pick
 ```
 
 ## Testing Commands
@@ -161,6 +202,8 @@ git test
   - [conventional-commit](conventional-commit.md)
   - [open-pr](open-pr.md)
   - [sync](sync.md)
+  - [rollback](rollback.md)
+  - [jerrypick](jerrypick.md)
 - Check [troubleshooting guide](../installation/troubleshooting.md)
 - Review [known issues](../known-issues.md)
 - Run verification: `git test -v`

@@ -1,48 +1,12 @@
 # Git Workflow Improvements
 
 ## Overview
-This documentation describes improvements and new features for our git workflow system.
+This documentation describes planned improvements and new features for our git workflow system.
 
-## Command Reference
-
-### Existing Command Updates
-
-#### [Start Branch Updates](update-start-branch.md)
-Improvements for branch creation workflow:
-- Shorter `git start` alias (automatically configured)
-- Non-interactive mode with direct arguments (-n, -b flags)
-- Branch source control (main by default, --current option)
-- Sync and stash control (--no-sync, --no-stash flags)
-
-#### [Conventional Commit Updates](update-conventional-commit.md)
-Enhancements for commit creation:
-- Direct message and scope flags (-m, -s)
-- Auto-push capability (-p)
-- Breaking change support (-b)
-- Skip commit hooks (--no-verify)
-
-#### [Open PR Updates](update-open-pr.md)
-Pull request creation improvements:
-- Non-interactive mode (-t, --title, --body)
-- Draft PR support (--draft)
-- Template integration
-- Label and reviewer management
-- Auto-merge settings
-
-### Branch Management
-- [Sync Command](sync-command.md) - Complete branch synchronization with configurable behavior
+## Planned Improvements
 
 ### Review Process
 - [Review Command](review-command.md) - Streamlined PR review process
-
-### Production Management
-- [Rollback Command](rollback-command.md) - Safe production rollback process with:
-  - Interactive commit selection from configured main branch
-  - Automatic rollback branch creation
-  - Change verification and conflict detection
-  - PR-based review process
-  - Dry run support
-  - Uses same main branch configuration as sync command
 
 ### Workspace Management
 - [Workspace Command](workspace-command.md) - Save and restore workspace states
@@ -50,49 +14,30 @@ Pull request creation improvements:
 ### Progress Tracking
 - [Standup Command](standup-command.md) - Generate work summaries for standups
 
+### Mergetool Integration
+- [Mergetool Integration](mergetool-integration.md) - Improved conflict resolution process
+
 ## Implementation Priority
 
-1. Critical Priority
-   - Rollback command (production safety)
-   - Sync command (daily workflow)
-   - Start branch improvements:
-     * Automatic git start alias
-     * Branch source control
-     * Non-interactive mode
-
-2. High Priority
+1. High Priority
    - Review command
-   - Conventional commit improvements:
-     * Direct arguments
-     * Auto-push support
-   - Open PR improvements:
-     * Draft PR support
-     * Template integration
+   - Mergetool integration
 
-3. Medium Priority
+2. Medium Priority
    - Standup command
-   - Label management
-   - Breaking change support
 
-4. Nice to Have
+3. Nice to Have
    - Workspace command
-   - Custom hooks
-   - Auto-merge settings
 
 ## Next Steps
 
-1. Implement critical commands:
-   - Rollback command first (production safety)
-   - Then sync command for daily workflow
-   - Add start branch improvements:
-     * Configure automatic alias
-     * Add branch source control
-     * Implement non-interactive flags
+1. Implement high priority improvements:
+   - Review command for streamlined PR process
+   - Mergetool integration for better conflict resolution
 
 2. Add comprehensive testing:
-   - Unit tests for each command
+   - Unit tests for each new command
    - Integration tests for workflows
-   - Specific tests for rollback scenarios
    - Configuration tests
 
 3. Update documentation:
@@ -132,3 +77,5 @@ Pull request creation improvements:
    - Test framework
    - Version tracking
    - Release management
+
+Note: Some previously planned improvements (sync, rollback, and cherry-pick commands) have been implemented and are now part of the main ChronoGit functionality. Refer to the main documentation for information on these commands.
