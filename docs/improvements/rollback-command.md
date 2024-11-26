@@ -1,10 +1,10 @@
 # Git Rollback Command
 
 ## Description
-Provides a safe and interactive way to rollback production changes. Shows recent changes, helps select the rollback point, and creates a new branch for review before applying the rollback. Uses the configured main branch from git config.
+Provides a safe and interactive way to rollback changes. Shows recent changes with pagination, helps select the rollback point, and creates a new branch for review before applying the rollback. Uses the configured main branch from git config.
 
 ## Features
-- Interactive commit selection
+- Interactive commit selection with pagination
 - Safe rollback through PR process
 - Automatic branch creation
 - Change verification
@@ -14,21 +14,25 @@ Provides a safe and interactive way to rollback production changes. Shows recent
 ## Example Usage
 ```bash
 # View and rollback changes
-$ rollback-production
-Using main branch: development (configured in git config)
-Last 7 changes in development:
-abc123 - feat: add user authentication (2 days ago) by dev1
-def456 - fix: correct login validation (1 day ago) by dev2
-ghi789 - style: update button colors (1 hour ago) by dev3
+$ git rollback
+Using main branch: production (configured in git config)
+Recent changes in production:
+↑/↓ to navigate, Enter to select, 'n' for next page, 'p' for previous page
+> abc123 - feat: add user authentication (2 days ago) by dev1
+  def456 - fix: correct login validation (1 day ago) by dev2
+  ghi789 - style: update button colors (1 hour ago) by dev3
+  jkl012 - docs: update API documentation (3 hours ago) by dev4
+  mno345 - refactor: optimize database queries (5 hours ago) by dev5
+[1-5/20 commits]
 
 Select commit hash to rollback to: abc123
 Creating rollback branch...
 Reverting changes...
-Rollback branch created: rollback/development_20230615_143022
+Rollback branch created: rollback/production_20230615_143022
 Please review changes and merge through PR process
 
 # Verify rollback
-$ verify-rollback rollback/development_20230615_143022
+$ git verify-rollback rollback/production_20230615_143022
 Changes to be reverted:
  M src/auth/login.js
  M src/styles/buttons.css
@@ -37,16 +41,16 @@ Changes to be reverted:
 
 ## Command Options
 
-### rollback-production
+### git rollback
 1. **--dry-run**
    - Purpose: Preview rollback changes without creating branch
-   - Example: `rollback-production --dry-run`
+   - Example: `git rollback --dry-run`
 
 2. **--skip-verify**
    - Purpose: Skip verification step
-   - Example: `rollback-production --skip-verify`
+   - Example: `git rollback --skip-verify`
 
-### verify-rollback
+### git verify-rollback
 - Takes rollback branch name as argument
 - Shows changes to be reverted
 - Checks for potential conflicts
@@ -58,6 +62,10 @@ git config workflow.mainBranch development
 
 # Check current main branch configuration
 git config workflow.mainBranch
+
+# Or use the interactive menu
+git chronogit
+# Then select option 2 to set configuration
 ```
 
 ## Implementation
@@ -66,7 +74,7 @@ git config workflow.mainBranch
 ```bash
 #!/bin/bash
 
-rollback_production() {
+rollback() {
     local dry_run=false
     local skip_verify=false
     
@@ -91,19 +99,61 @@ rollback_production() {
     
     echo "Using main branch: $main_branch"
     
-    # Get last 7 main branch commits
-    echo "Last 7 changes in $main_branch:"
-    git log -n 7 --pretty=format:"%h - %s (%cr) by %an" origin/$main_branch
+    # Get commits with pagination
+    local page_size=5
+    local start=0
+    local selected=0
+    local commits=($(git log --format="%h - %s (%cr) by %an" origin/$main_branch))
     
-    # Interactive selection
-    echo -e "\nSelect commit hash to rollback to:"
-    read -p "> " target_commit
-    
-    # Validate commit exists
-    if ! git rev-parse --quiet --verify "$target_commit" >/dev/null; then
-        echo "Invalid commit hash"
-        return 1
-    }
+    while true; do
+        clear
+        echo "Recent changes in $main_branch:"
+        echo "↑/↓ to navigate, Enter to select, 'n' for next page, 'p' for previous page"
+        for ((i=start; i<start+page_size && i<${#commits[@]}; i++)); do
+            if [ $i -eq $selected ]; then
+                echo "> ${commits[$i]}"
+            else
+                echo "  ${commits[$i]}"
+            fi
+        done
+        echo "[$(($start+1))-$((start+page_size))/${#commits[@]} commits]"
+        
+        read -sn1 key
+        case "$key" in
+            A) # Up arrow
+                ((selected--))
+                if [ $selected -lt $start ]; then
+                    ((start-=page_size))
+                    [ $start -lt 0 ] && start=0
+                fi
+                [ $selected -lt 0 ] && selected=$((${#commits[@]}-1))
+                ;;
+            B) # Down arrow
+                ((selected++))
+                if [ $selected -ge $((start+page_size)) ]; then
+                    ((start+=page_size))
+                    [ $((start+page_size)) -gt ${#commits[@]} ] && start=$((${#commits[@]}-page_size))
+                    [ $start -lt 0 ] && start=0
+                fi
+                [ $selected -ge ${#commits[@]} ] && selected=0
+                ;;
+            n) # Next page
+                ((start+=page_size))
+                [ $((start+page_size)) -gt ${#commits[@]} ] && start=$((${#commits[@]}-page_size))
+                [ $start -lt 0 ] && start=0
+                selected=$start
+                ;;
+            p) # Previous page
+                ((start-=page_size))
+                [ $start -lt 0 ] && start=0
+                selected=$start
+                ;;
+            "") # Enter
+                target_commit=$(echo ${commits[$selected]} | cut -d' ' -f1)
+                break
+                ;;
+        esac
+    done
     
     # Create rollback branch
     local timestamp=$(date +%Y%m%d_%H%M%S)
@@ -174,11 +224,12 @@ verify_rollback() {
 
 ### Pros
 - Safe rollback process through PR
-- Clear view of recent changes
+- Clear view of recent changes with pagination
 - Automatic branch creation
 - Verification steps included
 - Prevents accidental direct rollbacks
 - Respects configured main branch
+- Consistent interface with other ChronoGit commands
 
 ### Cons
 - Requires understanding of git revert
@@ -192,7 +243,7 @@ verify_rollback() {
 3. Keep rollback commits small when possible
 4. Document rollback reasons
 5. Clean up rollback branches after merge
-6. Configure main branch per repository
+6. Configure main branch per repository using git config
 
 ## Integration
 
@@ -200,4 +251,4 @@ verify_rollback() {
 - Supports team review process
 - Compatible with CI/CD pipelines
 - Integrates with existing git aliases
-- Uses same configuration as other commands
+- Uses same configuration as other ChronoGit commands
