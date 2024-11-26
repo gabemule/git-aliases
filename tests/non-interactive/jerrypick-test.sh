@@ -62,9 +62,39 @@ test_jerrypick_specific_branch() {
     teardown_test_repo
 }
 
+# Test git jerrypick with conflicts
+test_jerrypick_conflicts() {
+    setup_test_repo
+    
+    # Create a feature branch with some commits
+    git checkout -b feature-branch
+    echo "Feature content" > feature.txt
+    git add feature.txt
+    git commit -m "Add feature"
+    
+    # Switch back to main branch and create conflicting changes
+    git checkout main
+    echo "Conflicting content" > feature.txt
+    git add feature.txt
+    git commit -m "Add conflicting content"
+    
+    # Run git jerrypick with feature branch
+    output=$(echo -e "\n" | git jerrypick feature-branch)
+    
+    # Check if conflict message is present
+    assert_contains "$output" "Conflict detected"
+    assert_contains "$output" "Please resolve conflicts and run 'git cherry-pick --continue'"
+    
+    # Check that cherry-pick is in progress
+    assert_contains "$(git status)" "You are currently cherry-picking"
+    
+    teardown_test_repo
+}
+
 # Run the tests
 run_test test_jerrypick_dry_run
 run_test test_jerrypick_specific_branch
+run_test test_jerrypick_conflicts
 
 # Print test summary
 print_test_summary

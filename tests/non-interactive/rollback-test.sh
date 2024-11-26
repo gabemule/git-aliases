@@ -52,9 +52,34 @@ test_rollback_skip_verify() {
     teardown_test_repo
 }
 
+# Test git rollback creates a rollback branch
+test_rollback_create_branch() {
+    setup_test_repo
+    
+    # Create some commits
+    echo "Initial content" > test.txt
+    git add test.txt
+    git commit -m "Initial commit"
+    echo "Updated content" > test.txt
+    git add test.txt
+    git commit -m "Update content"
+    
+    # Run git rollback
+    output=$(echo "y" | git rollback)
+    
+    # Check if rollback branch was created
+    assert_contains "$output" "Rollback branch created: rollback/"
+    
+    # Check that the rollback branch exists
+    assert_contains "$(git branch)" "rollback/"
+    
+    teardown_test_repo
+}
+
 # Run the tests
 run_test test_rollback_dry_run
 run_test test_rollback_skip_verify
+run_test test_rollback_create_branch
 
 # Print test summary
 print_test_summary
