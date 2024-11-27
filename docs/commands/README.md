@@ -223,7 +223,7 @@ git test
 
 - See command-specific documentation:
   - [start-branch](start-branch.md)
-  - [conventional-commit](conventional-commit.md)
+  - [cc](conventional-commit.md)
   - [open-pr](open-pr.md)
   - [sync](sync.md)
   - [rollback](rollback.md)
