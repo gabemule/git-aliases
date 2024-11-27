@@ -3,8 +3,11 @@
 # Source test utilities
 source "$(dirname "$0")/../test-utils.sh"
 
+echo -e "${BLUE}=== Testing Jerrypick Command (Non-Interactive) ===${NC}"
+
 # Test git jerrypick with dry run
-test_jerrypick_dry_run() {
+run_test "jerrypick with dry run" '
+    # Set up test repository
     setup_test_repo
     
     # Create a feature branch with some commits
@@ -20,7 +23,8 @@ test_jerrypick_dry_run() {
     git checkout main
     
     # Run git jerrypick with dry run
-    output=$(git jerrypick --dry-run feature-branch)
+    # Use --all flag to select all commits non-interactively
+    output=$(git jerrypick --dry-run --all feature-branch)
     
     # Check if dry-run messages are present
     assert_contains "$output" "[DRY-RUN] Would cherry-pick: Add feature"
@@ -30,11 +34,13 @@ test_jerrypick_dry_run() {
     assert_not_contains "$(git log --oneline)" "Add feature"
     assert_not_contains "$(git log --oneline)" "Update feature"
     
+    # Clean up
     teardown_test_repo
-}
+'
 
 # Test git jerrypick with specific branch
-test_jerrypick_specific_branch() {
+run_test "jerrypick with specific branch" '
+    # Set up test repository
     setup_test_repo
     
     # Create a feature branch with some commits
@@ -50,7 +56,8 @@ test_jerrypick_specific_branch() {
     git checkout main
     
     # Run git jerrypick with specific branch
-    output=$(echo -e "\n\n" | git jerrypick feature-branch)
+    # Use --all flag to select all commits non-interactively
+    output=$(git jerrypick --all feature-branch)
     
     # Check if cherry-pick was successful
     assert_contains "$output" "Successfully applied selected commits to current branch"
@@ -59,11 +66,13 @@ test_jerrypick_specific_branch() {
     assert_contains "$(git log --oneline)" "Add feature"
     assert_contains "$(git log --oneline)" "Update feature"
     
+    # Clean up
     teardown_test_repo
-}
+'
 
 # Test git jerrypick with conflicts
-test_jerrypick_conflicts() {
+run_test "jerrypick with conflicts" '
+    # Set up test repository
     setup_test_repo
     
     # Create a feature branch with some commits
@@ -79,22 +88,19 @@ test_jerrypick_conflicts() {
     git commit -m "Add conflicting content"
     
     # Run git jerrypick with feature branch
-    output=$(echo -e "\n" | git jerrypick feature-branch)
+    # Use --all flag to select all commits non-interactively
+    output=$(git jerrypick --all feature-branch)
     
     # Check if conflict message is present
     assert_contains "$output" "Conflict detected"
-    assert_contains "$output" "Please resolve conflicts and run 'git cherry-pick --continue'"
+    assert_contains "$output" "Please resolve conflicts and run '\''git cherry-pick --continue'\''"
     
     # Check that cherry-pick is in progress
     assert_contains "$(git status)" "You are currently cherry-picking"
     
+    # Clean up
     teardown_test_repo
-}
-
-# Run the tests
-run_test test_jerrypick_dry_run
-run_test test_jerrypick_specific_branch
-run_test test_jerrypick_conflicts
+'
 
 # Print test summary
 print_test_summary

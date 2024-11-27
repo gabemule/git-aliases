@@ -3,8 +3,11 @@
 # Source test utilities
 source "$(dirname "$0")/../test-utils.sh"
 
+echo -e "${BLUE}=== Testing Rollback Command (Non-Interactive) ===${NC}"
+
 # Test git rollback with dry run
-test_rollback_dry_run() {
+run_test "rollback with dry run" '
+    # Set up test repository
     setup_test_repo
     
     # Create some commits
@@ -25,11 +28,13 @@ test_rollback_dry_run() {
     # Check that no actual rollback branch was created
     assert_not_contains "$(git branch)" "rollback/"
     
+    # Clean up
     teardown_test_repo
-}
+'
 
 # Test git rollback with skip verify
-test_rollback_skip_verify() {
+run_test "rollback with skip verify" '
+    # Set up test repository
     setup_test_repo
     
     # Create some commits
@@ -49,11 +54,13 @@ test_rollback_skip_verify() {
     # Check that verification step was skipped
     assert_not_contains "$output" "Verifying changes..."
     
+    # Clean up
     teardown_test_repo
-}
+'
 
 # Test git rollback creates a rollback branch
-test_rollback_create_branch() {
+run_test "rollback creates a branch" '
+    # Set up test repository
     setup_test_repo
     
     # Create some commits
@@ -73,13 +80,9 @@ test_rollback_create_branch() {
     # Check that the rollback branch exists
     assert_contains "$(git branch)" "rollback/"
     
+    # Clean up
     teardown_test_repo
-}
-
-# Run the tests
-run_test test_rollback_dry_run
-run_test test_rollback_skip_verify
-run_test test_rollback_create_branch
+'
 
 # Print test summary
 print_test_summary
