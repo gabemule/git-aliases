@@ -56,11 +56,23 @@ check_config "scripts location" \
     "Scripts not found at configured path: $ALIASES_DIR"
 
 # Check configuration defaults
-check_config "configuration defaults" \
-    "[ \"$(git config workflow.mainBranch || echo 'production')\" = 'production' ] && \
-     [[ \"$(git config workflow.ticketPattern || echo '^[A-Z]+-[0-9]+$')\" =~ ^\^[A-Z]+-[0-9]+\$ ]] && \
-     [ \"$(git config workflow.defaultTarget || echo 'development')\" = 'development' ]" \
-    "Default configuration values are incorrect."
+config_check_result=$(
+    { [ "$(git config workflow.mainBranch || echo 'production')" = 'production' ] || echo 'mainBranch mismatch'; } && \
+    { [ "$(git config workflow.defaultTarget || echo 'development')" = 'development' ] || echo 'defaultTarget mismatch'; } && \
+    { [ "$(git config workflow.ticketPattern || echo '^[A-Z]+-[0-9]+$')" = '^[A-Z]+-[0-9]+$' ] || echo 'ticketPattern mismatch'; } && \
+    { [ "$(git config workflow.prTemplatePath || echo '.github/pull_request_template.md')" = '.github/pull_request_template.md' ] || echo 'prTemplatePath mismatch'; } && \
+    { [ "$(git config workflow.mergetool || echo '')" = '' ] || echo 'mergetool mismatch'; } && \
+    { [ "$(git config workflow.mergetoolAuto || echo 'false')" = 'false' ] || echo 'mergetoolAuto mismatch'; } && \
+    { [ "$(git config workflow.mergetool.path || echo '')" = '' ] || echo 'mergetool.path mismatch'; } && \
+    { [ "$(git config workflow.mergetool.args || echo '')" = '' ] || echo 'mergetool.args mismatch'; }
+)
+
+if [ -z "$config_check_result" ]; then
+    echo -e "Checking configuration defaults... ${GREEN}✓${NC}"
+else
+    echo -e "Checking configuration defaults... ${RED}✗${NC}"
+    echo "  Default configuration values are incorrect: $config_check_result"
+fi
 
 # Check branch prefixes
 check_config "branch prefixes" \
@@ -73,7 +85,7 @@ check_config "branch prefixes" \
 
 # Summary
 echo
-if [ $? -eq 0 ]; then
+if [ $? -eq 0 ] && [ -z "$config_check_result" ]; then
     echo -e "${GREEN}Setup verified successfully!${NC}"
     echo "You can now use: git cc, git start-branch, git open-pr"
     exit 0
