@@ -121,6 +121,28 @@ Provides an interactive way to cherry-pick commits from one branch to another.
 - Multiple commit selection
 - Dry-run option for safety
 
+### [🗂️ Workspace](workspace.md)
+```bash
+# Show help
+git workspace -h
+
+# Save current workspace
+git workspace save my-workspace
+
+# Restore a workspace
+git workspace restore my-workspace
+
+# List workspaces
+git workspace list
+```
+Allows saving and restoring complete workspace states, including staged changes, unstaged changes, and untracked files.
+
+**Key Features:**
+- Complete state saving (branch, staged, unstaged, untracked)
+- Multiple named workspaces
+- Easy context switching
+- Separation of changes (staged vs unstaged)
+
 ## Common Patterns
 
 All commands follow these consistent patterns:
@@ -134,6 +156,7 @@ git pr -h
 git sync -h
 git rollback -h
 git jerrypick -h
+git workspace -h
 
 # Note: Using --help shows alias definition
 # See known-issues.md for details
@@ -168,6 +191,7 @@ git pr        # for open-pr
 git sync      # for branch synchronization
 git rollback  # for rollback
 git jerrypick # for cherry-pick
+git workspace # for workspace management
 ```
 
 ## Testing Commands
@@ -204,6 +228,7 @@ git test
   - [sync](sync.md)
   - [rollback](rollback.md)
   - [jerrypick](jerrypick.md)
+  - [workspace](workspace.md)
 - Check [troubleshooting guide](../installation/troubleshooting.md)
 - Review [known issues](../known-issues.md)
 - Run verification: `git test -v`

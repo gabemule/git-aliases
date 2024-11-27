@@ -15,7 +15,11 @@ git test -i
 # Example workflow:
 1. Create branch
 2. Make commits
-3. Create PR
+3. Sync changes
+4. Create PR
+5. Rollback changes
+6. Cherry-pick commits
+7. Manage workspaces
 ```
 
 ### 2. Non-interactive Tests
@@ -40,6 +44,26 @@ git test -n
 3. open-pr:
    ```bash
    git pr -t development --title "Test PR" --no-browser
+   ```
+
+4. sync:
+   ```bash
+   git sync --no-push
+   ```
+
+5. rollback:
+   ```bash
+   git rollback --dry-run
+   ```
+
+6. jerrypick:
+   ```bash
+   git jerrypick --dry-run feature-branch
+   ```
+
+7. workspace:
+   ```bash
+   git workspace save test-workspace
    ```
 ```
 
@@ -178,6 +202,67 @@ check_test "draft pr" \
     "Created draft PR"
 ```
 
+### 4. sync Tests
+
+```bash
+# Test sync without push
+check_test "sync without push" \
+    "git sync --no-push" \
+    "Skipping push"
+
+# Test sync with dry run
+check_test "sync dry run" \
+    "git sync --dry-run" \
+    "[DRY-RUN] Would push changes"
+```
+
+### 5. rollback Tests
+
+```bash
+# Test rollback dry run
+check_test "rollback dry run" \
+    "git rollback --dry-run" \
+    "[DRY-RUN] Would create branch: rollback/"
+
+# Test rollback skip verify
+check_test "rollback skip verify" \
+    "git rollback --skip-verify" \
+    "Rollback branch created: rollback/"
+```
+
+### 6. jerrypick Tests
+
+```bash
+# Test jerrypick dry run
+check_test "jerrypick dry run" \
+    "git jerrypick --dry-run feature-branch" \
+    "[DRY-RUN] Would cherry-pick:"
+
+# Test jerrypick specific branch
+check_test "jerrypick specific branch" \
+    "echo -e '\n\n' | git jerrypick feature-branch" \
+    "Successfully applied selected commits"
+```
+
+### 7. workspace Tests
+
+```bash
+# Test workspace save
+check_test "workspace save" \
+    "git workspace save test-workspace" \
+    "Workspace 'test-workspace' saved"
+
+# Test workspace list
+check_test "workspace list" \
+    "git workspace list" \
+    "test-workspace"
+
+# Test workspace restore
+check_test "workspace restore" \
+    "git workspace restore test-workspace" \
+    "Workspace 'test-workspace' restored"
+```
+
 ## Non-interactive Mode
 
 For automated testing, commands support non-interactive mode:
@@ -197,6 +282,26 @@ git cc -m "message" --type feat -s ui --non-interactive
 git pr -t development --title "Test PR" --no-browser
 ```
 
+### 4. sync
+```bash
+git sync --no-push --no-update
+```
+
+### 5. rollback
+```bash
+git rollback --dry-run
+```
+
+### 6. jerrypick
+```bash
+git jerrypick --dry-run feature-branch
+```
+
+### 7. workspace
+```bash
+git workspace save test-workspace
+```
+
 ## Test Organization
 
 ```
@@ -206,7 +311,11 @@ tests/
 ├── non-interactive/      # Non-interactive feature tests
 │   ├── start-branch-test.sh
 │   ├── conventional-commit-test.sh
-│   └── open-pr-test.sh
+│   ├── open-pr-test.sh
+│   ├── sync-test.sh
+│   ├── rollback-test.sh
+│   ├── jerrypick-test.sh
+│   └── workspace-test.sh
 └── verify/               # Setup and verification tests
     ├── installation.sh
     └── workflow.sh

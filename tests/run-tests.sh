@@ -53,6 +53,7 @@ non_interactive_tests=(
     "$ALIASES_DIR/tests/non-interactive/sync-test.sh"
     "$ALIASES_DIR/tests/non-interactive/rollback-test.sh"
     "$ALIASES_DIR/tests/non-interactive/jerrypick-test.sh"
+    "$ALIASES_DIR/tests/non-interactive/workspace-test.sh"
 )
 verify_tests=(
     "$ALIASES_DIR/tests/verify/installation.sh"

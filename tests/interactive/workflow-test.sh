@@ -100,6 +100,7 @@ show_guide "Welcome to Git Workflow Test" "This interactive test will guide you 
 2. Making changes and committing
 3. Syncing changes
 4. Creating a pull request
+5. Using workspace command
 
 Each step will be explained before execution, and you'll be prompted to continue.
 This helps you understand the workflow while testing it works correctly."
@@ -207,7 +208,7 @@ git status
 pause
 
 # Step 4: Create PR
-show_guide "Step 4: Creating Pull Request" "Finally, we'll create a pull request:
+show_guide "Step 4: Creating Pull Request" "Now we'll create a pull request:
 
 1. Select target branch (development)
 2. Enter PR title
@@ -245,32 +246,69 @@ else
     pause
 fi
 
-# Step 5: Run verification
-show_guide "Step 5: Verification" "Now we'll verify everything:
+# Step 5: Test workspace command
+show_guide "Step 5: Testing Workspace Command" "Now we'll test the workspace command:
+
+1. Save current workspace
+2. Make some changes
+3. List workspaces
+4. Restore saved workspace
+
+This demonstrates the workspace management workflow."
+
+# Save workspace
+echo -e "${YELLOW}Saving current workspace...${NC}"
+"$ALIASES_DIR/bin/workspace.sh" save test-workspace || handle_error "Failed to save workspace"
+
+# Make some changes
+echo "new content" > new_file.txt
+git add new_file.txt
+
+# List workspaces
+echo -e "${YELLOW}Listing workspaces...${NC}"
+"$ALIASES_DIR/bin/workspace.sh" list || handle_error "Failed to list workspaces"
+
+# Restore workspace
+echo -e "${YELLOW}Restoring saved workspace...${NC}"
+"$ALIASES_DIR/bin/workspace.sh" restore test-workspace || handle_error "Failed to restore workspace"
+
+# Verify workspace restoration
+if [[ ! -f new_file.txt ]]; then
+    echo -e "${GREEN}Workspace restored successfully!${NC}"
+else
+    handle_error "Workspace restoration failed"
+fi
+
+# Step 6: Run verification
+show_guide "Step 6: Verification" "Now we'll verify everything:
 
 1. Branch structure
 2. Commit format
 3. Ticket references
 4. Sync status
+5. Workspace functionality
 
 This ensures all parts of the workflow are working correctly."
 
 "$ALIASES_DIR/tests/verify/workflow.sh" || handle_error "Verification failed"
 
 # Cleanup
-show_guide "Step 6: Cleanup" "Finally, we'll clean up our test:
+show_guide "Step 7: Cleanup" "Finally, we'll clean up our test:
 
 1. Delete test branch
 2. Restore any stashed changes
 3. Return to production branch
+4. Remove test workspace
 
 Would you like to clean up (delete test branch locally and remotely)? (Y/n)"
 read -n 1 cleanup
 echo
 if [[ $cleanup =~ ^[Yy]?$ ]]; then
-    # Remove test file first
-    rm -f test.txt
+    # Remove test files first
+    rm -f test.txt new_file.txt
     cleanup_branch "feature/test-feature"
+    # Remove test workspace
+    rm -rf "$HOME/.git-workspaces/$(git rev-parse --show-toplevel | md5sum | cut -d' ' -f1)/test-workspace"*
 fi
 
 # Restore any stashed changes
@@ -284,9 +322,11 @@ What we tested:
 3. Branch synchronization ✓
 4. Pull requests (requires gh CLI)
 5. Ticket handling ✓
+6. Workspace management ✓
 
 You can now use these commands in your daily workflow:
 - git start-branch
 - git cc (conventional-commit)
 - git sync
-- git open-pr"
+- git open-pr
+- git workspace"

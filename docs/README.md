@@ -27,6 +27,22 @@ Welcome to the ChronoGit documentation! Here you'll find comprehensive guides an
   - Target selection
   - Template support
   - Draft PRs
+- [`git sync`](commands/sync.md) - Synchronize branches
+  - Update from main branch
+  - Pull from remote
+  - Push local changes
+- [`git rollback`](commands/rollback.md) - Safely revert changes
+  - Interactive commit selection
+  - Automatic branch creation
+  - Verification step
+- [`git jerrypick`](commands/jerrypick.md) - Interactive cherry-pick
+  - Multiple commit selection
+  - Branch selection
+  - Conflict handling
+- [`git workspace`](commands/workspace.md) - Manage workspaces
+  - Save current state
+  - Restore saved state
+  - List workspaces
 
 ### [⚙️ Configuration](configuration/README.md)
 - [Custom settings](configuration/custom-config.md)
@@ -65,10 +81,7 @@ Welcome to the ChronoGit documentation! Here you'll find comprehensive guides an
 
 ### [🔮 Future Improvements](improvements/README.md)
 - [Review command](improvements/review-command.md)
-- [Rollback command](improvements/rollback-command.md)
 - [Standup command](improvements/standup-command.md)
-- [Sync command](improvements/sync-command.md)
-- [Workspace command](improvements/workspace-command.md)
 
 ## 🔍 Quick Links
 
@@ -86,7 +99,11 @@ chronogit/
 ├── bin/              # Main executable scripts
 │   ├── conventional-commit.sh
 │   ├── start-branch.sh
-│   └── open-pr.sh
+│   ├── open-pr.sh
+│   ├── sync.sh
+│   ├── rollback.sh
+│   ├── jerrypick.sh
+│   └── workspace.sh
 ├── tests/            # Testing scripts
 │   ├── run-tests.sh          # Test runner
 │   ├── interactive/          # Interactive tests

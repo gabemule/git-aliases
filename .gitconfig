@@ -9,4 +9,5 @@
     sync = !bash "$(dirname "$(git config --get include.path)")/bin/sync.sh"
     rollback = !bash "$(dirname "$(git config --get include.path)")/bin/rollback.sh"
     jerrypick = !bash "$(dirname "$(git config --get include.path)")/bin/jerrypick.sh"
+    workspace = !bash "$(dirname "$(git config --get include.path)")/bin/workspace.sh"
     # Add more aliases here as needed
