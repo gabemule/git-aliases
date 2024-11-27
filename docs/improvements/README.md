@@ -8,32 +8,21 @@ This documentation describes planned improvements and new features for our git w
 ### Review Process
 - [Review Command](review-command.md) - Streamlined PR review process
 
-### Workspace Management
-- [Workspace Command](workspace-command.md) - Save and restore workspace states
-
 ### Progress Tracking
 - [Standup Command](standup-command.md) - Generate work summaries for standups
-
-### Mergetool Integration
-- [Mergetool Integration](mergetool-integration.md) - Improved conflict resolution process
 
 ## Implementation Priority
 
 1. High Priority
    - Review command
-   - Mergetool integration
 
 2. Medium Priority
    - Standup command
-
-3. Nice to Have
-   - Workspace command
 
 ## Next Steps
 
 1. Implement high priority improvements:
    - Review command for streamlined PR process
-   - Mergetool integration for better conflict resolution
 
 2. Add comprehensive testing:
    - Unit tests for each new command
@@ -78,4 +67,4 @@ This documentation describes planned improvements and new features for our git w
    - Version tracking
    - Release management
 
-Note: Some previously planned improvements (sync, rollback, and cherry-pick commands) have been implemented and are now part of the main ChronoGit functionality. Refer to the main documentation for information on these commands.
+Note: Several previously planned improvements (sync, rollback, cherry-pick, workspace, and mergetool integration commands) have been implemented and are now part of the main ChronoGit functionality. Refer to the main documentation for information on these commands.

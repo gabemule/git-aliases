@@ -23,6 +23,12 @@ Complete guide to all available ChronoGit configurations and their underlying gi
     
     # PR settings
     prTemplatePath = .github/pull_request_template.md  # PR template location
+
+    # Mergetool settings
+    mergetool =                 # Preferred mergetool
+    mergetoolAuto = false       # Auto-launch mergetool on conflicts
+    mergetool.path =            # Custom path to mergetool binary
+    mergetool.args =            # Additional mergetool arguments
 ```
 
 ### Local Configuration (.git/config)
@@ -32,6 +38,8 @@ Complete guide to all available ChronoGit configurations and their underlying gi
     mainBranch = main
     defaultTarget = staging
     ticketPattern = ^TEAM-[0-9]+$
+    mergetool = kdiff3
+    mergetoolAuto = true
 ```
 
 ### Branch Configuration
@@ -75,6 +83,12 @@ git config --local workflow.defaultTarget staging
 
 # Set branch ticket
 git config branch.feature/task.ticket PROJ-123
+
+# Set mergetool
+git config workflow.mergetool kdiff3
+
+# Enable auto-launch of mergetool
+git config workflow.mergetoolAuto true
 ```
 
 ### Remove Configuration
@@ -117,6 +131,15 @@ git config --unset branch.feature/task.ticket
 |---------|---------|-------------|-----------------|----------------|
 | workflow.prTemplatePath | .github/pull_request_template.md | Path to PR template | `git config workflow.prTemplatePath` | `git config workflow.prTemplatePath .github/custom-template.md` |
 
+### Mergetool Settings
+
+| Setting | Default | Description | Command to View | Command to Set |
+|---------|---------|-------------|-----------------|----------------|
+| workflow.mergetool | - | Preferred mergetool | `git config workflow.mergetool` | `git config workflow.mergetool kdiff3` |
+| workflow.mergetoolAuto | false | Auto-launch mergetool on conflicts | `git config workflow.mergetoolAuto` | `git config workflow.mergetoolAuto true` |
+| workflow.mergetool.path | - | Custom path to mergetool binary | `git config workflow.mergetool.path` | `git config workflow.mergetool.path /usr/local/bin/kdiff3` |
+| workflow.mergetool.args | - | Additional mergetool arguments | `git config workflow.mergetool.args` | `git config workflow.mergetool.args "--auto"` |
+
 ## Under the Hood
 
 ### Branch Creation
@@ -134,6 +157,11 @@ git config --unset branch.feature/task.ticket
 - Template loaded from `workflow.prTemplatePath`
 - Ticket reference from `branch.<name>.ticket`
 
+### Conflict Resolution
+- Mergetool is determined by `workflow.mergetool`
+- Auto-launch behavior controlled by `workflow.mergetoolAuto`
+- Custom path and arguments used if specified in `workflow.mergetool.path` and `workflow.mergetool.args`
+
 ## Examples
 
 ### Team Setup
@@ -143,6 +171,8 @@ git config --unset branch.feature/task.ticket
     mainBranch = main
     defaultTarget = development
     ticketPattern = ^TEAM-[0-9]+$
+    mergetool = vscode
+    mergetoolAuto = true
 ```
 
 ### Project Setup
@@ -152,6 +182,8 @@ git config --unset branch.feature/task.ticket
     mainBranch = develop
     defaultTarget = staging
     featurePrefix = feat/
+    mergetool = kdiff3
+    mergetool.path = /usr/local/bin/kdiff3
 ```
 
 ### Branch Ticket
@@ -167,3 +199,4 @@ git config --unset branch.feature/task.ticket
 - [chronogit command](../commands/chronogit.md) - Interactive configuration management
 - [Installation Guide](../installation/README.md) - Initial setup
 - [Troubleshooting](../installation/troubleshooting.md) - Common issues
+- [Mergetool Integration](../workflow/mergetool-integration.md) - Detailed guide on mergetool integration

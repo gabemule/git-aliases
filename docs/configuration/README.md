@@ -33,6 +33,15 @@ git chronogit    # Manage workflow settings
 
 # Testing
 git test        # Run tests (shows interactive menu)
+
+# Sync
+git sync        # Synchronize branch with main and remote
+
+# Rollback
+git rollback    # Safely revert changes in the main branch
+
+# Cherry-pick
+git jerrypick   # Interactively cherry-pick commits
 ```
 
 ## Branch Configuration
@@ -88,6 +97,34 @@ git cc -t PROJ-456
 # Use branch ticket (default)
 git cc
 ```
+
+## Mergetool Configuration
+
+ChronoGit now includes advanced mergetool integration. You can configure your preferred mergetool and its behavior:
+
+```bash
+# Configure mergetool
+git chronogit
+# Select: 2) Set configuration
+# Choose: workflow.mergetool
+
+# Configure auto-launch of mergetool
+git chronogit
+# Select: 2) Set configuration
+# Choose: workflow.mergetoolAuto
+
+# Set custom path for mergetool
+git chronogit
+# Select: 2) Set configuration
+# Choose: workflow.mergetool.path
+
+# Set additional arguments for mergetool
+git chronogit
+# Select: 2) Set configuration
+# Choose: workflow.mergetool.args
+```
+
+These settings affect conflict resolution in various commands like `git sync`, `git jerrypick`, and `git rollback`.
 
 ## Environment Setup
 
@@ -147,6 +184,12 @@ For settings that apply to all repositories:
     
     # PR settings
     prTemplatePath = .github/pull_request_template.md
+    
+    # Mergetool settings
+    mergetool = 
+    mergetoolAuto = false
+    mergetool.path = 
+    mergetool.args = 
 ```
 
 #### 2. Local (.git/config)
@@ -157,6 +200,8 @@ For repository-specific settings:
     mainBranch = main
     defaultTarget = staging
     ticketPattern = ^TEAM-[0-9]+$
+    mergetool = kdiff3
+    mergetoolAuto = true
 ```
 
 #### 3. Branch
@@ -203,3 +248,4 @@ git chronogit
 - [Command Reference](../commands/README.md)
 - [Workflow Guide](../workflow/README.md)
 - [Troubleshooting](../installation/troubleshooting.md)
+- [Mergetool Integration](../workflow/mergetool-integration.md)
