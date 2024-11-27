@@ -228,8 +228,19 @@ $ git pr --title "Add search" --no-ticket
    # Enter: custom/template.md
    ```
 
-## Related Commands
+## Related ChronoGit Commands
 
-- [git start-branch](start-branch.md) - Create branches with ticket tracking
-- [git cc](conventional-commit.md) - Create commits for PR
 - [git chronogit](chronogit.md) - Configure PR settings
+- [git cc](conventional-commit.md) - Create commits for PR
+- [git jerrypick](jerrypick.md) - Cherry-pick commits interactively
+- [git rollback](rollback.md) - Safely revert changes in the main branch
+- [git start-branch](start-branch.md) - Create branches with ticket tracking
+- [git sync](sync.md) - Synchronize your branch with the main branch and remote
+- [git workspace](workspace.md) - Manage and switch between different workspaces
+
+## Useful Built-in Commands
+
+- [git stash](https://git-scm.com/docs/git-stash) - Temporarily store modified, tracked files
+- [git status](https://git-scm.com/docs/git-status) - Show the working tree status
+- [git log](https://git-scm.com/docs/git-log) - Show commit logs
+- [git diff](https://git-scm.com/docs/git-diff) - Show changes between commits, commit and working tree, etc

@@ -120,8 +120,19 @@ After rollback branch creation:
    ```
 3. After review and approval, merge the rollback PR
 
-## Related Commands
+## Related ChronoGit Commands
 
-- [git sync](sync.md) - Synchronize branches before rollback
-- [git open-pr](open-pr.md) - Create PR for the rollback
 - [git chronogit](chronogit.md) - Configure main branch settings
+- [git cc](conventional-commit.md) - Create conventional commits
+- [git jerrypick](jerrypick.md) - Cherry-pick commits interactively
+- [git open-pr](open-pr.md) - Create PR for the rollback
+- [git start-branch](start-branch.md) - Create new branches
+- [git sync](sync.md) - Synchronize branches before rollback
+- [git workspace](workspace.md) - Manage and switch between different workspaces
+
+## Useful Built-in Commands
+
+- [git stash](https://git-scm.com/docs/git-stash) - Temporarily store modified, tracked files
+- [git status](https://git-scm.com/docs/git-status) - Show the working tree status
+- [git log](https://git-scm.com/docs/git-log) - Show commit logs
+- [git diff](https://git-scm.com/docs/git-diff) - Show changes between commits, commit and working tree, etc

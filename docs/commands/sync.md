@@ -88,10 +88,19 @@ This order ensures:
 - If you encounter unexpected behavior, check the [known issues](../known-issues.md) document.
 - For more detailed troubleshooting, refer to the [troubleshooting guide](../installation/troubleshooting.md).
 
-## Related Commands
+## Related ChronoGit Commands
 
-- [git start-branch](start-branch.md): Create new branches
+- [git chronogit](chronogit.md): Configure sync settings
 - [git cc](conventional-commit.md): Create conventional commits
+- [git jerrypick](jerrypick.md): Cherry-pick commits interactively
 - [git open-pr](open-pr.md): Open pull requests
+- [git rollback](rollback.md): Safely revert changes in the main branch
+- [git start-branch](start-branch.md): Create new branches
+- [git workspace](workspace.md): Manage and switch between different workspaces
 
-For more information on the overall workflow, see the [Workflow Guide](../workflow/README.md).
+## Useful Built-in Commands
+
+- [git stash](https://git-scm.com/docs/git-stash) - Temporarily store modified, tracked files
+- [git status](https://git-scm.com/docs/git-status) - Show the working tree status
+- [git log](https://git-scm.com/docs/git-log) - Show commit logs
+- [git diff](https://git-scm.com/docs/git-diff) - Show changes between commits, commit and working tree, etc

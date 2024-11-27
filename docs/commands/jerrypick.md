@@ -109,8 +109,19 @@ Error: Branch 'non-existent-branch' does not exist
 4. Resolve any conflicts if they occur
 5. Commit the changes (if not in dry-run mode)
 
-## Related Commands
+## Related ChronoGit Commands
 
-- [git start-branch](start-branch.md) - Create a new branch before cherry-picking
+- [git chronogit](chronogit.md) - Configure jerrypick settings
 - [git cc](conventional-commit.md) - Commit changes after cherry-picking
+- [git open-pr](open-pr.md) - Create PR for cherry-picked changes
+- [git rollback](rollback.md) - Safely revert changes if needed
+- [git start-branch](start-branch.md) - Create a new branch before cherry-picking
 - [git sync](sync.md) - Synchronize branches before or after cherry-picking
+- [git workspace](workspace.md) - Manage and switch between different workspaces
+
+## Useful Built-in Commands
+
+- [git stash](https://git-scm.com/docs/git-stash) - Temporarily store modified, tracked files
+- [git status](https://git-scm.com/docs/git-status) - Show the working tree status
+- [git log](https://git-scm.com/docs/git-log) - Show commit logs
+- [git diff](https://git-scm.com/docs/git-diff) - Show changes between commits, commit and working tree, etc

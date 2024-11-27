@@ -74,16 +74,20 @@ git workspace <action> [name]
 3. Be cautious when restoring workspaces on top of existing work to avoid conflicts.
 4. Use `git workspace list` to keep track of your saved workspaces.
 
-## Related Commands
+## Related ChronoGit Commands
 
-- [git stash](https://git-scm.com/docs/git-stash): Built-in Git command for stashing changes
+- [git chronogit](chronogit.md): Configure workspace settings
+- [git cc](conventional-commit.md): Create commits in your workspace
+- [git jerrypick](jerrypick.md): Cherry-pick commits into your workspace
+- [git open-pr](open-pr.md): Create PR from your workspace
+- [git rollback](rollback.md): Safely revert changes in your workspace
 - [git start-branch](start-branch.md): Create a new branch before saving a workspace
+- [git stash](https://git-scm.com/docs/git-stash): Built-in Git command for stashing changes
 - [git sync](sync.md): Synchronize your branch before saving or after restoring a workspace
 
-## Notes
+## Useful Built-in Commands
 
-- Workspaces are saved locally and are not pushed to remote repositories.
-- The workspace command creates a `.git-workspaces` directory in your home folder to store workspace data.
-- Each workspace saves the current branch, staged changes, unstaged changes, and untracked files separately.
-
-For more information on managing your Git workflow, see the [Workflow Guide](../workflow/README.md).
+- [git stash](https://git-scm.com/docs/git-stash) - Temporarily store modified, tracked files
+- [git status](https://git-scm.com/docs/git-status) - Show the working tree status
+- [git log](https://git-scm.com/docs/git-log) - Show commit logs
+- [git diff](https://git-scm.com/docs/git-diff) - Show changes between commits, commit and working tree, etc
