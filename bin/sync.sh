@@ -78,9 +78,7 @@ sync_branch() {
                 echo -e "${RED}Conflicts detected while merging $main_branch:${NC}"
                 git diff --name-only --diff-filter=U
                 echo
-                echo -e "${YELLOW}Launching mergetool to resolve conflicts...${NC}"
-                if ! git mergetool; then
-                    echo -e "${RED}Error: Failed to launch mergetool${NC}"
+                if ! handle_conflicts; then
                     return 1
                 fi
                 
@@ -113,9 +111,8 @@ sync_branch() {
                 echo -e "${YELLOW}Attempting to resolve with rebase...${NC}"
                 
                 if ! git pull --rebase origin $current_branch; then
-                    echo -e "${YELLOW}Conflicts detected during rebase. Launching mergetool...${NC}"
-                    if ! git mergetool; then
-                        echo -e "${RED}Error: Failed to launch mergetool${NC}"
+                    echo -e "${YELLOW}Conflicts detected during rebase.${NC}"
+                    if ! handle_conflicts; then
                         return 1
                     fi
                     

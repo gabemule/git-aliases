@@ -20,6 +20,10 @@ get_default() {
         workflow.releasePrefix)   echo "release/" ;;
         workflow.docsPrefix)      echo "docs/" ;;
         workflow.prTemplatePath)  echo ".github/pull_request_template.md" ;;
+        workflow.mergetool)       echo "" ;;
+        workflow.mergetoolAuto)   echo "false" ;;
+        workflow.mergetool.path)  echo "" ;;
+        workflow.mergetool.args)  echo "" ;;
         *)                       echo "No default value" ;;
     esac
 }
@@ -37,6 +41,10 @@ get_description() {
         workflow.releasePrefix)   echo "Prefix for release branches" ;;
         workflow.docsPrefix)      echo "Prefix for documentation branches" ;;
         workflow.prTemplatePath)  echo "Path to PR template" ;;
+        workflow.mergetool)       echo "Preferred git mergetool" ;;
+        workflow.mergetoolAuto)   echo "Auto-launch mergetool on conflicts" ;;
+        workflow.mergetool.path)  echo "Custom path to mergetool binary" ;;
+        workflow.mergetool.args)  echo "Additional mergetool arguments" ;;
         *)                       echo "No description available" ;;
     esac
 }
@@ -148,6 +156,35 @@ prompt_non_empty() {
         fi
     done
     echo "$input"
+}
+
+# Common function to handle conflicts
+handle_conflicts() {
+    local tool=$(get_config workflow.mergetool)
+    local auto_launch=$(get_config workflow.mergetoolAuto)
+    local tool_path=$(get_config workflow.mergetool.path)
+    local tool_args=$(get_config workflow.mergetool.args)
+
+    if [ "$auto_launch" = "true" ]; then
+        local cmd="git mergetool"
+        if [ -n "$tool" ]; then
+            cmd+=" --tool=$tool"
+        fi
+        if [ -n "$tool_path" ]; then
+            cmd+=" --tool-path=$tool_path"
+        fi
+        if [ -n "$tool_args" ]; then
+            cmd+=" $tool_args"
+        fi
+        
+        echo -e "${BLUE}Conflicts detected. Launching mergetool...${NC}"
+        $cmd
+    else
+        echo -e "${YELLOW}Conflicts detected. Please resolve them manually.${NC}"
+        echo "You can run 'git mergetool' to use your configured merge tool."
+        echo "After resolving conflicts, run the appropriate continue command for your current operation."
+        return 1
+    fi
 }
 
 # Load initial configuration

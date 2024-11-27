@@ -111,9 +111,12 @@ jerrypick() {
         else
             echo -e "${BLUE}Cherry-picking: ${commits[$i]}${NC}"
             if ! git cherry-pick "$commit_hash"; then
-                echo -e "${RED}Conflict detected. Please resolve conflicts and run 'git cherry-pick --continue'${NC}"
-                echo -e "${RED}Or run 'git cherry-pick --abort' to cancel the operation${NC}"
-                return 1
+                echo -e "${RED}Conflict detected.${NC}"
+                if ! handle_conflicts; then
+                    echo -e "${RED}Cherry-pick aborted. Please resolve conflicts manually and try again.${NC}"
+                    git cherry-pick --abort
+                    return 1
+                fi
             fi
         fi
     done

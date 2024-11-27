@@ -1,6 +1,6 @@
 # 🔙 Rollback Command
 
-Provides a safe and interactive way to revert changes in the main branch, creating a new branch for review before applying the rollback.
+Provides a safe and interactive way to revert changes in the main branch, creating a new branch for review before applying the rollback, with automatic conflict resolution using the configured mergetool.
 
 ## Usage
 
@@ -18,6 +18,9 @@ git rollback --dry-run
 
 # Skip verification
 git rollback --skip-verify
+
+# Continue after resolving conflicts
+git rollback --continue
 ```
 
 ### Options
@@ -25,6 +28,7 @@ git rollback --skip-verify
 - `-h` - Show help message
 - `--dry-run` - Preview rollback changes without creating branch
 - `--skip-verify` - Skip verification step
+- `--continue` - Continue rollback after resolving conflicts
 
 ## Automatic Features
 
@@ -53,6 +57,13 @@ Creating rollback branch...
 Rollback branch created: rollback/production_20230615_143022
 ```
 
+### 4. Automatic Conflict Resolution
+When conflicts occur during the rollback process, the configured mergetool is automatically launched:
+```bash
+Conflict detected in file: src/auth/login.js
+Launching configured mergetool...
+```
+
 ## Interactive Usage
 
 ### Full Interactive Flow
@@ -78,6 +89,14 @@ $ git rollback --dry-run
 [DRY-RUN] Would revert commits from abc123 to HEAD
 ```
 
+### Continuing After Conflict Resolution
+
+```bash
+$ git rollback --continue
+Continuing rollback process...
+Rollback completed successfully
+```
+
 ## Error Handling
 
 ### Fetch Failed
@@ -90,6 +109,9 @@ Error: Failed to fetch latest changes
 ```bash
 $ git rollback
 Error: Failed to revert changes
+Conflict detected. Launching configured mergetool...
+Please resolve conflicts using the mergetool.
+After resolving, run 'git rollback --continue'
 ```
 
 ### Push Failed
@@ -111,18 +133,26 @@ Changes to be reverted:
 
 ## Workflow Steps
 
-After rollback branch creation:
-
-1. Review the changes in the rollback branch
-2. Create a PR to merge the rollback:
+1. Start the rollback process:
+   ```bash
+   git rollback
+   ```
+2. Select the commit to rollback to
+3. If conflicts occur, use the automatically launched mergetool to resolve them
+4. Continue the rollback process after conflict resolution:
+   ```bash
+   git rollback --continue
+   ```
+5. Review the changes in the rollback branch
+6. Create a PR to merge the rollback:
    ```bash
    git pr -t production
    ```
-3. After review and approval, merge the rollback PR
+7. After review and approval, merge the rollback PR
 
 ## Related ChronoGit Commands
 
-- [git chronogit](chronogit.md) - Configure main branch settings
+- [git chronogit](chronogit.md) - Configure settings
 - [git cc](conventional-commit.md) - Create conventional commits
 - [git jerrypick](jerrypick.md) - Cherry-pick commits interactively
 - [git open-pr](open-pr.md) - Create PR for the rollback
@@ -136,3 +166,8 @@ After rollback branch creation:
 - [git status](https://git-scm.com/docs/git-status) - Show the working tree status
 - [git log](https://git-scm.com/docs/git-log) - Show commit logs
 - [git diff](https://git-scm.com/docs/git-diff) - Show changes between commits, commit and working tree, etc
+- [git mergetool](https://git-scm.com/docs/git-mergetool) - Run merge conflict resolution tools to resolve merge conflicts
+
+## Related Documentation
+
+- [Mergetool Integration](../workflow/mergetool-integration.md): Detailed guide on mergetool integration and configuration

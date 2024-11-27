@@ -7,6 +7,7 @@ source "$SCRIPT_DIR/common/config.sh"
 rollback() {
     local dry_run=false
     local skip_verify=false
+    local continue_rollback=false
     
     # Get main branch from config or use default
     local main_branch=$(git config workflow.mainBranch || echo "production")
@@ -16,11 +17,32 @@ rollback() {
         case $1 in
             --dry-run) dry_run=true ;;
             --skip-verify) skip_verify=true ;;
+            --continue) continue_rollback=true ;;
             -h|--help) show_help; return 0 ;;
             *) echo "Unknown parameter: $1"; show_help; return 1 ;;
         esac
         shift
     done
+    
+    if [[ "$continue_rollback" == true ]]; then
+        if [[ ! -f ".git/ROLLBACK_IN_PROGRESS" ]]; then
+            echo -e "${RED}No rollback in progress. Run 'git rollback' without --continue${NC}"
+            return 1
+        fi
+        local rollback_branch=$(cat .git/ROLLBACK_IN_PROGRESS)
+        echo -e "${BLUE}Continuing rollback on branch: $rollback_branch${NC}"
+        git revert --continue
+        if [[ $? -ne 0 ]]; then
+            if ! handle_conflicts; then
+                echo -e "${RED}Rollback failed. Please resolve conflicts and run 'git rollback --continue'${NC}"
+                return 1
+            fi
+        fi
+        git commit -m "Rollback: Continue revert process"
+        rm -f .git/ROLLBACK_IN_PROGRESS
+        echo -e "${GREEN}Rollback completed successfully${NC}"
+        return 0
+    fi
     
     # Ensure we're up to date
     if ! git fetch origin; then
@@ -100,9 +122,12 @@ rollback() {
     
     # Create revert commit
     if ! git revert --no-commit "$target_commit"..HEAD; then
-        echo -e "${RED}Error: Failed to revert changes${NC}"
-        git revert --abort
-        return 1
+        echo -e "${RED}Conflicts detected during rollback.${NC}"
+        if ! handle_conflicts; then
+            echo -e "${RED}Rollback failed. Please resolve conflicts and run 'git rollback --continue'${NC}"
+            echo "$rollback_branch" > .git/ROLLBACK_IN_PROGRESS
+            return 1
+        fi
     fi
     
     # Verify changes if not skipped
@@ -153,6 +178,7 @@ show_help() {
     echo "Options:"
     echo "  --dry-run      Preview rollback changes without creating branch"
     echo "  --skip-verify  Skip verification step"
+    echo "  --continue     Continue rollback after resolving conflicts"
     echo "  -h             Show this help message"
 }
 

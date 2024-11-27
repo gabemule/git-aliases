@@ -29,6 +29,10 @@ show_help() {
     echo "  workflow.releasePrefix   - Prefix for release branches"
     echo "  workflow.docsPrefix      - Prefix for documentation branches"
     echo "  workflow.prTemplatePath  - Path to PR template"
+    echo "  workflow.mergetool       - Preferred git mergetool"
+    echo "  workflow.mergetoolAuto   - Auto-launch mergetool on conflicts"
+    echo "  workflow.mergetool.path  - Custom path to mergetool binary"
+    echo "  workflow.mergetool.args  - Additional mergetool arguments"
     exit 0
 }
 
@@ -160,6 +164,10 @@ show_all_configs() {
         workflow.releasePrefix
         workflow.docsPrefix
         workflow.prTemplatePath
+        workflow.mergetool
+        workflow.mergetoolAuto
+        workflow.mergetool.path
+        workflow.mergetool.args
     )
     
     for key in "${keys[@]}"; do
@@ -188,6 +196,10 @@ set_config_interactive() {
         workflow.releasePrefix
         workflow.docsPrefix
         workflow.prTemplatePath
+        workflow.mergetool
+        workflow.mergetoolAuto
+        workflow.mergetool.path
+        workflow.mergetool.args
     )
     
     local i=1
@@ -258,6 +270,10 @@ reset_config_interactive() {
         workflow.releasePrefix
         workflow.docsPrefix
         workflow.prTemplatePath
+        workflow.mergetool
+        workflow.mergetoolAuto
+        workflow.mergetool.path
+        workflow.mergetool.args
     )
     
     local i=1

@@ -1,6 +1,6 @@
 # 🍒 Jerrypick Command
 
-Provides an interactive way to cherry-pick commits from one branch to another, allowing for easy selection of multiple commits with a user-friendly interface.
+Provides an interactive way to cherry-pick commits from one branch to another, allowing for easy selection of multiple commits with a user-friendly interface and automatic conflict resolution using configured mergetool.
 
 ## Usage
 
@@ -57,6 +57,13 @@ abc123 - feat: add password reset functionality
 ghi789 - style: improve login form UI
 ```
 
+### 4. Automatic Conflict Resolution
+When conflicts occur during cherry-picking, the configured mergetool is automatically launched to assist in resolving conflicts:
+```bash
+Conflict detected in file: src/auth/password-reset.js
+Launching configured mergetool...
+```
+
 ## Interactive Usage
 
 ### Full Interactive Flow
@@ -88,7 +95,9 @@ $ git jerrypick --dry-run feature/user-auth
 ```bash
 $ git jerrypick
 Cherry-picking: abc123 - feat: add password reset functionality
-Conflict detected. Please resolve conflicts and run 'git cherry-pick --continue'
+Conflict detected. Launching configured mergetool...
+Please resolve conflicts using the mergetool.
+After resolving, run 'git cherry-pick --continue'
 Or run 'git cherry-pick --abort' to cancel the operation
 ```
 
@@ -106,12 +115,13 @@ Error: Branch 'non-existent-branch' does not exist
    ```
 2. Select the source branch (if not specified)
 3. Choose the commits to cherry-pick
-4. Resolve any conflicts if they occur
-5. Commit the changes (if not in dry-run mode)
+4. If conflicts occur, use the automatically launched mergetool to resolve them
+5. Continue the cherry-pick process after conflict resolution
+6. Commit the changes (if not in dry-run mode)
 
 ## Related ChronoGit Commands
 
-- [git chronogit](chronogit.md) - Configure jerrypick settings
+- [git chronogit](chronogit.md) - Configure settings
 - [git cc](conventional-commit.md) - Commit changes after cherry-picking
 - [git open-pr](open-pr.md) - Create PR for cherry-picked changes
 - [git rollback](rollback.md) - Safely revert changes if needed
@@ -125,3 +135,8 @@ Error: Branch 'non-existent-branch' does not exist
 - [git status](https://git-scm.com/docs/git-status) - Show the working tree status
 - [git log](https://git-scm.com/docs/git-log) - Show commit logs
 - [git diff](https://git-scm.com/docs/git-diff) - Show changes between commits, commit and working tree, etc
+- [git mergetool](https://git-scm.com/docs/git-mergetool) - Run merge conflict resolution tools to resolve merge conflicts
+
+## Related Documentation
+
+- [Mergetool Integration](../workflow/mergetool-integration.md): Detailed guide on mergetool integration and configuration
