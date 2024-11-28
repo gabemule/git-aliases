@@ -15,7 +15,7 @@ git start -h
 # Interactive mode
 git start-branch
 
-# Interactive mode
+# Interactive mode (short alias)
 git start 
 
 # With ticket, branch type and name  flags
