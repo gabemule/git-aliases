@@ -12,13 +12,13 @@ git start-branch -h
 # or
 git start -h
 
-# Interactive mode (full command)
-git start-branch -t PROJ-123
+# Interactive mode
+git start-branch
 
-# Interactive mode (short alias)
-git start -t PROJ-123
+# Interactive mode
+git start 
 
-# With branch type and name
+# With ticket, branch type and name  flags
 git start-branch -t PROJ-123 -n user-authentication -b feature
 ```
 
