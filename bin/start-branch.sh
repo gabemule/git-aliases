@@ -91,14 +91,13 @@ descriptions=(
     "Write, update, or fix documentation"
 )
 
-# Variable to store stash information
-stash_info=""
-
 # Handle stashing if needed
 if [[ "$no_stash" != true ]] && [[ -n $(git status -s) ]]; then
+    echo -e "${BLUE}You have modified files. Creating a stash...${NC}"
     stash_description="Auto stash before start-branch on $(date '+%Y-%m-%d %H:%M:%S')"
     git stash save "$stash_description" -a
-    stash_info="Stash created with description: $stash_description"
+    echo -e "${GREEN}Stash created with description: $stash_description${NC}"
+    sleep 2
 fi
 
 # Handle branch source and sync
@@ -132,22 +131,17 @@ fi
 
 # Get task name if not provided
 if [ -z "$branch_name" ]; then
-    branch_name=$(read_secure_input "Enter the name of the new task: ")
-    while [ -z "$branch_name" ]; do
-        echo "Input cannot be empty. Please try again."
-        branch_name=$(read_secure_input "Enter the name of the new task: ")
-    done
+    branch_name=$(prompt_non_empty "Enter the name of the new task")
 fi
 
 # If ticket not provided via argument, prompt for it
 if [ -z "$ticket" ]; then
-    ticket=$(read_secure_input "Enter ticket number (optional, e.g., PROJ-123): ")
-    if [ -n "$ticket" ]; then
-        if ! validate_ticket "$ticket"; then
-            echo "Invalid ticket format. Using empty ticket."
-            ticket=""
+    while true; do
+        ticket=$(prompt_non_empty "Enter ticket number (e.g., PROJ-123)")
+        if validate_ticket "$ticket"; then
+            break
         fi
-    fi
+    done
 fi
 
 # Get prefix based on branch type
@@ -163,22 +157,13 @@ esac
 # Create branch with descriptive name (without ticket)
 final_branch_name="${prefix}${branch_name// /-}"
 if git checkout -b "$final_branch_name"; then
-    # Store ticket reference in git config (if provided)
-    if [ -n "$ticket" ]; then
-        git config branch."$final_branch_name".ticket "$ticket"
-        echo -e "${GREEN}Associated ticket: $ticket${NC}"
-    else
-        echo -e "${YELLOW}No ticket associated with this branch.${NC}"
-    fi
+    # Store ticket reference in git config
+    git config branch."$final_branch_name".ticket "$ticket"
     
     echo
     echo -e "${GREEN}Successfully created and switched to new branch: $final_branch_name${NC}"
+    echo -e "${GREEN}Associated ticket: $ticket${NC}"
     echo -e "${BLUE}You can now start working on your task.${NC}"
-    if [ -n "$stash_info" ]; then
-        echo
-        echo -e "${YELLOW}$stash_info${NC}"
-        echo -e "${BLUE}Use 'git stash pop' to retrieve your stashed changes.${NC}"
-    fi
     echo
     echo "When you're done:"
     echo "1. Create a pull request to merge into 'development'"
