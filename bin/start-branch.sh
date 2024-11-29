@@ -131,15 +131,21 @@ fi
 
 # Get task name if not provided
 if [ -z "$branch_name" ]; then
-    branch_name=$(prompt_non_empty "Enter the name of the new task")
+    branch_name=$(read_secure_input "Enter the name of the new task: ")
+    while [ -z "$branch_name" ]; do
+        echo "Input cannot be empty. Please try again."
+        branch_name=$(read_secure_input "Enter the name of the new task: ")
+    done
 fi
 
 # If ticket not provided via argument, prompt for it
 if [ -z "$ticket" ]; then
     while true; do
-        ticket=$(prompt_non_empty "Enter ticket number (e.g., PROJ-123)")
-        if validate_ticket "$ticket"; then
+        ticket=$(read_secure_input "Enter ticket number (e.g., PROJ-123): ")
+        if [ -n "$ticket" ] && validate_ticket "$ticket"; then
             break
+        else
+            echo "Invalid ticket format or empty input. Please try again."
         fi
     done
 fi

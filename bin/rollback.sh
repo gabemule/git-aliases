@@ -129,12 +129,12 @@ rollback() {
             return 1
         fi
     fi
-    
+
     # Verify changes if not skipped
     if [[ "$skip_verify" == false ]]; then
         echo -e "${BLUE}Verifying changes...${NC}"
         verify_rollback "$rollback_branch" "$main_branch"
-        read -p "Continue with rollback? (y/N) " confirm
+        confirm=$(read_secure_input "Continue with rollback? (y/N) ")
         if [[ ! $confirm =~ ^[Yy]$ ]]; then
             echo -e "${YELLOW}Rollback aborted${NC}"
             git checkout -
@@ -142,7 +142,7 @@ rollback() {
             return 1
         fi
     fi
-    
+
     git commit -m "Rollback: Revert $main_branch to $target_commit"
     
     # Push and create PR

@@ -146,15 +146,28 @@ prompt_with_default() {
 }
 
 # Function to prompt for non-empty input
-prompt_non_empty() {
+read_secure_input() {
     local prompt="$1"
     local input=""
-    while [ -z "$input" ]; do
-        read -p "$prompt: " input
-        if [ -z "$input" ]; then
-            echo "Input cannot be empty. Please try again."
+    local char=""
+    
+    echo -n "$prompt"
+    
+    while IFS= read -r -n1 -s char; do
+        if [[ $char == $'\0' ]]; then
+            break
+        elif [[ $char == $'\177' ]] || [[ $char == $'\b' ]]; then
+            if [ ${#input} -gt 0 ]; then
+                input=${input::-1}
+                echo -ne "\b \b"
+            fi
+        elif [[ $char != $'\e' ]]; then
+            input+="$char"
+            echo -n "$char"
         fi
     done
+    
+    echo
     echo "$input"
 }
 
