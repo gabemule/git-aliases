@@ -140,14 +140,13 @@ fi
 
 # If ticket not provided via argument, prompt for it
 if [ -z "$ticket" ]; then
-    while true; do
-        ticket=$(read_secure_input "Enter ticket number (e.g., PROJ-123): ")
-        if [ -n "$ticket" ] && validate_ticket "$ticket"; then
-            break
-        else
-            echo "Invalid ticket format or empty input. Please try again."
+    ticket=$(read_secure_input "Enter ticket number (optional, e.g., PROJ-123): ")
+    if [ -n "$ticket" ]; then
+        if ! validate_ticket "$ticket"; then
+            echo "Invalid ticket format. Using empty ticket."
+            ticket=""
         fi
-    done
+    fi
 fi
 
 # Get prefix based on branch type
@@ -163,12 +162,16 @@ esac
 # Create branch with descriptive name (without ticket)
 final_branch_name="${prefix}${branch_name// /-}"
 if git checkout -b "$final_branch_name"; then
-    # Store ticket reference in git config
-    git config branch."$final_branch_name".ticket "$ticket"
+    # Store ticket reference in git config (if provided)
+    if [ -n "$ticket" ]; then
+        git config branch."$final_branch_name".ticket "$ticket"
+        echo -e "${GREEN}Associated ticket: $ticket${NC}"
+    else
+        echo -e "${YELLOW}No ticket associated with this branch.${NC}"
+    fi
     
     echo
     echo -e "${GREEN}Successfully created and switched to new branch: $final_branch_name${NC}"
-    echo -e "${GREEN}Associated ticket: $ticket${NC}"
     echo -e "${BLUE}You can now start working on your task.${NC}"
     echo
     echo "When you're done:"

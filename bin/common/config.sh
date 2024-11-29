@@ -149,25 +149,10 @@ prompt_with_default() {
 read_secure_input() {
     local prompt="$1"
     local input=""
-    local char=""
     
-    echo -n "$prompt"
+    # Use read with -e for line editing and -r to prevent backslash escapes
+    read -e -r -p "$prompt" input
     
-    while IFS= read -r -n1 -s char; do
-        if [[ $char == $'\0' ]]; then
-            break
-        elif [[ $char == $'\177' ]] || [[ $char == $'\b' ]]; then
-            if [ ${#input} -gt 0 ]; then
-                input=${input::-1}
-                echo -ne "\b \b"
-            fi
-        elif [[ $char != $'\e' ]]; then
-            input+="$char"
-            echo -n "$char"
-        fi
-    done
-    
-    echo
     echo "$input"
 }
 
