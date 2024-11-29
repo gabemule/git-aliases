@@ -125,7 +125,7 @@ show_menu() {
     echo "3) Reset configuration"
     echo "4) Exit"
     echo
-    choice=$(read_secure_input "Select option (1-4): ")
+    read -p "Select option (1-4): " choice
     echo
     
     case $choice in
@@ -210,7 +210,7 @@ set_config_interactive() {
     done
     echo
     
-    config_choice=$(read_secure_input "Select configuration (1-$((i-1))): ")
+    read -p "Select configuration (1-$((i-1))): " config_choice
     if [[ ! $config_choice =~ ^[0-9]+$ ]] || [ $config_choice -lt 1 ] || [ $config_choice -ge $i ]; then
         echo -e "${RED}Invalid choice${NC}"
         read -p "Press Enter to continue..."
@@ -228,7 +228,7 @@ set_config_interactive() {
     echo "2) Local"
     echo "3) Branch"
     echo
-    scope_choice=$(read_secure_input "Select scope (1-3): ")
+    read -p "Select scope (1-3): " scope_choice
     
     case $scope_choice in
         1) scope="global" ;;
@@ -243,7 +243,7 @@ set_config_interactive() {
     
     # Get new value
     local default_value=$(get_default "$selected_key")
-    value=$(read_secure_input "Enter new value [$default_value]: ")
+    read -p "Enter new value [$default_value]: " value
     value=${value:-$default_value}
     
     # Set configuration
@@ -284,7 +284,7 @@ reset_config_interactive() {
     done
     echo
     
-    config_choice=$(read_secure_input "Select configuration (1-$((i-1))): ")
+    read -p "Select configuration (1-$((i-1))): " config_choice
     if [[ ! $config_choice =~ ^[0-9]+$ ]] || [ $config_choice -lt 1 ] || [ $config_choice -ge $i ]; then
         echo -e "${RED}Invalid choice${NC}"
         read -p "Press Enter to continue..."
@@ -302,7 +302,7 @@ reset_config_interactive() {
     echo "2) Local"
     echo "3) Branch"
     echo
-    scope_choice=$(read_secure_input "Select scope (1-3): ")
+    read -p "Select scope (1-3): " scope_choice
     
     case $scope_choice in
         1)

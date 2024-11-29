@@ -156,7 +156,7 @@ if [ -z "$title" ]; then
     else
         default_title=""
     fi
-    title_input=$(read_secure_input "Enter PR title: $default_title")
+    read -p "Enter PR title: $default_title" title_input
     title="$default_title$title_input"
 elif [ -n "$ticket" ] && [ "$no_ticket" != true ] && [[ ! "$title" =~ \[$ticket\] ]]; then
     # Add ticket to provided title if not present
@@ -166,11 +166,7 @@ fi
 # Handle PR description
 if [ -z "$body" ]; then
     echo -e "${BLUE}Enter PR description (press Ctrl+D when finished):${NC}"
-    body=""
-    while IFS= read -r line; do
-        body+="$line"$'\n'
-    done
-    body=${body%$'\n'}  # Remove trailing newline
+    body=$(cat)
 fi
 
 # Check for PR template if not explicitly skipped

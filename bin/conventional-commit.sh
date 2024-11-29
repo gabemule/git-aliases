@@ -176,11 +176,7 @@ if [ "$no_body" != true ]; then
     if [ -z "$body" ]; then
         if [ "$non_interactive" != true ]; then
             echo "Enter commit body (optional, press Ctrl+D when finished):"
-            body=""
-            while IFS= read -r line; do
-                body+="$line"$'\n'
-            done
-            body=${body%$'\n'}  # Remove trailing newline
+            body=$(cat)
         fi
     fi
 fi
@@ -230,7 +226,7 @@ echo
 
 # Confirm commit in interactive mode
 if [ "$non_interactive" != true ]; then
-    confirm=$(read_secure_input "Do you want to commit with this message? (Y/n) ")
+    read -p "Do you want to commit with this message? (Y/n) " confirm
     if [[ ! $confirm =~ ^[Yy]?$ ]]; then
         echo
         echo -e "${YELLOW}Commit aborted.${NC}"
@@ -280,7 +276,7 @@ if [ "$auto_push" = true ]; then
     fi
 elif [ "$non_interactive" != true ]; then
     # Offer to push in interactive mode
-    push_confirm=$(read_secure_input "Do you want to push the changes now? (Y/n) ")
+    read -p "Do you want to push the changes now? (Y/n) " push_confirm
     if [[ $push_confirm =~ ^[Yy]?$ ]]; then
         echo
         if git push origin $current_branch; then

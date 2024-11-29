@@ -146,13 +146,15 @@ prompt_with_default() {
 }
 
 # Function to prompt for non-empty input
-read_secure_input() {
+prompt_non_empty() {
     local prompt="$1"
     local input=""
-    
-    # Use read with -e for line editing and -r to prevent backslash escapes
-    read -e -r -p "$prompt" input
-    
+    while [ -z "$input" ]; do
+        read -p "$prompt: " input
+        if [ -z "$input" ]; then
+            echo "Input cannot be empty. Please try again."
+        fi
+    done
     echo "$input"
 }
 
