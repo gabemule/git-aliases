@@ -91,13 +91,14 @@ descriptions=(
     "Write, update, or fix documentation"
 )
 
+# Variable to store stash information
+stash_info=""
+
 # Handle stashing if needed
 if [[ "$no_stash" != true ]] && [[ -n $(git status -s) ]]; then
-    echo -e "${BLUE}You have modified files. Creating a stash...${NC}"
     stash_description="Auto stash before start-branch on $(date '+%Y-%m-%d %H:%M:%S')"
     git stash save "$stash_description" -a
-    echo -e "${GREEN}Stash created with description: $stash_description${NC}"
-    sleep 2
+    stash_info="Stash created with description: $stash_description"
 fi
 
 # Handle branch source and sync
@@ -173,6 +174,11 @@ if git checkout -b "$final_branch_name"; then
     echo
     echo -e "${GREEN}Successfully created and switched to new branch: $final_branch_name${NC}"
     echo -e "${BLUE}You can now start working on your task.${NC}"
+    if [ -n "$stash_info" ]; then
+        echo
+        echo -e "${YELLOW}$stash_info${NC}"
+        echo -e "${BLUE}Use 'git stash pop' to retrieve your stashed changes.${NC}"
+    fi
     echo
     echo "When you're done:"
     echo "1. Create a pull request to merge into 'development'"
