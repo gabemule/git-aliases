@@ -11,10 +11,14 @@ This documentation describes planned improvements and new features for our git w
 ### Progress Tracking
 - [Standup Command](standup-command.md) - Generate work summaries for standups
 
+### Identity Management
+- [SSH Identity Management](ssh-identity-management.md) - Configure repository-specific SSH keys and identity
+
 ## Implementation Priority
 
 1. High Priority
    - Review command
+   - SSH Identity Management
 
 2. Medium Priority
    - Standup command
@@ -23,6 +27,7 @@ This documentation describes planned improvements and new features for our git w
 
 1. Implement high priority improvements:
    - Review command for streamlined PR process
+   - SSH Identity Management for repository-specific SSH keys and identity
 
 2. Add comprehensive testing:
    - Unit tests for each new command
