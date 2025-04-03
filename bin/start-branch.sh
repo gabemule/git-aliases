@@ -18,6 +18,7 @@ show_help() {
     echo "      --current          Create branch from current branch"
     echo "      --no-sync          Skip syncing with main branch"
     echo "      --no-stash         Skip stashing changes"
+    echo "      --no-ticket        Skip ticket reference requirement"
     echo "  -h                      Show this help message"
     echo
     echo "Branch Types:"
@@ -42,6 +43,7 @@ branch_type=""
 use_current_branch=false
 no_sync=false
 no_stash=false
+no_ticket=false
 
 # Parse command line arguments
 while [[ $# -gt 0 ]]; do
@@ -71,6 +73,10 @@ while [[ $# -gt 0 ]]; do
             ;;
         --no-stash)
             no_stash=true
+            shift
+            ;;
+        --no-ticket)
+            no_ticket=true
             shift
             ;;
         *)
@@ -135,7 +141,7 @@ if [ -z "$branch_name" ]; then
 fi
 
 # If ticket not provided via argument, prompt for it
-if [ -z "$ticket" ]; then
+if [ -z "$ticket" ] && [ "$no_ticket" != true ]; then
     while true; do
         ticket=$(prompt_non_empty "Enter ticket number (e.g., PROJ-123)")
         if validate_ticket "$ticket"; then
@@ -157,12 +163,16 @@ esac
 # Create branch with descriptive name (without ticket)
 final_branch_name="${prefix}${branch_name// /-}"
 if git checkout -b "$final_branch_name"; then
-    # Store ticket reference in git config
-    git config branch."$final_branch_name".ticket "$ticket"
+    # Store ticket reference in git config if we have one
+    if [ -n "$ticket" ]; then
+        git config branch."$final_branch_name".ticket "$ticket"
+        echo -e "${GREEN}Associated ticket: $ticket${NC}"
+    else
+        echo -e "${YELLOW}No ticket associated with this branch.${NC}"
+    fi
     
     echo
     echo -e "${GREEN}Successfully created and switched to new branch: $final_branch_name${NC}"
-    echo -e "${GREEN}Associated ticket: $ticket${NC}"
     echo -e "${BLUE}You can now start working on your task.${NC}"
     echo
     echo "When you're done:"
