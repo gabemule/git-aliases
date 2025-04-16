@@ -143,6 +143,28 @@ Allows saving and restoring complete workspace states, including staged changes,
 - Easy context switching
 - Separation of changes (staged vs unstaged)
 
+### [🔑 SSH Config](ssh-config.md)
+```bash
+# Show help
+git ssh-config -h
+
+# Interactive mode
+git ssh-config
+
+# List available SSH keys
+git ssh-config -l
+
+# Use specific key
+git ssh-config -k ~/.ssh/id_ed25519_work
+```
+Configure repository-specific SSH keys and identity information for separating personal and organizational identities.
+
+**Key Features:**
+- Repository-specific SSH key configuration
+- Identity (name/email) management
+- Interactive key selection
+- Works with all Git commands that use SSH
+
 ## Common Patterns
 
 All commands follow these consistent patterns:
@@ -192,6 +214,7 @@ git sync      # for branch synchronization
 git rollback  # for rollback
 git jerrypick # for cherry-pick
 git workspace # for workspace management
+git ssh-config # for SSH key and identity management
 ```
 
 ## Testing Commands
@@ -229,6 +252,7 @@ git test
   - [rollback](rollback.md)
   - [jerrypick](jerrypick.md)
   - [workspace](workspace.md)
+  - [ssh-config](ssh-config.md)
 - Check [troubleshooting guide](../installation/troubleshooting.md)
 - Review [known issues](../known-issues.md)
 - Run verification: `git test -v`

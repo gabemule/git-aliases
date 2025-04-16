@@ -36,6 +36,7 @@ ChronoGit embodies the spirit of adventure and precision, empowering teams to:
 - **Branch Synchronization**: Keep your branches up-to-date with `git sync`
 - **Rollback**: Safely revert changes with `git rollback`
 - **Cherry-pick**: Selectively apply commits with `git jerrypick`
+- **SSH Identity Management**: Configure repository-specific SSH keys with `git ssh-config`
 
 ## 📂 Documentation
 

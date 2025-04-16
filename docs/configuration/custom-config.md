@@ -29,6 +29,12 @@ Complete guide to all available ChronoGit configurations and their underlying gi
     mergetoolAuto = false       # Auto-launch mergetool on conflicts
     mergetool.path =            # Custom path to mergetool binary
     mergetool.args =            # Additional mergetool arguments
+    
+    # SSH settings
+    ssh.keyDir = ~/.ssh         # Directory for SSH keys
+    ssh.confirmChange = true    # Confirm before changing SSH key
+    ssh.displayFormat = both    # SSH key display format (name, comment, both)
+    ssh.promptIdentity = true   # Always prompt for identity when setting SSH key
 ```
 
 ### Local Configuration (.git/config)
@@ -140,12 +146,26 @@ git config --unset branch.feature/task.ticket
 | workflow.mergetool.path | - | Custom path to mergetool binary | `git config workflow.mergetool.path` | `git config workflow.mergetool.path /usr/local/bin/kdiff3` |
 | workflow.mergetool.args | - | Additional mergetool arguments | `git config workflow.mergetool.args` | `git config workflow.mergetool.args "--auto"` |
 
+### SSH Settings
+
+| Setting | Default | Description | Command to View | Command to Set |
+|---------|---------|-------------|-----------------|----------------|
+| workflow.ssh.keyDir | ~/.ssh | Directory for SSH keys | `git config workflow.ssh.keyDir` | `git config workflow.ssh.keyDir ~/.ssh/custom-keys` |
+| workflow.ssh.confirmChange | true | Confirm before changing SSH key | `git config workflow.ssh.confirmChange` | `git config workflow.ssh.confirmChange false` |
+| workflow.ssh.displayFormat | both | SSH key display format (name, comment, both) | `git config workflow.ssh.displayFormat` | `git config workflow.ssh.displayFormat name` |
+| workflow.ssh.promptIdentity | true | Always prompt for identity when setting SSH key | `git config workflow.ssh.promptIdentity` | `git config workflow.ssh.promptIdentity false` |
+
 ## Under the Hood
 
 ### Branch Creation
 - `workflow.mainBranch`: Used by start-branch to determine source branch
 - `workflow.*Prefix`: Used to prefix branch names based on type
 - Branch ticket is stored using `branch.<name>.ticket`
+
+### SSH Configuration
+- `core.sshCommand`: Used by ssh-config to set repository-specific SSH key
+- `user.name` and `user.email`: Used to set repository-specific identity
+- `workflow.ssh.*`: Used to customize SSH key management behavior
 
 ### Commit Creation
 - Branch ticket is read from `branch.<name>.ticket`

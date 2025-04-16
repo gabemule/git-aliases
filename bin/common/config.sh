@@ -24,6 +24,10 @@ get_default() {
         workflow.mergetoolAuto)   echo "false" ;;
         workflow.mergetool.path)  echo "" ;;
         workflow.mergetool.args)  echo "" ;;
+        workflow.ssh.keyDir)      echo "~/.ssh" ;;
+        workflow.ssh.confirmChange) echo "true" ;;
+        workflow.ssh.displayFormat) echo "both" ;;
+        workflow.ssh.promptIdentity) echo "true" ;;
         *)                       echo "No default value" ;;
     esac
 }
@@ -45,6 +49,10 @@ get_description() {
         workflow.mergetoolAuto)   echo "Auto-launch mergetool on conflicts" ;;
         workflow.mergetool.path)  echo "Custom path to mergetool binary" ;;
         workflow.mergetool.args)  echo "Additional mergetool arguments" ;;
+        workflow.ssh.keyDir)      echo "Directory for SSH keys" ;;
+        workflow.ssh.confirmChange) echo "Confirm before changing SSH key" ;;
+        workflow.ssh.displayFormat) echo "SSH key display format (name, comment, both)" ;;
+        workflow.ssh.promptIdentity) echo "Always prompt for identity when setting SSH key" ;;
         *)                       echo "No description available" ;;
     esac
 }
