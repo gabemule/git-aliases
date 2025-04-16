@@ -121,25 +121,110 @@ if [ "$valid_prefix" = false ]; then
     exit 1
 fi
 
+# Function to verify if branch exists
+verify_branch_exists() {
+    local branch=$1
+    if ! git show-ref --verify --quiet refs/remotes/origin/$branch; then
+        echo -e "${YELLOW}Warning: The branch '$branch' doesn't seem to exist in the remote repository.${NC}"
+        read -p "Continue anyway? (y/n): " confirm
+        if [[ ! "$confirm" =~ ^[Yy]$ ]]; then
+            echo -e "${RED}Operation cancelled.${NC}"
+            exit 1
+        fi
+    fi
+}
+
 # Get target branch if not provided
 if [ -z "$target" ]; then
+    # Get settings following priority hierarchy
+    # Branch > Local > Global > Default
+    
+    # Try to get defaultTarget from git settings
+    default_target=""
+    main_branch=""
+    
+    # 1. Check current branch configuration (highest priority)
+    branch_default=$(git config branch."$current_branch".defaultTarget)
+    # Also check workflow.defaultTarget in branch configuration
+    if [ -z "$branch_default" ]; then
+        branch_default=$(git config branch."$current_branch".workflow.defaultTarget)
+    fi
+    
+    branch_main=$(git config branch."$current_branch".mainBranch)
+    # Also check workflow.mainBranch in branch configuration
+    if [ -z "$branch_main" ]; then
+        branch_main=$(git config branch."$current_branch".workflow.mainBranch)
+    fi
+    
+    # 2. Check local configuration
+    local_default=$(git config --local --get workflow.defaultTarget)
+    local_main=$(git config --local --get workflow.mainBranch)
+    
+    # 3. Check global configuration
+    global_default=$(git config --global --get workflow.defaultTarget)
+    global_main=$(git config --global --get workflow.mainBranch)
+    
+    # 4. Check chronogit configuration (fallback)
+    chronogit_default=$(git config --get chronogit.defaultTarget)
+    chronogit_main=$(git config --get chronogit.mainBranch)
+    
+    # Apply hierarchy for defaultTarget
+    if [ -n "$branch_default" ]; then
+        default_target="$branch_default"
+    elif [ -n "$local_default" ]; then
+        default_target="$local_default"
+    elif [ -n "$global_default" ]; then
+        default_target="$global_default"
+    elif [ -n "$chronogit_default" ]; then
+        default_target="$chronogit_default"
+    else
+        default_target="development"  # Default value
+    fi
+    
+    # Apply hierarchy for mainBranch
+    if [ -n "$branch_main" ]; then
+        main_branch="$branch_main"
+    elif [ -n "$local_main" ]; then
+        main_branch="$local_main"
+    elif [ -n "$global_main" ]; then
+        main_branch="$global_main"
+    elif [ -n "$chronogit_main" ]; then
+        main_branch="$chronogit_main"
+    else
+        main_branch="production"  # Default value
+    fi
+    
+    # Prepare options for menu
+    options=()
+    
+    # Add defaultTarget as first option
+    options+=("$default_target")
+    
+    # Add mainBranch if it's different from defaultTarget
+    if [ "$main_branch" != "$default_target" ]; then
+        options+=("$main_branch")
+    fi
+    
+    # Always add the "other" option
+    options+=("other")
+    
     echo -e "${BLUE}Select the target branch for your PR:${NC}"
-    select target_choice in "development" "production"; do
-        case $target_choice in
-            development|production)
-                target=$target_choice
-                break
-                ;;
-            *) echo -e "${RED}Invalid option. Please try again.${NC}";;
-        esac
+    select target_choice in "${options[@]}"; do
+        if [ "$target_choice" = "other" ]; then
+            read -p "Enter the target branch name: " target
+            verify_branch_exists "$target"
+            break
+        elif [ -n "$target_choice" ]; then
+            target=$target_choice
+            verify_branch_exists "$target"
+            break
+        else
+            echo -e "${RED}Invalid option. Please try again.${NC}"
+        fi
     done
 else
-    # Validate provided target
-    if [[ ! "$target" =~ ^(development|production)$ ]]; then
-        echo -e "${RED}Invalid target branch: $target${NC}"
-        echo "Valid targets: development, production"
-        exit 1
-    fi
+    # Check if the target branch exists
+    verify_branch_exists "$target"
 fi
 
 # Check if PR already exists
