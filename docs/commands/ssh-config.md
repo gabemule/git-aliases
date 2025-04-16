@@ -31,6 +31,7 @@ git ssh-config -i branch
 git ssh-config -r                # Reset both local and branch
 git ssh-config -r local          # Reset only local
 git ssh-config -r branch         # Reset only branch
+git ssh-config -r global         # Reset only global
 
 # Direct configuration with scope as first argument
 git ssh-config global -k ~/.ssh/id_ed25519
@@ -62,7 +63,7 @@ git ssh-config -h
 - `-l, --list` - List available SSH keys
 - `-s, --show` - Show current SSH configuration (keys and identities)
 - `-r, --reset [scope]` - Reset SSH configuration to defaults
-  - Scope can be: local, branch, or both (default)
+  - Scope can be: global, local, branch, or both (default)
 - `--no-identity` - Skip identity configuration
 - `-h, --help` - Show help message
 
@@ -242,6 +243,17 @@ Output:
 ```
 Resetting branch 'feature/task' SSH configuration...
 Branch 'feature/task' SSH configuration reset to defaults
+```
+
+```bash
+# Reset only global configuration
+git ssh-config -r global
+```
+
+Output:
+```
+Resetting global SSH configuration...
+Global SSH configuration reset to defaults
 ```
 
 ### Direct Configuration Examples

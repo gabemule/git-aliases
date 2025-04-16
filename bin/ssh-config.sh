@@ -24,7 +24,7 @@ show_help() {
     echo "  -l, --list            List available SSH keys"
     echo "  -s, --show            Show current SSH configuration"
     echo "  -r, --reset [scope]   Reset SSH configuration to defaults"
-    echo "                        Scope can be: local, branch, or both (default)"
+    echo "                        Scope can be: global, local, branch, or both (default)"
     echo "  -g, --global          (Deprecated) Set configuration at global level"
     echo "  -b, --branch          (Deprecated) Set configuration at branch level"
     echo "      --local           (Deprecated) Set configuration at local level"
@@ -45,6 +45,7 @@ show_help() {
     echo "  git ssh-config -r                # Reset both local and branch SSH configuration"
     echo "  git ssh-config -r local          # Reset only local SSH configuration"
     echo "  git ssh-config -r branch         # Reset only branch SSH configuration"
+    echo "  git ssh-config -r global         # Reset only global SSH configuration"
     echo "  git ssh-config global -k ~/.ssh/id_ed25519  # Set global SSH key"
     echo "  git ssh-config branch -k ~/.ssh/id_ed25519_project  # Set branch-specific SSH key"
     echo "  git ssh-config local -k ~/.ssh/id_ed25519_work -n \"Work User\" -e \"work@example.com\""
@@ -407,6 +408,21 @@ configure_identity() {
     echo "Email: $email"
 }
 
+# Function to reset global SSH configuration
+reset_global_ssh_config() {
+    echo -e "${BLUE}Resetting global SSH configuration...${NC}"
+    
+    # Unset global SSH command
+    git config --global --unset core.sshCommand
+    
+    # Unset global identity
+    git config --global --unset user.name
+    git config --global --unset user.email
+    
+    echo -e "${GREEN}Global SSH configuration reset to defaults${NC}"
+    return 0
+}
+
 # Function to reset local SSH configuration
 reset_local_ssh_config() {
     echo -e "${BLUE}Resetting local SSH configuration...${NC}"
@@ -515,7 +531,7 @@ while [[ $# -gt 0 ]]; do
         -r|--reset)
             reset_config=true
             # Check if next argument is a valid reset scope
-            if [[ "$2" == "local" || "$2" == "branch" || "$2" == "both" ]]; then
+            if [[ "$2" == "global" || "$2" == "local" || "$2" == "branch" || "$2" == "both" ]]; then
                 reset_scope="$2"
                 shift
             else
@@ -572,21 +588,44 @@ fi
 
 # Reset configuration if requested
 if [ "$reset_config" = true ]; then
-    case "$reset_scope" in
-        "local")
-            # Reset only local configuration
-            reset_local_ssh_config
-            ;;
-        "branch")
-            # Reset only branch configuration
-            reset_branch_ssh_config
-            ;;
-        *)
-            # Reset both local and branch configuration
-            reset_local_ssh_config
-            reset_branch_ssh_config
-            ;;
-    esac
+    # If scope is provided via positional argument, use it for reset
+    if [ -n "$scope" ]; then
+        case "$scope" in
+            "global")
+                # Reset global configuration
+                reset_global_ssh_config
+                ;;
+            "local")
+                # Reset local configuration
+                reset_local_ssh_config
+                ;;
+            "branch")
+                # Reset branch configuration
+                reset_branch_ssh_config
+                ;;
+        esac
+    else
+        # Use reset_scope if no positional scope
+        case "$reset_scope" in
+            "global")
+                # Reset global configuration
+                reset_global_ssh_config
+                ;;
+            "local")
+                # Reset only local configuration
+                reset_local_ssh_config
+                ;;
+            "branch")
+                # Reset only branch configuration
+                reset_branch_ssh_config
+                ;;
+            *)
+                # Reset both local and branch configuration
+                reset_local_ssh_config
+                reset_branch_ssh_config
+                ;;
+        esac
+    fi
     exit 0
 fi
 
