@@ -6,9 +6,14 @@ source "$SCRIPT_DIR/common/config.sh"
 
 # Show help message
 show_help() {
-    echo "Usage: git ssh-config [options]"
+    echo "Usage: git ssh-config [scope] [options]"
     echo
     echo "Configure SSH key and identity for Git"
+    echo
+    echo "Scope (optional):"
+    echo "  global               Set configuration at global level (all repositories)"
+    echo "  local                Set configuration at local level (current repository only, default)"
+    echo "  branch               Set configuration at branch level (current branch only)"
     echo
     echo "Options:"
     echo "  -k, --key <path>      Specify SSH key path directly"
@@ -20,9 +25,9 @@ show_help() {
     echo "  -s, --show            Show current SSH configuration"
     echo "  -r, --reset [scope]   Reset SSH configuration to defaults"
     echo "                        Scope can be: local, branch, or both (default)"
-    echo "  -g, --global          Set configuration at global level (all repositories)"
-    echo "  -b, --branch          Set configuration at branch level (current branch only)"
-    echo "      --local           Set configuration at local level (current repository only, default)"
+    echo "  -g, --global          (Deprecated) Set configuration at global level"
+    echo "  -b, --branch          (Deprecated) Set configuration at branch level"
+    echo "      --local           (Deprecated) Set configuration at local level"
     echo "      --no-identity     Skip identity configuration"
     echo "  -h, --help            Show this help message"
     echo
@@ -30,6 +35,9 @@ show_help() {
     echo "  git ssh-config                   # Interactive SSH key selection (local scope)"
     echo "  git ssh-config -l                # List available SSH keys"
     echo "  git ssh-config -s                # Show current SSH configuration"
+    echo "  git ssh-config global            # Configure global SSH key (interactive)"
+    echo "  git ssh-config branch            # Configure branch SSH key (interactive)"
+    echo "  git ssh-config local             # Configure local SSH key (interactive)"
     echo "  git ssh-config -i                # Configure identity interactively"
     echo "  git ssh-config -i global         # Configure global identity"
     echo "  git ssh-config -i local          # Configure local identity"
@@ -37,9 +45,9 @@ show_help() {
     echo "  git ssh-config -r                # Reset both local and branch SSH configuration"
     echo "  git ssh-config -r local          # Reset only local SSH configuration"
     echo "  git ssh-config -r branch         # Reset only branch SSH configuration"
-    echo "  git ssh-config -g -k ~/.ssh/id_ed25519  # Set global SSH key"
-    echo "  git ssh-config -b -k ~/.ssh/id_ed25519_project  # Set branch-specific SSH key"
-    echo "  git ssh-config -k ~/.ssh/id_ed25519_work -n \"Work User\" -e \"work@example.com\""
+    echo "  git ssh-config global -k ~/.ssh/id_ed25519  # Set global SSH key"
+    echo "  git ssh-config branch -k ~/.ssh/id_ed25519_project  # Set branch-specific SSH key"
+    echo "  git ssh-config local -k ~/.ssh/id_ed25519_work -n \"Work User\" -e \"work@example.com\""
     exit 0
 }
 
@@ -448,6 +456,7 @@ scope=""
 show_current=false
 reset_config=false
 reset_scope=""
+positional_scope=""
 
 # Parse command line arguments
 while [[ $# -gt 0 ]]; do
@@ -481,14 +490,17 @@ while [[ $# -gt 0 ]]; do
             shift
             ;;
         -g|--global)
+            # Deprecated but still supported
             scope="global"
             shift
             ;;
         -b|--branch)
+            # Deprecated but still supported
             scope="branch"
             shift
             ;;
         --local)
+            # Deprecated but still supported
             scope="local"
             shift
             ;;
@@ -511,6 +523,11 @@ while [[ $# -gt 0 ]]; do
             fi
             shift
             ;;
+        global|local|branch)
+            # Positional scope argument
+            positional_scope="$1"
+            shift
+            ;;
         *)
             echo -e "${RED}Unknown option: $1${NC}"
             echo "Use -h to see available options"
@@ -518,6 +535,11 @@ while [[ $# -gt 0 ]]; do
             ;;
     esac
 done
+
+# Use positional scope if provided
+if [ -n "$positional_scope" ]; then
+    scope="$positional_scope"
+fi
 
 # Check if we're in a git repository
 if ! git rev-parse --is-inside-work-tree > /dev/null 2>&1; then

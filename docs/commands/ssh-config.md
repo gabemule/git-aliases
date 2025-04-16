@@ -14,6 +14,11 @@ git ssh-config -l
 # Show current SSH configuration (keys and identities)
 git ssh-config -s
 
+# Configure SSH key for specific scope (interactive)
+git ssh-config global            # Configure global SSH key
+git ssh-config local             # Configure local SSH key
+git ssh-config branch            # Configure branch SSH key
+
 # Configure only identity (name and email)
 git ssh-config -i
 
@@ -27,17 +32,15 @@ git ssh-config -r                # Reset both local and branch
 git ssh-config -r local          # Reset only local
 git ssh-config -r branch         # Reset only branch
 
-# Global configuration (for all repositories)
+# Direct configuration with scope as first argument
+git ssh-config global -k ~/.ssh/id_ed25519
+git ssh-config branch -k ~/.ssh/id_ed25519_project
+git ssh-config local -k ~/.ssh/id_ed25519_work -n "Work User" -e "work@example.com"
+
+# Legacy syntax (deprecated but still supported)
 git ssh-config -g -k ~/.ssh/id_ed25519
-
-# Local configuration (for current repository only)
-git ssh-config --local -k ~/.ssh/id_ed25519_work
-
-# Branch configuration (for current branch only)
 git ssh-config -b -k ~/.ssh/id_ed25519_project
-
-# Set identity along with key
-git ssh-config -k ~/.ssh/id_ed25519 -n "Work User" -e "work@example.com"
+git ssh-config --local -k ~/.ssh/id_ed25519_work
 
 # Show help
 git ssh-config -h
@@ -45,6 +48,12 @@ git ssh-config -h
 
 ## Options
 
+### Scope (as first argument)
+- `global` - Set configuration at global level (all repositories)
+- `local` - Set configuration at local level (current repository only, default)
+- `branch` - Set configuration at branch level (current branch only)
+
+### Command Options
 - `-k, --key <path>` - Specify SSH key path directly
 - `-n, --name <name>` - Set user name
 - `-e, --email <email>` - Set user email
@@ -54,11 +63,13 @@ git ssh-config -h
 - `-s, --show` - Show current SSH configuration (keys and identities)
 - `-r, --reset [scope]` - Reset SSH configuration to defaults
   - Scope can be: local, branch, or both (default)
+- `--no-identity` - Skip identity configuration
+- `-h, --help` - Show help message
+
+### Legacy Options (Deprecated)
 - `-g, --global` - Set configuration at global level (all repositories)
 - `-b, --branch` - Set configuration at branch level (current branch only)
 - `--local` - Set configuration at local level (current repository only, default)
-- `--no-identity` - Skip identity configuration
-- `-h, --help` - Show help message
 
 ## How It Works
 
@@ -237,7 +248,7 @@ Branch 'feature/task' SSH configuration reset to defaults
 
 ```bash
 # Global configuration
-git ssh-config -g -k ~/.ssh/id_rsa -n "Personal User" -e "personal@example.com"
+git ssh-config global -k ~/.ssh/id_rsa -n "Personal User" -e "personal@example.com"
 ```
 
 Output:
@@ -250,7 +261,7 @@ Email: personal@example.com
 
 ```bash
 # Local (repository) configuration
-git ssh-config --local -k ~/.ssh/id_ed25519_work -n "Work User" -e "work@company.com"
+git ssh-config local -k ~/.ssh/id_ed25519_work -n "Work User" -e "work@company.com"
 ```
 
 Output:
@@ -263,7 +274,7 @@ Email: work@company.com
 
 ```bash
 # Branch-specific configuration
-git ssh-config -b -k ~/.ssh/id_ed25519_project
+git ssh-config branch -k ~/.ssh/id_ed25519_project
 ```
 
 Output:
@@ -299,11 +310,11 @@ git chronogit
 
 ```bash
 # Set personal key globally (default for all repositories)
-git ssh-config -g -k ~/.ssh/id_personal
+git ssh-config global -k ~/.ssh/id_personal
 
 # Set work key for specific repositories
 cd ~/work/project
-git ssh-config -k ~/.ssh/id_work -n "Work Name" -e "work@company.com"
+git ssh-config local -k ~/.ssh/id_work -n "Work Name" -e "work@company.com"
 ```
 
 ### Project-Specific Keys
@@ -311,10 +322,10 @@ git ssh-config -k ~/.ssh/id_work -n "Work Name" -e "work@company.com"
 ```bash
 # Set different keys for different projects
 cd ~/projects/personal
-git ssh-config -k ~/.ssh/id_personal
+git ssh-config local -k ~/.ssh/id_personal
 
 cd ~/projects/client
-git ssh-config -k ~/.ssh/id_client
+git ssh-config local -k ~/.ssh/id_client
 ```
 
 ### Branch-Specific Identities
@@ -322,10 +333,10 @@ git ssh-config -k ~/.ssh/id_client
 ```bash
 # Use different identities for different branches
 git checkout feature/personal
-git ssh-config -b -k ~/.ssh/id_personal -n "Personal Name" -e "personal@example.com"
+git ssh-config branch -k ~/.ssh/id_personal -n "Personal Name" -e "personal@example.com"
 
 git checkout feature/work
-git ssh-config -b -k ~/.ssh/id_work -n "Work Name" -e "work@company.com"
+git ssh-config branch -k ~/.ssh/id_work -n "Work Name" -e "work@company.com"
 ```
 
 ## Related ChronoGit Commands
