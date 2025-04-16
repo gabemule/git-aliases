@@ -62,6 +62,37 @@ Your current branch must:
    - docs/ - For documentation
 2. Not have an existing PR to the target branch
 
+## Target Branch Selection
+
+The command determines the target branch options using a configuration hierarchy:
+
+1. **Branch Configuration** (highest priority)
+   - `git config branch.<branch-name>.defaultTarget`
+   - `git config branch.<branch-name>.workflow.defaultTarget`
+   - `git config branch.<branch-name>.mainBranch`
+   - `git config branch.<branch-name>.workflow.mainBranch`
+
+2. **Local Repository Configuration**
+   - `git config --local workflow.defaultTarget`
+   - `git config --local workflow.mainBranch`
+
+3. **Global User Configuration**
+   - `git config --global workflow.defaultTarget`
+   - `git config --global workflow.mainBranch`
+
+4. **ChronoGit Configuration** (fallback)
+   - `git config chronogit.defaultTarget`
+   - `git config chronogit.mainBranch`
+
+5. **Default Values** (if nothing else is configured)
+   - `development` for defaultTarget
+   - `production` for mainBranch
+
+The target branch menu will show:
+1. The default target branch (from configuration hierarchy)
+2. The main branch (if different from default target)
+3. An "other" option to specify a custom branch
+
 ## Interactive PR Creation
 
 ```bash
@@ -70,6 +101,7 @@ $ git open-pr
 Select the target branch for your PR:
 1) development
 2) production
+3) other
 ? 1
 Enter PR title: [PROJ-123] Add user authentication
 Enter PR description (press Ctrl+D when finished):
@@ -83,7 +115,11 @@ $ git pr
 Select the target branch for your PR:
 1) development
 2) production
-? 1
+3) other
+? 3
+Enter the target branch name: feature/experimental
+Warning: The branch 'feature/experimental' doesn't seem to exist in the remote repository.
+Continue anyway? (y/n): y
 Enter PR title: [PROJ-123] Add user authentication
 ✓ Opening PR in browser...
 ```
@@ -188,6 +224,14 @@ Current branch: main
 $ git pr -t invalid
 Invalid target branch: invalid
 Valid targets: development, production
+```
+
+### Branch Verification
+```bash
+$ git pr -t non-existent-branch
+Warning: The branch 'non-existent-branch' doesn't seem to exist in the remote repository.
+Continue anyway? (y/n): n
+Operation cancelled.
 ```
 
 ### Existing PR

@@ -31,6 +31,7 @@ git start-branch -t PROJ-123 -n user-authentication -b feature
 - `--current` - Create branch from current branch instead of main
 - `--no-sync` - Skip main branch sync (use with caution, see [Conflict Management](../workflow/best-practices.md#conflict-management))
 - `--no-stash` - Skip stashing changes (use with caution, see [Stash Pop Conflicts](../workflow/best-practices.md#3-stash-pop-conflicts))
+- `--no-ticket` - Skip ticket reference requirement (for branches without associated tickets)
 
 ## Branch Types
 
@@ -118,6 +119,14 @@ Select branch type: [Use arrow keys to select]
 Enter the name of the new task: fix login
 ✓ Successfully created and switched to new branch: bugfix/fix-login
 ✓ Associated ticket: PROJ-123
+```
+
+### Without Ticket (Experimental Branch)
+
+```bash
+$ git start --no-ticket -n "experimental-feature" -b feature
+✓ Successfully created and switched to new branch: feature/experimental-feature
+✓ No ticket associated with this branch.
 ```
 
 ## Error Handling

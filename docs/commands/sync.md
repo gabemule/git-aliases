@@ -70,13 +70,15 @@ This order ensures:
    - Automatic conflict detection
 
 3. **Conflict Handling**
-   - Automatic mergetool integration
+   - Conflict detection and resolution
    - Clear conflict status messages
    - Progress tracking
    - State preservation
 
 4. **Mergetool Integration**
-   - Automatically launches configured mergetool on conflicts
+   - Mergetool integration based on configuration
+   - If `workflow.mergetoolAuto` is set to "true", mergetool is launched automatically
+   - Otherwise, you'll need to resolve conflicts manually
    - Uses mergetool settings from chronogit configuration
    - Supports custom mergetool paths and arguments
 

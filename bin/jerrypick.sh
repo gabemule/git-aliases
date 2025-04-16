@@ -97,7 +97,7 @@ jerrypick() {
     while true; do
         clear
         echo -e "${BLUE}Recent commits in $source_branch:${NC}"
-        echo "Use j/k to navigate, Space to select/deselect, Enter to confirm"
+        echo "Use ↑/↓ to navigate, Space to select/deselect, Enter to confirm"
         for ((i=start; i<start+page_size && i<${#commits[@]}; i++)); do
             if [[ " ${selections[@]} " =~ " $i " ]]; then
                 mark="[x]"
@@ -242,16 +242,28 @@ select_option() {
             fi
         done
         
-        # Simple key reading
-        read -s -n 1 key
-        if [[ "$key" == "k" ]]; then
-            # Up
-            ((selected--))
-            [ $selected -lt 0 ] && selected=$((${#options[@]}-1))
-        elif [[ "$key" == "j" ]]; then
-            # Down
-            ((selected++))
-            [ $selected -ge ${#options[@]} ] && selected=0
+        # Read key
+        IFS= read -r -s -n1 key
+        
+        # Handle arrow keys (they send escape sequences)
+        if [[ $key == $'\e' ]]; then
+            # Read the next two characters
+            read -r -s -n1 key2
+            read -r -s -n1 key3
+            
+            # Process arrow keys
+            if [[ $key2 == "[" ]]; then
+                case $key3 in
+                    A)  # Up arrow
+                        ((selected--))
+                        [ $selected -lt 0 ] && selected=$((${#options[@]}-1))
+                        ;;
+                    B)  # Down arrow
+                        ((selected++))
+                        [ $selected -ge ${#options[@]} ] && selected=0
+                        ;;
+                esac
+            fi
         elif [[ "$key" == $'\n' || "$key" == "" ]]; then
             # Enter
             return $selected

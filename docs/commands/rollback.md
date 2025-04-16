@@ -57,11 +57,18 @@ Creating rollback branch...
 Rollback branch created: rollback/production_20230615_143022
 ```
 
-### 4. Automatic Conflict Resolution
-When conflicts occur during the rollback process, the configured mergetool is automatically launched:
+### 4. Conflict Resolution
+When conflicts occur during the rollback process, the behavior depends on the configuration:
+
+If `workflow.mergetoolAuto` is set to "true":
 ```bash
-Conflict detected in file: src/auth/login.js
-Launching configured mergetool...
+Conflicts detected. Launching mergetool...
+```
+
+Otherwise:
+```bash
+Conflicts detected during rollback.
+Rollback failed. Please resolve conflicts and run 'git rollback --continue'
 ```
 
 ## Interactive Usage
@@ -108,10 +115,8 @@ Error: Failed to fetch latest changes
 ### Revert Failed
 ```bash
 $ git rollback
-Error: Failed to revert changes
-Conflict detected. Launching configured mergetool...
-Please resolve conflicts using the mergetool.
-After resolving, run 'git rollback --continue'
+Conflicts detected during rollback.
+Rollback failed. Please resolve conflicts and run 'git rollback --continue'
 ```
 
 ### Push Failed
@@ -122,14 +127,22 @@ Error: Failed to push rollback branch
 
 ## Verification
 
-The command includes a verification step:
+The command includes a verification step that shows the changes to be reverted and checks if the rollback can be done without conflicts:
+
 ```bash
 Verifying changes...
 Changes to be reverted:
- M src/auth/login.js
- M src/styles/buttons.css
+[git diff output]
+
+# If the rollback branch is an ancestor of the main branch
 ✓ Clean rollback possible
+
+# Otherwise
+⚠️ Conflicts may occur during rollback
+Please review carefully
 ```
+
+This verification can be skipped with the `--skip-verify` option.
 
 ## Workflow Steps
 
@@ -138,11 +151,14 @@ Changes to be reverted:
    git rollback
    ```
 2. Select the commit to rollback to
-3. If conflicts occur, use the automatically launched mergetool to resolve them
-4. Continue the rollback process after conflict resolution:
-   ```bash
-   git rollback --continue
-   ```
+3. If there are no conflicts, the rollback will be completed automatically
+4. If there are conflicts:
+   - If `workflow.mergetoolAuto` is set to "true", the mergetool will be launched automatically
+   - Otherwise, you'll need to resolve conflicts manually
+   - After resolving conflicts, continue the process:
+     ```bash
+     git rollback --continue
+     ```
 5. Review the changes in the rollback branch
 6. Create a PR to merge the rollback:
    ```bash

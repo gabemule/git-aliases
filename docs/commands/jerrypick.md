@@ -16,6 +16,9 @@ git jerrypick
 # From a specific branch
 git jerrypick feature-branch
 
+# From a specific commit hash
+git jerrypick abc123f
+
 # Dry run mode
 git jerrypick --dry-run feature-branch
 ```
@@ -24,7 +27,9 @@ git jerrypick --dry-run feature-branch
 
 - `-h` - Show help message
 - `--dry-run` - Preview cherry-pick changes without applying them
+- `--debug` - Show debug information about commits and exit
 - `[source_branch]` - Specify the source branch for cherry-picking (optional)
+  - Can be a branch name or a commit hash
 
 ## Automatic Features
 
@@ -37,6 +42,8 @@ Available branches:
   bugfix/login-error
   develop
 ```
+
+Use the arrow keys (↑/↓) to navigate and Enter to select a branch.
 
 ### 2. Commit Selection with Pagination
 Displays commits from the selected branch with navigation:
@@ -57,11 +64,15 @@ abc123 - feat: add password reset functionality
 ghi789 - style: improve login form UI
 ```
 
-### 4. Automatic Conflict Resolution
-When conflicts occur during cherry-picking, the configured mergetool is automatically launched to assist in resolving conflicts:
+### 4. Conflict Resolution
+When conflicts occur during cherry-pick, options are provided to handle the conflict:
 ```bash
-Conflict detected in file: src/auth/password-reset.js
-Launching configured mergetool...
+Conflict detected while cherry-picking: abc123 - feat: add password reset functionality
+Options:
+  1) Continue (resolve conflicts manually)
+  2) Skip this commit
+  3) Abort cherry-pick
+Enter your choice (1-3):
 ```
 
 ## Interactive Usage
@@ -89,16 +100,40 @@ $ git jerrypick --dry-run feature/user-auth
 [DRY-RUN] Would cherry-pick: ghi789 style: improve login form UI
 ```
 
+### Debug Mode
+
+```bash
+$ git jerrypick --debug feature/user-auth
+Debug: Running git log for feature/user-auth
+Debug: End of git log output
+Debug: Number of commits found: 15
+Debug: Commit 0: abc123 - feat: add password reset functionality (2 days ago) by John Doe
+Debug: Commit 1: def456 - test: add unit tests for user authentication (3 days ago) by Jane Smith
+...
+```
+
+### Direct Commit Cherry-pick
+
+```bash
+$ git jerrypick abc123f
+Using commit: abc123f
+Cherry-picking: abc123 - feat: add password reset functionality (2 days ago) by John Doe
+Successfully applied commit to current branch.
+```
+
 ## Error Handling
 
 ### Cherry-pick Conflict
 ```bash
 $ git jerrypick
 Cherry-picking: abc123 - feat: add password reset functionality
-Conflict detected. Launching configured mergetool...
-Please resolve conflicts using the mergetool.
-After resolving, run 'git cherry-pick --continue'
-Or run 'git cherry-pick --abort' to cancel the operation
+Conflict detected while cherry-picking: abc123 - feat: add password reset functionality
+Options:
+  1) Continue (resolve conflicts manually)
+  2) Skip this commit
+  3) Abort cherry-pick
+Enter your choice (1-3): 1
+Please resolve conflicts manually and run 'git cherry-pick --continue' when done.
 ```
 
 ### Invalid Branch
@@ -115,8 +150,11 @@ Error: Branch 'non-existent-branch' does not exist
    ```
 2. Select the source branch (if not specified)
 3. Choose the commits to cherry-pick
-4. If conflicts occur, use the automatically launched mergetool to resolve them
-5. Continue the cherry-pick process after conflict resolution
+4. If conflicts occur:
+   - Choose to continue (resolve conflicts manually)
+   - Skip the conflicting commit
+   - Abort the cherry-pick process
+5. If continuing, resolve conflicts and run `git cherry-pick --continue`
 6. Commit the changes (if not in dry-run mode)
 
 ## Related ChronoGit Commands
