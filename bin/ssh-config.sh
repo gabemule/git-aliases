@@ -14,7 +14,12 @@ show_help() {
     echo "  -k, --key <path>      Specify SSH key path directly"
     echo "  -n, --name <name>     Set user name"
     echo "  -e, --email <email>   Set user email"
+    echo "  -i, --identity [scope] Configure only identity (name and email)"
+    echo "                        Scope can be: global, local, branch, or none for interactive"
     echo "  -l, --list            List available SSH keys"
+    echo "  -s, --show            Show current SSH configuration"
+    echo "  -r, --reset [scope]   Reset SSH configuration to defaults"
+    echo "                        Scope can be: local, branch, or both (default)"
     echo "  -g, --global          Set configuration at global level (all repositories)"
     echo "  -b, --branch          Set configuration at branch level (current branch only)"
     echo "      --local           Set configuration at local level (current repository only, default)"
@@ -24,6 +29,14 @@ show_help() {
     echo "Examples:"
     echo "  git ssh-config                   # Interactive SSH key selection (local scope)"
     echo "  git ssh-config -l                # List available SSH keys"
+    echo "  git ssh-config -s                # Show current SSH configuration"
+    echo "  git ssh-config -i                # Configure identity interactively"
+    echo "  git ssh-config -i global         # Configure global identity"
+    echo "  git ssh-config -i local          # Configure local identity"
+    echo "  git ssh-config -i branch         # Configure branch identity"
+    echo "  git ssh-config -r                # Reset both local and branch SSH configuration"
+    echo "  git ssh-config -r local          # Reset only local SSH configuration"
+    echo "  git ssh-config -r branch         # Reset only branch SSH configuration"
     echo "  git ssh-config -g -k ~/.ssh/id_ed25519  # Set global SSH key"
     echo "  git ssh-config -b -k ~/.ssh/id_ed25519_project  # Set branch-specific SSH key"
     echo "  git ssh-config -k ~/.ssh/id_ed25519_work -n \"Work User\" -e \"work@example.com\""
@@ -109,13 +122,26 @@ show_ssh_config() {
     # Get current branch
     local current_branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null)
     
-    # Get configurations
+    # Get SSH configurations
     local global_ssh=$(git config --global core.sshCommand)
     local local_ssh=$(git config --local core.sshCommand 2>/dev/null)
     local branch_ssh=""
     
     if [ -n "$current_branch" ]; then
         branch_ssh=$(git config "branch.$current_branch.sshCommand" 2>/dev/null)
+    fi
+    
+    # Get identity configurations
+    local global_name=$(git config --global user.name)
+    local global_email=$(git config --global user.email)
+    local local_name=$(git config --local user.name 2>/dev/null)
+    local local_email=$(git config --local user.email 2>/dev/null)
+    local branch_name=""
+    local branch_email=""
+    
+    if [ -n "$current_branch" ]; then
+        branch_name=$(git config "branch.$current_branch.user.name" 2>/dev/null)
+        branch_email=$(git config "branch.$current_branch.user.email" 2>/dev/null)
     fi
     
     # Determine effective value based on precedence
@@ -136,11 +162,14 @@ show_ssh_config() {
         effective_source="default"
     fi
     
+    # Extract key paths
     local global_key=$([ -n "$global_ssh" ] && extract_key_path "$global_ssh" || echo "Not set")
     local local_key=$([ -n "$local_ssh" ] && extract_key_path "$local_ssh" || echo "Not set")
     local branch_key=$([ -n "$branch_ssh" ] && extract_key_path "$branch_ssh" || echo "Not set")
     local effective_key=$([ "$effective_source" != "default" ] && extract_key_path "$effective_value" || echo "Not set")
     
+    # Display SSH keys
+    echo -e "${BLUE}SSH Keys:${NC}"
     echo -e "  Global:    ${YELLOW}${global_key}${NC}"
     echo -e "  Local:     ${YELLOW}${local_key}${NC}"
     
@@ -152,6 +181,43 @@ show_ssh_config() {
     
     echo -e "  Effective: ${GREEN}${effective_key}${NC} (${effective_source})"
     echo
+    
+    # Display identities
+    echo -e "${BLUE}Identities:${NC}"
+    echo -e "  Global:    ${YELLOW}${global_name:-Not set}${NC} <${YELLOW}${global_email:-Not set}${NC}>"
+    echo -e "  Local:     ${YELLOW}${local_name:-Not set}${NC} <${YELLOW}${local_email:-Not set}${NC}>"
+    
+    if [ -n "$current_branch" ]; then
+        echo -e "  Branch:    ${YELLOW}${branch_name:-Not set}${NC} <${YELLOW}${branch_email:-Not set}${NC}> (${current_branch})"
+    else
+        echo -e "  Branch:    ${YELLOW}Not in a branch${NC}"
+    fi
+    
+    # Determine effective identity
+    local effective_name=""
+    local effective_email=""
+    local effective_identity_source=""
+    
+    if [ -n "$branch_name" ] && [ -n "$branch_email" ]; then
+        effective_name="$branch_name"
+        effective_email="$branch_email"
+        effective_identity_source="branch"
+    elif [ -n "$local_name" ] && [ -n "$local_email" ]; then
+        effective_name="$local_name"
+        effective_email="$local_email"
+        effective_identity_source="local"
+    elif [ -n "$global_name" ] && [ -n "$global_email" ]; then
+        effective_name="$global_name"
+        effective_email="$global_email"
+        effective_identity_source="global"
+    else
+        effective_name="Not set"
+        effective_email="Not set"
+        effective_identity_source="default"
+    fi
+    
+    echo -e "  Effective: ${GREEN}${effective_name}${NC} <${GREEN}${effective_email}${NC}> (${effective_identity_source})"
+    echo
 }
 
 # Function to select configuration scope
@@ -162,11 +228,6 @@ select_scope() {
     if [ -n "$default_scope" ]; then
         scope=$default_scope
     else
-        echo -e "${BLUE}Select configuration scope:${NC}"
-        echo "1) Global (all repositories)"
-        echo "2) Local (current repository only)"
-        echo "3) Branch (current branch only)"
-        echo
         read -p "Select scope (1-3) [2]: " scope_choice
         
         case ${scope_choice:-2} in
@@ -338,14 +399,55 @@ configure_identity() {
     echo "Email: $email"
 }
 
+# Function to reset local SSH configuration
+reset_local_ssh_config() {
+    echo -e "${BLUE}Resetting local SSH configuration...${NC}"
+    
+    # Unset local SSH command
+    git config --local --unset core.sshCommand
+    
+    # Unset local identity
+    git config --local --unset user.name
+    git config --local --unset user.email
+    
+    echo -e "${GREEN}Local SSH configuration reset to defaults${NC}"
+    return 0
+}
+
+# Function to reset branch SSH configuration
+reset_branch_ssh_config() {
+    local current_branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null)
+    
+    if [ -z "$current_branch" ]; then
+        echo -e "${RED}Not in a branch${NC}"
+        return 1
+    fi
+    
+    echo -e "${BLUE}Resetting branch '$current_branch' SSH configuration...${NC}"
+    
+    # Unset branch SSH command
+    git config --unset "branch.$current_branch.sshCommand"
+    
+    # Unset branch identity
+    git config --unset "branch.$current_branch.user.name"
+    git config --unset "branch.$current_branch.user.email"
+    
+    echo -e "${GREEN}Branch '$current_branch' SSH configuration reset to defaults${NC}"
+    return 0
+}
+
 # Initialize variables
 key_path=""
 user_name=""
 user_email=""
 list_only=false
 skip_identity=false
+identity_only=false
+identity_scope=""
 scope=""
 show_current=false
+reset_config=false
+reset_scope=""
 
 # Parse command line arguments
 while [[ $# -gt 0 ]]; do
@@ -364,6 +466,15 @@ while [[ $# -gt 0 ]]; do
         -e|--email)
             user_email="$2"
             shift 2
+            ;;
+        -i|--identity)
+            identity_only=true
+            # Check if next argument is a valid identity scope
+            if [[ "$2" == "global" || "$2" == "local" || "$2" == "branch" ]]; then
+                identity_scope="$2"
+                shift
+            fi
+            shift
             ;;
         -l|--list)
             list_only=true
@@ -387,6 +498,17 @@ while [[ $# -gt 0 ]]; do
             ;;
         -s|--show)
             show_current=true
+            shift
+            ;;
+        -r|--reset)
+            reset_config=true
+            # Check if next argument is a valid reset scope
+            if [[ "$2" == "local" || "$2" == "branch" || "$2" == "both" ]]; then
+                reset_scope="$2"
+                shift
+            else
+                reset_scope="both"
+            fi
             shift
             ;;
         *)
@@ -426,9 +548,66 @@ if [ "$list_only" = true ]; then
     exit 0
 fi
 
+# Reset configuration if requested
+if [ "$reset_config" = true ]; then
+    case "$reset_scope" in
+        "local")
+            # Reset only local configuration
+            reset_local_ssh_config
+            ;;
+        "branch")
+            # Reset only branch configuration
+            reset_branch_ssh_config
+            ;;
+        *)
+            # Reset both local and branch configuration
+            reset_local_ssh_config
+            reset_branch_ssh_config
+            ;;
+    esac
+    exit 0
+fi
+
+# Function to display scope options
+display_scope_options() {
+    echo -e "${BLUE}Select configuration scope:${NC}"
+    echo -e "1) ${GREEN}Global${NC} - Apply to all repositories (saved in ~/.gitconfig)"
+    echo -e "2) ${GREEN}Local${NC}  - Apply to current repository only (saved in .git/config)"
+    
+    # Get current branch
+    local current_branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null)
+    if [ -n "$current_branch" ]; then
+        echo -e "3) ${GREEN}Branch${NC} - Apply to current branch '${YELLOW}${current_branch}${NC}' only"
+    else
+        echo -e "3) ${GREEN}Branch${NC} - Apply to current branch only"
+    fi
+    
+    echo
+}
+
+# Configure identity only if requested
+if [ "$identity_only" = true ]; then
+    # If no scope specified, prompt for it
+    if [ -z "$identity_scope" ]; then
+        # Display scope descriptions
+        display_scope_options
+        
+        # Call select_scope
+        identity_scope=$(select_scope "")
+    fi
+    
+    # Configure identity
+    configure_identity "$user_name" "$user_email" "$identity_scope"
+    exit 0
+fi
+
 # If no scope specified, prompt for it
 if [ -z "$scope" ]; then
-    scope=$(select_scope "local")
+    # Display scope descriptions
+    display_scope_options
+    
+    # Call select_scope
+    scope=$(select_scope "")
 fi
 
 # Configure SSH key
@@ -438,7 +617,7 @@ if [ -n "$key_path" ] || [ -z "$user_name" ] && [ -z "$user_email" ]; then
         if [ "$skip_identity" = false ]; then
             # Check if we should prompt for identity
             if [ -z "$user_name" ] && [ -z "$user_email" ]; then
-                local prompt_identity=$(get_config workflow.ssh.promptIdentity)
+                prompt_identity=$(get_config workflow.ssh.promptIdentity)
                 if [ "$prompt_identity" = "true" ]; then
                     configure_identity "" "" "$scope"
                 fi

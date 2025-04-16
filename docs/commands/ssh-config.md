@@ -11,8 +11,21 @@ git ssh-config
 # List available SSH keys
 git ssh-config -l
 
-# Show current SSH configuration
+# Show current SSH configuration (keys and identities)
 git ssh-config -s
+
+# Configure only identity (name and email)
+git ssh-config -i
+
+# Configure identity for specific scope
+git ssh-config -i global
+git ssh-config -i local
+git ssh-config -i branch
+
+# Reset SSH configuration to defaults
+git ssh-config -r                # Reset both local and branch
+git ssh-config -r local          # Reset only local
+git ssh-config -r branch         # Reset only branch
 
 # Global configuration (for all repositories)
 git ssh-config -g -k ~/.ssh/id_ed25519
@@ -35,8 +48,12 @@ git ssh-config -h
 - `-k, --key <path>` - Specify SSH key path directly
 - `-n, --name <name>` - Set user name
 - `-e, --email <email>` - Set user email
+- `-i, --identity [scope]` - Configure only identity (name and email)
+  - Scope can be: global, local, branch, or none for interactive
 - `-l, --list` - List available SSH keys
-- `-s, --show` - Show current SSH configuration
+- `-s, --show` - Show current SSH configuration (keys and identities)
+- `-r, --reset [scope]` - Reset SSH configuration to defaults
+  - Scope can be: local, branch, or both (default)
 - `-g, --global` - Set configuration at global level (all repositories)
 - `-b, --branch` - Set configuration at branch level (current branch only)
 - `--local` - Set configuration at local level (current repository only, default)
@@ -115,10 +132,17 @@ Output:
 ```
 Current SSH Configuration:
 
+SSH Keys:
   Global:    /home/user/.ssh/id_rsa
   Local:     /home/user/.ssh/id_ed25519_work
   Branch:    Not set (feature/task)
   Effective: /home/user/.ssh/id_ed25519_work (local)
+
+Identities:
+  Global:    Personal User <personal@example.com>
+  Local:     Work User <work@company.com>
+  Branch:    Not set <Not set> (feature/task)
+  Effective: Work User <work@company.com> (local)
 ```
 
 ### List Available Keys
@@ -134,6 +158,79 @@ Available SSH Keys:
 /home/user/.ssh/id_rsa (ED25519) - personal@example.com
 /home/user/.ssh/id_ed25519_work (ED25519) - work@company.com
 /home/user/.ssh/id_ed25519_project (ED25519) - project@organization.com
+```
+
+### Configure Identity Only
+
+```bash
+# Configure identity interactively
+git ssh-config -i
+```
+
+Output:
+```
+Select configuration scope:
+1) Global - Apply to all repositories (saved in ~/.gitconfig)
+2) Local  - Apply to current repository only (saved in .git/config)
+3) Branch - Apply to current branch 'feature/task' only
+
+Select scope (1-3) [2]: 1
+Configure Identity for Repository
+
+Name [Current User]: Personal User
+Email [user@example.com]: personal@example.com
+Global identity configured
+Name: Personal User
+Email: personal@example.com
+```
+
+```bash
+# Configure identity for specific scope
+git ssh-config -i global -n "Personal User" -e "personal@example.com"
+```
+
+Output:
+```
+Global identity configured
+Name: Personal User
+Email: personal@example.com
+```
+
+### Reset Configuration
+
+```bash
+# Reset both local and branch configurations
+git ssh-config -r
+```
+
+Output:
+```
+Resetting local SSH configuration...
+Local SSH configuration reset to defaults
+Resetting branch 'feature/task' SSH configuration...
+Branch 'feature/task' SSH configuration reset to defaults
+```
+
+```bash
+# Reset only local configuration
+git ssh-config -r local
+```
+
+Output:
+```
+Resetting local SSH configuration...
+Local SSH configuration reset to defaults
+```
+
+```bash
+# Reset only branch configuration
+git ssh-config -r branch
+```
+
+Output:
+```
+Resetting branch 'feature/task' SSH configuration...
+Branch 'feature/task' SSH configuration reset to defaults
 ```
 
 ### Direct Configuration Examples
