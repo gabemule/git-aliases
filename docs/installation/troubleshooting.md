@@ -286,6 +286,52 @@ winget install GitHub.cli  # Windows
 gh auth login
 ```
 
+## Windows-Specific Issues
+
+### "bash: command not found"
+
+**Problem**: Windows doesn't have bash installed by default
+
+**Solution**:
+```bash
+# Option 1: Use Git Bash (comes with Git for Windows)
+# Run all commands from Git Bash terminal
+
+# Option 2: Install WSL (Windows Subsystem for Linux)
+# Follow instructions at https://docs.microsoft.com/en-us/windows/wsl/install
+```
+
+### Path Issues in Windows
+
+**Problem**: Incorrect path format in Windows
+
+**Check**:
+```bash
+# Check the path in .gitconfig
+git config --get include.path
+```
+
+**Solution**:
+```cmd
+# Re-add configuration with correct path format
+echo [include]>> %USERPROFILE%\.gitconfig
+echo     path = %CD%\.gitconfig>> %USERPROFILE%\.gitconfig
+
+# Verify it worked
+git config --get include.path
+```
+
+### Script Execution Policy in PowerShell
+
+**Problem**: Scripts can't be executed due to execution policy
+
+**Solution**:
+```
+# Run Git Bash as administrator or use CMD instead of PowerShell
+# If you must use PowerShell, temporarily change execution policy:
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+```
+
 ## Verification Steps
 
 Run these checks to verify your setup:
