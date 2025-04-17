@@ -7,6 +7,7 @@ Get started with ChronoGit quickly and easily.
 Before installing ChronoGit, ensure you have:
 
 1. Git installed and configured
+
    ```bash
    git --version
    ```
@@ -16,21 +17,47 @@ Before installing ChronoGit, ensure you have:
    gh --version
    ```
 
+## Important Note
+
+⚠️ **IMPORTANT**: Execute the commands in the exact order shown below. Configuring aliases before cloning the repository can cause configuration issues.
+
 ## Quick Install
 
+### 1. Clone repository
+
 ```bash
-# 1. Clone repository
 git clone https://github.com/your-username/chronogit.git
 cd chronogit
+```
 
-# 2. Configure git aliases
-# For Unix/Linux/macOS:
+### 2. Configure git aliases
+
+- #### For Unix/Linux/macOS:
+
+```bash
 echo -e "[include]\n    path = $(pwd)/.gitconfig" >> ~/.gitconfig && git config --get include.path >/dev/null && echo "✓ Git aliases configured successfully" || echo "✗ Configuration failed"
+```
 
-# For Windows (CMD):
-echo [include]>> %USERPROFILE%\.gitconfig && echo     path = %CD%\.gitconfig>> %USERPROFILE%\.gitconfig && git config --get include.path >nul 2>&1 && echo ✓ Git aliases configured successfully || echo ✗ Configuration failed
+- #### For Windows (PowerShell):
 
-# 3. Verify installation
+```bash
+git config --global include.path "$pwd\.gitconfig"
+if ($?) {
+    Write-Host "✓ Git aliases configured successfully"
+} else {
+    Write-Host "✗ Configuration failed - See troubleshooting guide for help"
+}
+```
+
+- #### For Windows (CMD):
+
+```bash
+powershell -Command "git config --global include.path \"$pwd\.gitconfig\"; if ($?) { Write-Host \"✓ Git aliases configured successfully\" } else { Write-Host \"✗ Configuration failed - See troubleshooting guide for help\" }"
+```
+
+### 3. Verify installation
+
+```bash
 git test -v
 ```
 
@@ -61,12 +88,21 @@ echo -e "[include]\n    path = $(pwd)/.gitconfig" >> ~/.gitconfig
 git config --get include.path
 ```
 
+#### Windows (PowerShell)
+
+```powershell
+# Add configuration
+git config --global include.path "$pwd\.gitconfig"
+
+# Verify configuration
+git config --get include.path
+```
+
 #### Windows (CMD)
 
 ```cmd
-# Add configuration to .gitconfig
-echo [include]>> %USERPROFILE%\.gitconfig
-echo     path = %CD%\.gitconfig>> %USERPROFILE%\.gitconfig
+# Add configuration
+powershell -Command "git config --global include.path \"%CD%\.gitconfig\""
 
 # Verify configuration
 git config --get include.path
@@ -155,6 +191,7 @@ See our [Troubleshooting Guide](troubleshooting.md) for solutions to:
 - Permission denied errors
 - GitHub CLI issues
 - Configuration problems
+- Windows-specific issues (including backup and restore procedures)
 
 ## Next Steps
 
