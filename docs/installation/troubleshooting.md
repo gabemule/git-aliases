@@ -22,6 +22,7 @@ chmod +x /path/to/chronogit/bin/*.sh
 **Problem**: Commands like `git cc` not found
 
 **Check**:
+
 ```bash
 # Verify git config include
 git config --get include.path
@@ -31,6 +32,7 @@ cat ~/.gitconfig
 ```
 
 **Solution**:
+
 ```bash
 # Re-add configuration
 echo -e "[include]\n    path = $(pwd)/.gitconfig" >> ~/.gitconfig
@@ -39,17 +41,59 @@ echo -e "[include]\n    path = $(pwd)/.gitconfig" >> ~/.gitconfig
 git config --get include.path
 ```
 
+### Windows Git Config Issues
+
+**Problem**: "fatal: bad config line" or configuration not working in Windows
+
+**Solution (PowerShell)**:
+
+```powershell
+# 1. Backup existing config
+if (Test-Path "$env:USERPROFILE\.gitconfig") {
+    Copy-Item "$env:USERPROFILE\.gitconfig" "$env:USERPROFILE\.gitconfig.bak" -Force
+    Write-Host "✓ Backup created at $env:USERPROFILE\.gitconfig.bak"
+}
+
+# 2. Remove existing config
+Remove-Item "$env:USERPROFILE\.gitconfig" -Force -ErrorAction SilentlyContinue
+
+# 3. Create new config
+New-Item -Path "$env:USERPROFILE\.gitconfig" -ItemType File -Force
+
+# 4. Add configuration
+git config --global include.path "$pwd\.gitconfig"
+
+# 5. Verify configuration
+git config --get include.path
+
+# If configuration failed, restore backup:
+if (-not $?) {
+    if (Test-Path "$env:USERPROFILE\.gitconfig.bak") {
+        Copy-Item "$env:USERPROFILE\.gitconfig.bak" "$env:USERPROFILE\.gitconfig" -Force
+        Write-Host "✓ Original configuration restored from backup"
+    }
+}
+```
+
+**Solution (CMD)**:
+
+```cmd
+powershell -Command "if (Test-Path \"$env:USERPROFILE\.gitconfig\") { Copy-Item \"$env:USERPROFILE\.gitconfig\" \"$env:USERPROFILE\.gitconfig.bak\" -Force; Write-Host \"✓ Backup created at $env:USERPROFILE\.gitconfig.bak\" }; Remove-Item \"$env:USERPROFILE\.gitconfig\" -Force -ErrorAction SilentlyContinue; New-Item -Path \"$env:USERPROFILE\.gitconfig\" -ItemType File -Force; git config --global include.path \"%CD%\.gitconfig\"; if (-not $?) { if (Test-Path \"$env:USERPROFILE\.gitconfig.bak\") { Copy-Item \"$env:USERPROFILE\.gitconfig.bak\" \"$env:USERPROFILE\.gitconfig\" -Force; Write-Host \"✓ Original configuration restored from backup\" } }"
+```
+
 ### Script Permissions
 
 **Problem**: "Permission denied" when running commands
 
 **Check**:
+
 ```bash
 # Check permissions
 ls -l bin/*.sh
 ```
 
 **Solution**:
+
 ```bash
 # Fix permissions
 chmod +x bin/*.sh
@@ -64,6 +108,7 @@ ls -l bin/*.sh
 **Problem**: PR creation fails
 
 **Check**:
+
 ```bash
 # Check installation
 gh --version
@@ -73,10 +118,14 @@ gh auth status
 ```
 
 **Solution**:
+
 ```bash
 # Install GitHub CLI
 brew install gh  # macOS
+
 winget install GitHub.cli  # Windows
+# or
+choco install git # Windows (contains Git and Github CLI)
 
 # Authenticate
 gh auth login
@@ -89,6 +138,7 @@ gh auth login
 **Problem**: Branch creation fails
 
 **Check**:
+
 ```bash
 # Check current branch
 git branch
@@ -98,6 +148,7 @@ git status
 ```
 
 **Solution**:
+
 ```bash
 # Stash changes
 git stash
@@ -114,6 +165,7 @@ git stash pop
 **Problem**: Commit fails
 
 **Check**:
+
 ```bash
 # Check staged files
 git status
@@ -123,6 +175,7 @@ git log -1
 ```
 
 **Solution**:
+
 ```bash
 # Stage files
 git add .
@@ -139,6 +192,7 @@ git log -1
 **Problem**: PR creation fails
 
 **Check**:
+
 ```bash
 # Check branch
 git branch
@@ -148,6 +202,7 @@ git remote -v
 ```
 
 **Solution**:
+
 ```bash
 # Push branch
 git push origin feature/task
@@ -163,12 +218,14 @@ git pr -t development
 **Problem**: Wrong main branch
 
 **Check**:
+
 ```bash
 # Check configuration
 git config workflow.mainBranch
 ```
 
 **Solution**:
+
 ```bash
 # Set main branch
 git config workflow.mainBranch main
@@ -182,12 +239,14 @@ git config workflow.mainBranch
 **Problem**: Missing ticket references
 
 **Check**:
+
 ```bash
 # Check branch ticket
 git config branch.$(git rev-parse --abbrev-ref HEAD).ticket
 ```
 
 **Solution**:
+
 ```bash
 # Set ticket
 git config branch.$(git rev-parse --abbrev-ref HEAD).ticket PROJ-123
@@ -203,6 +262,7 @@ git config branch.$(git rev-parse --abbrev-ref HEAD).ticket
 **Problem**: Tests failing
 
 **Check**:
+
 ```bash
 # Run verification
 git test -v
@@ -212,6 +272,7 @@ git test -v
 ```
 
 **Solution**:
+
 ```bash
 # Fix permissions
 chmod +x tests/**/*.sh
@@ -225,6 +286,7 @@ git test -v
 **Problem**: Files not found
 
 **Check**:
+
 ```bash
 # Check current directory
 pwd
@@ -234,6 +296,7 @@ ls -la
 ```
 
 **Solution**:
+
 ```bash
 # Use full paths
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -247,6 +310,7 @@ source "$SCRIPT_DIR/common.sh"
 **Problem**: Git commands fail
 
 **Solution**:
+
 ```bash
 # Check if in git repo
 git rev-parse --git-dir
@@ -263,6 +327,7 @@ git remote add origin <url>
 **Problem**: Can't execute scripts
 
 **Solution**:
+
 ```bash
 # Fix script permissions
 chmod +x bin/*.sh
@@ -277,6 +342,7 @@ ls -l bin/*.sh
 **Problem**: PR creation fails
 
 **Solution**:
+
 ```bash
 # Install GitHub CLI
 brew install gh  # macOS
@@ -293,6 +359,7 @@ gh auth login
 **Problem**: Windows doesn't have bash installed by default
 
 **Solution**:
+
 ```bash
 # Option 1: Use Git Bash (comes with Git for Windows)
 # Run all commands from Git Bash terminal
@@ -306,12 +373,14 @@ gh auth login
 **Problem**: Incorrect path format in Windows
 
 **Check**:
+
 ```bash
 # Check the path in .gitconfig
 git config --get include.path
 ```
 
 **Solution**:
+
 ```cmd
 # Re-add configuration with correct path format
 echo [include]>> %USERPROFILE%\.gitconfig
@@ -326,6 +395,7 @@ git config --get include.path
 **Problem**: Scripts can't be executed due to execution policy
 
 **Solution**:
+
 ```
 # Run Git Bash as administrator or use CMD instead of PowerShell
 # If you must use PowerShell, temporarily change execution policy:
@@ -355,11 +425,13 @@ git config workflow.mainBranch
 If you're still having issues:
 
 1. Run verification tests:
+
    ```bash
    git test -v
    ```
 
 2. Check documentation:
+
    - [Installation Guide](README.md)
    - [Command Reference](../commands/README.md)
    - [Configuration Guide](../configuration/README.md)
