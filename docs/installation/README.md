@@ -67,13 +67,13 @@ git test -v
 
 ```bash
 # Using HTTPS
-git clone https://github.com/your-username/chronogit.git
+git clone https://github.com/Akad-Seguros/front-git-aliases.git
 
 # Using SSH
-git clone git@github.com:your-username/chronogit.git
+git clone git@github.com:Akad-Seguros/front-git-aliases.git
 
 # Change to directory
-cd chronogit
+cd front-git-aliases
 ```
 
 ### 2. Configure Git Aliases
