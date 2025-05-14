@@ -26,8 +26,8 @@ Before installing ChronoGit, ensure you have:
 ### 1. Clone repository
 
 ```bash
-git clone https://github.com/your-username/chronogit.git
-cd chronogit
+git clone git@github.com:Akad-Seguros/front-git-aliases.git
+cd front-git-aliases
 ```
 
 ### 2. Configure git aliases
@@ -67,13 +67,13 @@ git test -v
 
 ```bash
 # Using HTTPS
-git clone https://github.com/your-username/chronogit.git
+git clone https://github.com/Akad-Seguros/front-git-aliases.git
 
 # Using SSH
-git clone git@github.com:your-username/chronogit.git
+git clone git@github.com:Akad-Seguros/front-git-aliases.git
 
 # Change to directory
-cd chronogit
+cd front-git-aliases
 ```
 
 ### 2. Configure Git Aliases

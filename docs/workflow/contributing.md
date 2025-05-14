@@ -6,8 +6,8 @@ Thank you for considering contributing to ChronoGit! This guide will help you ge
 
 ```bash
 # 1. Fork and clone
-git clone https://github.com/your-username/chronogit.git
-cd chronogit
+git clone git@github.com:Akad-Seguros/front-git-aliases.git
+cd front-git-aliases
 
 # 2. Install
 echo -e "[include]\n    path = $(pwd)/.gitconfig" >> ~/.gitconfig
@@ -43,8 +43,8 @@ git pr
 
 2. Clone your fork:
    ```bash
-   git clone https://github.com/your-username/chronogit.git
-   cd chronogit
+   git clone git@github.com:Akad-Seguros/front-git-aliases.git
+   cd front-git-aliases
    ```
 
 3. Configure git aliases:
